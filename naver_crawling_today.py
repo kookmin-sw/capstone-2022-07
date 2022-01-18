@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from audioop import mul
+import multiprocessing
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 import requests
@@ -8,13 +10,6 @@ from multiprocessing import Manager, Pool, freeze_support  # Pool import하기
 import time
 import itertools
 
-
-"""
-< naver 뉴스 검색시 리스트 크롤링하는 프로그램 > _select사용
-- 크롤링 해오는 것 : 링크,제목,신문사,날짜,내용요약본
-- 날짜,내용요약본  -> 정제 작업 필요
-- 리스트 -> 딕셔너리 -> df -> 엑셀로 저장 
-"""
 
 url_stock = "http://api.seibro.or.kr/openapi/service/StockSvc/getKDRSecnInfo"  # 공공데이터포털 api 주소(Without param)
 api_service_key_stock = "RXhGWArdgsytKaKf0g%2FWxNuo27wXxg4iChLUs9ePc39VvneddFbQ9v9ZXCDWJkdFbhqCvbw9kdMGy%2F%2Bv3it50A%3D%3D"  # service api key
@@ -187,8 +182,9 @@ def run():
     url_list = m.list()
     result_dict = m.dict()
 
-    print(company)
-    with Pool(processes=8) as pool:
+    process = multiprocessing.cpu_count() * 2
+    # print(company)
+    with Pool(processes=process) as pool:
         pool.starmap(
             crawler, [(title_list, url_list, result_dict, query) for query in company]
         )
