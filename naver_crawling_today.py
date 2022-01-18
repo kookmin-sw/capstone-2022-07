@@ -12,10 +12,12 @@ import itertools
 
 
 url_stock = "http://api.seibro.or.kr/openapi/service/StockSvc/getKDRSecnInfo"  # 공공데이터포털 api 주소(Without param)
-api_service_key_stock = "RXhGWArdgsytKaKf0g%2FWxNuo27wXxg4iChLUs9ePc39VvneddFbQ9v9ZXCDWJkdFbhqCvbw9kdMGy%2F%2Bv3it50A%3D%3D"  # service api key
-api_decode_key_stock = requests.utils.unquote(
-    api_service_key_stock, encoding="utf-8"
-)  # api decode code
+api_service_key_stock = [
+    "RXhGWArdgsytKaKf0g%2FWxNuo27wXxg4iChLUs9ePc39VvneddFbQ9v9ZXCDWJkdFbhqCvbw9kdMGy%2F%2Bv3it50A%3D%3D",
+    "bqvyeN8k%2B8%2BfRLf7p4CNQsUIEL%2BRb4b2YR08MD10RDv3BxHugq6bR1wFEAo8hTau3XgiLcA7bEBoclnMdyBfNQ%3D%3D",
+    "zUgkw3obrruAXAW6kZrJnIpK8UUBIrwXrfroSgoDS7NUlSB%2BDz94OTIkkWeP0V%2BzOz81JVtW84bqh1y0HpzcUg%3D%3D",
+    "w9Ra19Zqn3%2BLgg2zHoRiZa8zZPdSCXSgFgrgFGUkaYqqQRD6BVKMsUgiRyJqeEuG1pQ86vSioq03IRarAve7sg%3D%3D",
+]  # service api key
 
 # 각 크롤링 결과 저장하기 위한 리스트 선언
 title_text = []
@@ -56,24 +58,32 @@ def getStockCode(market, url_param):
     url_base = f"http://api.seibro.or.kr/openapi/service/{url_param}"
     url_spec = "getShotnByMartN1"
     url = url_base + "/" + url_spec
-    api_key_decode = requests.utils.unquote(api_decode_key_stock, encoding="utf-8")
+    stock_code = 0
+    while True:
+        api_decode_key_stock = requests.utils.unquote(
+            api_service_key_stock[stock_code], encoding="utf-8"
+        )
 
-    params = {
-        "serviceKey": api_key_decode,
-        "pageNo": 1,
-        "numOfRows": 100000,
-        "martTpcd": market,
-    }
+        params = {
+            "serviceKey": api_decode_key_stock,
+            "pageNo": 1,
+            "numOfRows": 100000,
+            "martTpcd": market,
+        }
 
-    response = requests.get(url, params=params)
-    # print(response.text)
-    xml = BeautifulSoup(response.text, "lxml")
-    items = xml.find("items")
-    item_list = []
-    for item in items:
-        item_list.append(item.find("korsecnnm").text.strip())
+        response = requests.get(url, params=params)
+        print(response.text)
+        xml = BeautifulSoup(response.text, "lxml")
+        items = xml.find("items")
+        item_list = []
+        try:
+            for item in items:
+                item_list.append(item.find("korsecnnm").text.strip())
+        except TypeError:
+            stock_code += 1
+            continue
 
-    return item_list
+        return item_list
 
 
 # 날짜 정제화 함수
@@ -138,7 +148,10 @@ def crawler(title_list, url_list, result_dict, query):
             + str(page)
         )
 
-        response = requests.get(url)
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36"
+        }
+        response = requests.get(url, headers=headers)
         html = response.text
 
         # 뷰티풀소프의 인자값 지정
@@ -165,6 +178,7 @@ def crawler(title_list, url_list, result_dict, query):
             contents_cleansing(contents_list)  # 본문요약 정제화
 
         page += 10
+        # print(response.text)
 
 
 def run():
