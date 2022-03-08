@@ -27,7 +27,7 @@ This project aims to build a system that notifies users of of stocks that are sh
 <img src="https://user-images.githubusercontent.com/28581806/157243525-8ec4b6ff-a358-4039-b176-43f854b53c8e.png" width="300" height="300">
 
 ```markdown
-🐯 \*\*\*\*1664
+🐯 ****1664
 📧 ijkoo16@kookmin.ac.kr
 📌 UI/UX 디자인, 크롤링 모델 구현
 ```
@@ -37,7 +37,7 @@ This project aims to build a system that notifies users of of stocks that are sh
 <img src = "https://user-images.githubusercontent.com/28581806/157243453-d16c9a94-9a85-4807-82bf-616ab19b36a0.png" width="300px" height="300px">
 
 ```markdown
-🐮 \*\*\*\*1660
+🐮 ****1660
 📧 Email: lkm9709@kookmin.ac.kr
 📌
 ```
@@ -47,7 +47,7 @@ This project aims to build a system that notifies users of of stocks that are sh
 <img src = "https://user-images.githubusercontent.com/28581806/157242024-c557b7e8-d1ab-499e-9f92-8f4e40aa4ff8.jpeg" width="300px" height="300px">
 
 ```markdown
-🐯 \*\*\*\*1667
+🐯 ****1667
 📧 Email: juns519@kookmin.ac.kr
 📌
 ```
@@ -55,7 +55,7 @@ This project aims to build a system that notifies users of of stocks that are sh
 <img src = "https://user-images.githubusercontent.com/28581806/157245315-08383b96-17d7-4d6b-a057-2e75c6ddb1e5.jpeg" width="300px" height="300px">
 
 ```markdown
-🐭 \*\*\*\*1672
+🐭 ****1672
 📧 Email: hyeong3642@kookmin.ac.kr
 📌
 ```
