@@ -9,6 +9,7 @@ import re
 from multiprocessing import Manager, Pool, freeze_support  # Pool import하기
 import time
 import itertools
+import pickle
 
 
 url_stock = "http://api.seibro.or.kr/openapi/service/StockSvc/getKDRSecnInfo"  # 공공데이터포털 api 주소(Without param)
@@ -72,7 +73,7 @@ def getStockCode(market, url_param):
         }
 
         response = requests.get(url, params=params)
-        print(response.text)
+        # print(response.text)
         xml = BeautifulSoup(response.text, "lxml")
         items = xml.find("items")
         item_list = []
@@ -200,7 +201,7 @@ def run():
     # print(company)
     with Pool(processes=process) as pool:
         pool.starmap(
-            crawler, [(title_list, url_list, result_dict, query) for query in company]
+            crawler, [(title_list, url_list, result_dict, query) for query in company[:2]]
         )
         pool.close()
         pool.join()
@@ -210,11 +211,12 @@ def run():
         "title": title_list,
         "urls": url_list,
     }
-    print(dict["title"])
-    print(len(title_list))
-    print(len(url_list))
-    print(f"{end - start:.5f} sec")
 
+    print(f"{end - start:.5f} sec")
+    print(dict)
+
+    with open('user.pkl','wb') as fw:
+        pickle.dump(dict, fw)
 
 if __name__ == "__main__":
     run()
