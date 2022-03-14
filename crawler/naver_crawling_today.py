@@ -122,7 +122,8 @@ def contents_cleansing(contents):
     contents_text.append(third_cleansing_contents)
 
 
-def crawler(title_list, url_list, temp_list, result_dict, query):
+# def crawler(title_list, url_list, temp_list, result_dict, query):
+def crawler(tuple_list, query):
     # s_from = s_date.replace(".","")
     # e_to = e_date.replace(".","")
     s_date = now.strftime("%Y.%m.%d.%H.%M")
@@ -131,7 +132,7 @@ def crawler(title_list, url_list, temp_list, result_dict, query):
     page = 1
     maxpage = 1
     
-    pov_or_neg = 0 #긍부정 라벨링 값
+
 
 
     # 11= 2페이지 21=3페이지 31=4페이지  ...81=9페이지 , 91=10페이지, 101=11페이지
@@ -162,28 +163,41 @@ def crawler(title_list, url_list, temp_list, result_dict, query):
         # 뷰티풀소프의 인자값 지정
         soup = BeautifulSoup(html, "html.parser")
 
+
         # <a>태그에서 제목과 링크주소 추출
+        # 기사 제목, 기사url 저장 
         atags = soup.select(".news_tit")
         for atag in atags:
-            title_text.append(atag.text)  # 제목
-            link_text.append(atag["href"])  # 링크주소
-            title_list.append(atag.text)
-            url_list.append(atag["href"])
+            # title_text.append(atag.text)  # 제목
+            # link_text.append(atag["href"])  # 링크주소
+            # title_list.append(atag.text)
+            # url_list.append(atag["href"])
             print(atag.text)
+            pov_or_neg = 0 #긍부정 라벨링 값
 
-            temp_list.append((query, atag.text, atag["href"]))
+
+            # TODO
+            """
+            긍부정 판별 코드 추가 필요
+
+            긍부정 판별 변수   pov_or neg로 저장
+            + tuple_list에 추가
+            tuple_list.append((query, atag.text, atag["href"], pov_or_neg))
+            """
+
+            tuple_list.append((query, atag.text, atag["href"]))
 
         # 날짜 추출
-        date_lists = soup.select(".info_group > span.info")
-        for date_list in date_lists:
-            # 1면 3단 같은 위치 제거
-            if date_list.text.find("면") == -1:
-                date_text.append(date_list.text)
+        # date_lists = soup.select(".info_group > span.info")
+        # for date_list in date_lists:
+        #     # 1면 3단 같은 위치 제거
+        #     if date_list.text.find("면") == -1:
+        #         date_text.append(date_list.text)
 
-        # 본문요약본
-        contents_lists = soup.select(".news_dsc")
-        for contents_list in contents_lists:
-            contents_cleansing(contents_list)  # 본문요약 정제화
+        # # 본문요약본
+        # contents_lists = soup.select(".news_dsc")
+        # for contents_list in contents_lists:
+        #     contents_cleansing(contents_list)  # 본문요약 정제화
 
         page += 10
         # print(response.text)
@@ -203,36 +217,32 @@ def run():
 
     pool = Pool(4)
     m = Manager()
-    title_list = m.list()
-    url_list = m.list()
-    temp_list = m.list()
-    result_dict = m.dict()
+
+    # title_list = m.list()
+    # url_list = m.list()
+    # result_dict = m.dict()
+
+
+    tuple_list = m.list()
+
 
     process = multiprocessing.cpu_count() * 2
     # print(company)
     with Pool(processes=process) as pool:
         pool.starmap(
-            crawler, [(title_list, url_list, temp_list, result_dict, query) for query in company[:40]]
+            crawler, [(tuple_list, query) for query in company[:40]]
+            # crawler, [(title_list, url_list, temp_list, result_dict, query) for query in company[:40]]
+
         )
         pool.close()
         pool.join()
 
     end = time.time()
-    dict = {
-        "title": title_list,
-        "urls": url_list,
-    }
 
-    print(f"{end - start:.5f} sec")
-    print(dict)
-
-    for i in temp_list:
-        print(i)
-
-    with open('test.csv', 'w') as f:
-        writer = csv.writer(f , lineterminator='\n')
-        for tup in temp_list:
-            writer.writerow(tup)
+    # dict = {
+    #     "title": title_list,
+    #     "urls": url_list,
+    # }
 
     # with open('user.pkl','wb') as f:
     #     pickle.dump(dict, f)
@@ -241,6 +251,19 @@ def run():
     #     data = pickle.load(f)
     # print(data["title"])
     # print(dict["title"])
+
+    print(f"{end - start:.5f} sec")
+
+    for i in tuple_list:
+        print(i)
+
+    #tuple to csv 저장
+    with open('test.csv', 'w') as f:
+        writer = csv.writer(f , lineterminator='\n')
+        for tup in tuple_list:
+            writer.writerow(tup)
+
+
 
 if __name__ == "__main__":
     run()
