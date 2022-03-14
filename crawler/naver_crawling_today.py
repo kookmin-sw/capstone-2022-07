@@ -121,7 +121,7 @@ def contents_cleansing(contents):
     contents_text.append(third_cleansing_contents)
 
 
-def crawler(title_list, url_list, result_dict, query):
+def crawler(title_list, url_list, temp_list, result_dict, query):
     # s_from = s_date.replace(".","")
     # e_to = e_date.replace(".","")
     s_date = now.strftime("%Y.%m.%d.%H.%M")
@@ -129,6 +129,9 @@ def crawler(title_list, url_list, result_dict, query):
     e_date = yesterday.strftime("%Y.%m.%d.%H.%M")
     page = 1
     maxpage = 1
+    
+    pov_or_neg = 0 #긍부정 라벨링 값
+
 
     # 11= 2페이지 21=3페이지 31=4페이지  ...81=9페이지 , 91=10페이지, 101=11페이지
     maxpage_t = (int(maxpage) - 1) * 10 + 1
@@ -166,6 +169,8 @@ def crawler(title_list, url_list, result_dict, query):
             title_list.append(atag.text)
             url_list.append(atag["href"])
 
+            temp_list.append((atag.text, atag["href"]))
+
         # 날짜 추출
         date_lists = soup.select(".info_group > span.info")
         for date_list in date_lists:
@@ -181,6 +186,8 @@ def crawler(title_list, url_list, result_dict, query):
         page += 10
         # print(response.text)
 
+        temp_list.append(query)
+
 
 def run():
 
@@ -195,13 +202,14 @@ def run():
     m = Manager()
     title_list = m.list()
     url_list = m.list()
+    temp_list = m.list()
     result_dict = m.dict()
 
     process = multiprocessing.cpu_count() * 2
     # print(company)
     with Pool(processes=process) as pool:
         pool.starmap(
-            crawler, [(title_list, url_list, result_dict, query) for query in company[:2]]
+            crawler, [(title_list, url_list, temp_list, result_dict, query) for query in company[:2]]
         )
         pool.close()
         pool.join()
@@ -215,8 +223,16 @@ def run():
     print(f"{end - start:.5f} sec")
     print(dict)
 
-    with open('user.pkl','wb') as fw:
-        pickle.dump(dict, fw)
+    for i in temp_list:
+        print(i)
+
+    # with open('user.pkl','wb') as f:
+    #     pickle.dump(dict, f)
+    
+    # with open('user.pkl', 'rb') as f:
+    #     data = pickle.load(f)
+    # print(data["title"])
+    # print(dict["title"])
 
 if __name__ == "__main__":
     run()
