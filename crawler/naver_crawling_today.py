@@ -10,6 +10,7 @@ from multiprocessing import Manager, Pool, freeze_support  # Pool import하기
 import time
 import itertools
 import pickle
+import csv
 
 
 url_stock = "http://api.seibro.or.kr/openapi/service/StockSvc/getKDRSecnInfo"  # 공공데이터포털 api 주소(Without param)
@@ -168,8 +169,9 @@ def crawler(title_list, url_list, temp_list, result_dict, query):
             link_text.append(atag["href"])  # 링크주소
             title_list.append(atag.text)
             url_list.append(atag["href"])
+            print(atag.text)
 
-            temp_list.append((atag.text, atag["href"]))
+            temp_list.append((query, atag.text, atag["href"]))
 
         # 날짜 추출
         date_lists = soup.select(".info_group > span.info")
@@ -186,7 +188,8 @@ def crawler(title_list, url_list, temp_list, result_dict, query):
         page += 10
         # print(response.text)
 
-        temp_list.append(query)
+        # temp_list.append(query)
+
 
 
 def run():
@@ -209,7 +212,7 @@ def run():
     # print(company)
     with Pool(processes=process) as pool:
         pool.starmap(
-            crawler, [(title_list, url_list, temp_list, result_dict, query) for query in company[:2]]
+            crawler, [(title_list, url_list, temp_list, result_dict, query) for query in company[:40]]
         )
         pool.close()
         pool.join()
@@ -225,6 +228,11 @@ def run():
 
     for i in temp_list:
         print(i)
+
+    with open('test.csv', 'w') as f:
+        writer = csv.writer(f , lineterminator='\n')
+        for tup in temp_list:
+            writer.writerow(tup)
 
     # with open('user.pkl','wb') as f:
     #     pickle.dump(dict, f)
