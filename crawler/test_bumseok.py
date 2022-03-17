@@ -116,7 +116,7 @@ def search_crawl(urll):
 
 
 cospi = getStockCode(11, "StockSvc")
-print(cospi)
+# print(cospi)
 cosdak = getStockCode(12, "StockSvc")
 cospi = [
     "동화약품",
@@ -1089,4 +1089,7 @@ def run():
 
 
 if __name__ == "__main__":
-    run()
+    # run()
+    data = search("카카오")
+    print(data)
+    
