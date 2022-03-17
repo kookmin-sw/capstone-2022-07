@@ -49,6 +49,13 @@ dev_dependencies:
   line_icons: ^2.0.0
   badges: ^2.0.2
 
+  # Firebase dependencies
+  firebase_core: ^1.13.1
+  firebase_auth: ^3.3.11
+  cloud_firestore: ^3.1.10
+  firebase_messaging: ^11.2.11
+  firebase_storage: ^10.2.9
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

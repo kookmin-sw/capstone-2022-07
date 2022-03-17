@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Animation/fade_animation.dart';
 import 'package:flutter_application_1/Components/nav_bar.dart';
 import 'package:flutter_application_1/main.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LoginScreen extends StatefulWidget {
   LoginScreen({Key? key}) : super(key: key);
@@ -159,7 +160,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   border: Border.all(color: Colors.white),
                 ),
                 child: OutlinedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    FirebaseFirestore.instance.collection("stock").add({
+                      'name': "test",
+                      'lower': 100000,
+                      'upper': '99999999',
+                      'volume': 1
+                    });
+                  },
                   child: Text(
                     "Apple로 로그인",
                     style: TextStyle(
