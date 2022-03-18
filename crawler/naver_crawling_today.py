@@ -180,12 +180,9 @@ def crawler(tuple_list, query):
             """
             긍부정 판별 코드 추가 필요
 
-            긍부정 판별 변수   pov_or neg로 저장
-            + tuple_list에 추가
-            tuple_list.append((query, atag.text, atag["href"], pov_or_neg))
+            긍부정 판별 변수   
+            pov_or neg로 저장
             """
-
-            
 
         # 날짜 추출
         date_lists = soup.select(".info_group > span.info")
@@ -226,6 +223,14 @@ def api_search(tuple_list, stock):
         # print(type(temp))
         # for index, item in enumerate(temp['items']):
         #     print(index+1, item['title'], item['link'], item['description'],item['pubDate'])
+
+        # TODO
+        """
+        긍부정 판별 코드 추가 필요
+
+        긍부정 판별 변수   
+        pov_or neg로 저장
+        """
 
         for dict in temp['items']:
             tuple_list.append((stock,dict['title'],dict['originallink'],dict['description'],dict['pubDate'],pov_or_neg))
