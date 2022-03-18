@@ -237,7 +237,7 @@ def api_search(tuple_list, stock):
         #         w.writerow(i.values())
         # print(temp['items'])
     else:
-        print("Error Code:" + res.status_code+" Stock name is "+stock)
+        print("Error Code:" + str(res.status_code)+" Stock name is "+ str(stock))
 
 
 def run():
@@ -262,7 +262,7 @@ def run():
     with Pool(processes=process) as pool:
         pool.starmap(
             # crawler, [(tuple_list, query) for query in company[:40]] ###### 크롤링 함수 사용시
-            api_search, [(tuple_list, query) for query in company[:10]] ###### api 함수 사용시
+            api_search, [(tuple_list, query) for query in company] ###### api 함수 사용시
         )
         pool.close()
         pool.join()
@@ -284,18 +284,14 @@ def run():
 
     """
 
-
+    print("끝 : 걸린시간 : ")
     print(f"{end - start:.5f} sec")
-
-    for i in tuple_list:
-        print(i)
 
     #tuple to csv 저장
     with open('news.csv', 'w') as f:
         writer = csv.writer(f , lineterminator='\n')
         for tup in tuple_list:
             writer.writerow(tup)
-
 
 
 if __name__ == "__main__":
