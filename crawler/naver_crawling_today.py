@@ -253,24 +253,27 @@ def run():
 
     start = time.time()
 
-    pool = Pool(4)
-    m = Manager()
+    # pool = Pool(4)
+    # m = Manager()
 
     # title_list = m.list()
     # url_list = m.list()
     # result_dict = m.dict()
 
-    tuple_list = m.list()
+    # tuple_list = m.list()
 
-    process = multiprocessing.cpu_count() * 2
-    # print(company)
-    with Pool(processes=process) as pool:
-        pool.starmap(
-            # crawler, [(tuple_list, query) for query in company[:40]] ###### 크롤링 함수 사용시
-            api_search, [(tuple_list, query) for query in company] ###### api 함수 사용시
-        )
-        pool.close()
-        pool.join()
+    # process = multiprocessing.cpu_count() * 2
+    # # print(company)
+    # with Pool(processes=process) as pool:
+    #     pool.starmap(
+    #         # crawler, [(tuple_list, query) for query in company[:40]] ###### 크롤링 함수 사용시
+    #         api_search, [(tuple_list, query) for query in company] ###### api 함수 사용시
+    #     )
+    #     pool.close()
+    #     pool.join()
+    tuple_list=[]
+    for query in company:
+        api_search(tuple_list, query) ###### api 함수 사용시
 
     end = time.time()
     """ pickle 내보내기 
