@@ -179,13 +179,9 @@ def crawler(tuple_list, query):
             # TODO
             """
             긍부정 판별 코드 추가 필요
-
-            긍부정 판별 변수   pov_or neg로 저장
-            + tuple_list에 추가
-            tuple_list.append((query, atag.text, atag["href"], pov_or_neg))
+            긍부정 판별 변수   
+            pov_or neg로 저장
             """
-
-            
 
         # 날짜 추출
         date_lists = soup.select(".info_group > span.info")
@@ -227,6 +223,13 @@ def api_search(tuple_list, stock):
         # for index, item in enumerate(temp['items']):
         #     print(index+1, item['title'], item['link'], item['description'],item['pubDate'])
 
+        # TODO
+        """
+        긍부정 판별 코드 추가 필요
+        긍부정 판별 변수   
+        pov_or neg로 저장
+        """
+
         for dict in temp['items']:
             tuple_list.append((stock,dict['title'],dict['originallink'],dict['description'],dict['pubDate'],pov_or_neg))
 
@@ -237,7 +240,7 @@ def api_search(tuple_list, stock):
         #         w.writerow(i.values())
         # print(temp['items'])
     else:
-        print("Error Code:" + res.status_code+" Stock name is "+stock)
+        print("Error Code:" + str(res.status_code)+" Stock name is "+ str(stock))
 
 
 def run():
@@ -262,7 +265,7 @@ def run():
     with Pool(processes=process) as pool:
         pool.starmap(
             # crawler, [(tuple_list, query) for query in company[:40]] ###### 크롤링 함수 사용시
-            api_search, [(tuple_list, query) for query in company[:10]] ###### api 함수 사용시
+            api_search, [(tuple_list, query) for query in company] ###### api 함수 사용시
         )
         pool.close()
         pool.join()
@@ -273,7 +276,6 @@ def run():
         "title": title_list,
         "urls": url_list,
     }
-
     with open('user.pkl','wb') as f:
         pickle.dump(dict, f)
     
@@ -281,21 +283,16 @@ def run():
         data = pickle.load(f)
     print(data["title"])
     print(dict["title"])
-
     """
 
-
+    print("끝 : 걸린시간 : ")
     print(f"{end - start:.5f} sec")
-
-    for i in tuple_list:
-        print(i)
 
     #tuple to csv 저장
     with open('news.csv', 'w') as f:
         writer = csv.writer(f , lineterminator='\n')
         for tup in tuple_list:
             writer.writerow(tup)
-
 
 
 if __name__ == "__main__":
