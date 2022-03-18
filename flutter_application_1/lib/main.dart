@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/init.dart';
 import 'package:flutter_application_1/screens/login_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
         }
         if (snapshot.connectionState == ConnectionState.done) {
           return MaterialApp(
-            home: LoginScreen(),
+            home: Init(),
           );
         } else {
           return Center(
