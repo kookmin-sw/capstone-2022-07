@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "157946043793",
+    "project_id": "capstone-2022-07-dac76",
+    "storage_bucket": "capstone-2022-07-dac76.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:157946043793:android:1b92d1fb6032d7e85dce30",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application_1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "157946043793-0verik00hi8s14cfr0pk5mvlddf7mqrv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSMyw-8lKmzk9um2VQBGHOa33rOmSkFdY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "157946043793-0verik00hi8s14cfr0pk5mvlddf7mqrv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
