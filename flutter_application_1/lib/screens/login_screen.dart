@@ -3,8 +3,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Animation/fade_animation.dart';
 import 'package:flutter_application_1/Components/nav_bar.dart';
+import 'package:flutter_application_1/Signin/function.dart';
 import 'package:flutter_application_1/main.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginScreen extends StatefulWidget {
   LoginScreen({Key? key}) : super(key: key);
@@ -195,7 +197,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   border: Border.all(color: Colors.white),
                 ),
                 child: OutlinedButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    await signInWithGoogle();
+                    print(FirebaseAuth.instance.currentUser);
+                  },
                   child: Text(
                     "Google 계정으로 로그인",
                     style: TextStyle(
