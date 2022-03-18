@@ -3,7 +3,9 @@ import requests
 from bs4 import BeautifulSoup
 import time
 import urllib.request
+from urllib.parse import urlparse
 from multiprocessing import Pool, freeze_support  # Pool import하기
+import csv
 
 url = "http://api.seibro.or.kr/openapi/service/StockSvc/getKDRSecnInfo"  # 공공데이터포털 api 주소(Without param)
 api_service_key_stock = "RXhGWArdgsytKaKf0g%2FWxNuo27wXxg4iChLUs9ePc39VvneddFbQ9v9ZXCDWJkdFbhqCvbw9kdMGy%2F%2Bv3it50A%3D%3D"  # service api key
@@ -12,8 +14,8 @@ api_decode_key_stock = requests.utils.unquote(
 )  # api decode code
 
 # Naver client key
-client_id_search = "4NnYXQRzNVwTEO2_rwpd"
-client_secret_search = "mZP8JBDOBK"
+client_id= "4NnYXQRzNVwTEO2_rwpd"
+client_secret = "mZP8JBDOBK"
 
 
 # 시간 측정 함수
@@ -63,20 +65,17 @@ def getStockCode(market, url_param):
 
 # 네이버 api 이용해서 기사 가져오는 코드
 def search(stock):
-    encText = urllib.parse.quote(stock)  # 검색할 키워드
-    url = (
-        "https://openapi.naver.com/v1/search/news?query=" + encText
-    )  # json 결과가 필요할 때 사용
-    # url = "https://openapi.naver.com/v1/search/news.xml?query=" + encText # xml 결과가 필요할 때 사용
-
+    encText = urllib.parse.quote(stock)
+    url = "https://openapi.naver.com/v1/search/news.json?query=" + encText # json 결과
+    # url = "https://openapi.naver.com/v1/search/blog.xml?query=" + encText # xml 결과
     request = urllib.request.Request(url)
-    request.add_header("X-Naver-Client-Id", client_id_search)
-    request.add_header("X-Naver-Client-Secret", client_secret_search)
+    request.add_header("X-Naver-Client-Id",client_id)
+    request.add_header("X-Naver-Client-Secret",client_secret)
     response = urllib.request.urlopen(request)
     rescode = response.getcode()
-    if rescode == 200:
+    if(rescode==200):
         response_body = response.read()
-        return response_body.decode("utf-8")
+        print(response_body.decode('utf-8'))
     else:
         print("Error Code:" + rescode)
 
@@ -1090,6 +1089,6 @@ def run():
 
 if __name__ == "__main__":
     # run()
-    data = search("카카오")
-    print(data)
+   search("카카오")
+
     

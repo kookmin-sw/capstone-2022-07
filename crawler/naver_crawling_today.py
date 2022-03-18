@@ -11,7 +11,7 @@ import time
 import itertools
 import pickle
 import csv
-
+import urllib.request
 
 url_stock = "http://api.seibro.or.kr/openapi/service/StockSvc/getKDRSecnInfo"  # 공공데이터포털 api 주소(Without param)
 api_service_key_stock = [
@@ -133,8 +133,6 @@ def crawler(tuple_list, query):
     maxpage = 1
     
 
-
-
     # 11= 2페이지 21=3페이지 31=4페이지  ...81=9페이지 , 91=10페이지, 101=11페이지
     maxpage_t = (int(maxpage) - 1) * 10 + 1
 
@@ -153,7 +151,6 @@ def crawler(tuple_list, query):
             + "&nso=so%3Ar%2Cp%3A&start="
             + str(page)
         )
-
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36"
         }
@@ -163,19 +160,22 @@ def crawler(tuple_list, query):
         # 뷰티풀소프의 인자값 지정
         soup = BeautifulSoup(html, "html.parser")
 
+        atags = soup.select(".news_tit")
+        news_name =""
+        news_date =""
+        news_url = ""
+        pov_or_neg = 0 #긍부정 라벨링 값
 
         # <a>태그에서 제목과 링크주소 추출
         # 기사 제목, 기사url 저장 
-        atags = soup.select(".news_tit")
         for atag in atags:
             # title_text.append(atag.text)  # 제목
             # link_text.append(atag["href"])  # 링크주소
             # title_list.append(atag.text)
             # url_list.append(atag["href"])
-            print(atag.text)
-            pov_or_neg = 0 #긍부정 라벨링 값
-
-
+            news_name = atag.text
+            news_url = atag["href"]
+            
             # TODO
             """
             긍부정 판별 코드 추가 필요
@@ -185,14 +185,17 @@ def crawler(tuple_list, query):
             tuple_list.append((query, atag.text, atag["href"], pov_or_neg))
             """
 
-            tuple_list.append((query, atag.text, atag["href"]))
+            
 
         # 날짜 추출
-        # date_lists = soup.select(".info_group > span.info")
-        # for date_list in date_lists:
-        #     # 1면 3단 같은 위치 제거
-        #     if date_list.text.find("면") == -1:
-        #         date_text.append(date_list.text)
+        date_lists = soup.select(".info_group > span.info")
+        for date_list in date_lists:
+            # 1면 3단 같은 위치 제거
+            if date_list.text.find("면") == -1:
+                # date_text.append(date_list.text)
+                news_date=date_list.text
+
+        tuple_list.append((query, news_name, news_url, news_date, pov_or_neg))
 
         # # 본문요약본
         # contents_lists = soup.select(".news_dsc")
@@ -200,14 +203,44 @@ def crawler(tuple_list, query):
         #     contents_cleansing(contents_list)  # 본문요약 정제화
 
         page += 10
-        # print(response.text)
 
-        # temp_list.append(query)
 
+# Naver client key
+client_id= "4NnYXQRzNVwTEO2_rwpd"
+client_secret = "mZP8JBDOBK"
+def api_search(tuple_list, stock):
+    url = 'https://openapi.naver.com/v1/search/news.json' 
+    header = {'X-Naver-Client-Id':client_id, 'X-Naver-Client-Secret':client_secret} 
+    param = {'query':stock, 'display':5, 'start':1, 'sort':'date'} 
+    # query     : 검색할 단어
+    # display   : 검색 출력 건수 (기본 10 / 최대 100)
+    # start     : 검색 시작 위치 (기본 1  / 최대 1000)
+    # sort      : 정렬순서      (기본 sim : 유사도 / date : 날짜)
+    res = requests.get(url, params=param, headers=header)
+
+    pov_or_neg = 0 #긍부정 라벨링 값
+
+    if res.status_code == 200:
+        temp = res.json()
+
+        # print(type(temp))
+        # for index, item in enumerate(temp['items']):
+        #     print(index+1, item['title'], item['link'], item['description'],item['pubDate'])
+
+        for dict in temp['items']:
+            tuple_list.append((stock,dict['title'],dict['originallink'],dict['description'],dict['pubDate'],pov_or_neg))
+
+        # with open('test_api.csv','w') as f:
+        #     w = csv.writer(f)
+        #     for i in temp['items']:
+        #         i['name']=stock
+        #         w.writerow(i.values())
+        # print(temp['items'])
+    else:
+        print("Error Code:" + res.status_code+" Stock name is "+stock)
 
 
 def run():
-
     temp = list()
     temp.append(getStockCode(11, "StockSvc"))
     temp.append(getStockCode(12, "StockSvc"))
@@ -222,35 +255,35 @@ def run():
     # url_list = m.list()
     # result_dict = m.dict()
 
-
     tuple_list = m.list()
-
 
     process = multiprocessing.cpu_count() * 2
     # print(company)
     with Pool(processes=process) as pool:
         pool.starmap(
-            crawler, [(tuple_list, query) for query in company[:40]]
-            # crawler, [(title_list, url_list, temp_list, result_dict, query) for query in company[:40]]
-
+            # crawler, [(tuple_list, query) for query in company[:40]] ###### 크롤링 함수 사용시
+            api_search, [(tuple_list, query) for query in company[:10]] ###### api 함수 사용시
         )
         pool.close()
         pool.join()
 
     end = time.time()
+    """ pickle 내보내기 
+    dict = {
+        "title": title_list,
+        "urls": url_list,
+    }
 
-    # dict = {
-    #     "title": title_list,
-    #     "urls": url_list,
-    # }
-
-    # with open('user.pkl','wb') as f:
-    #     pickle.dump(dict, f)
+    with open('user.pkl','wb') as f:
+        pickle.dump(dict, f)
     
-    # with open('user.pkl', 'rb') as f:
-    #     data = pickle.load(f)
-    # print(data["title"])
-    # print(dict["title"])
+    with open('user.pkl', 'rb') as f:
+        data = pickle.load(f)
+    print(data["title"])
+    print(dict["title"])
+
+    """
+
 
     print(f"{end - start:.5f} sec")
 
@@ -258,7 +291,7 @@ def run():
         print(i)
 
     #tuple to csv 저장
-    with open('test.csv', 'w') as f:
+    with open('news.csv', 'w') as f:
         writer = csv.writer(f , lineterminator='\n')
         for tup in tuple_list:
             writer.writerow(tup)
