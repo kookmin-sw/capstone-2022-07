@@ -74,9 +74,10 @@ def date_clean(inputdate):
 def text_clean(inputString):
     # inputString = inputString.replace("<b>","").replace("</b>","") # html 태그 제거  ## <b> <b/>
     inputString = re.sub(r'\<[^)]*\>', '', inputString, 0).strip() # <> 안의 내용 제거  ## html태그 + 종목명
-    inputString = re.sub('[-=+,#/\?:^.@*\"※~ㆍ!』‘|\(\)\[\]`\'…》\”\“\’·]', '', inputString) # 특수문자 제거
+    inputString = re.sub('[-=+,#/\?:^.@*\"※~ㆍ!』‘|\(\)\[\]`\'…》\”\“\’·]', ' ', inputString) # 특수문자 제거
+    inputString = inputString.replace("&quot;"," ").replace("amp;","").replace("&gt; "," ").replace("&lt;"," ")
+    inputString = ' '.join(inputString.split())
     
-
     return inputString
 
 # 기사 날짜 전처리 함수
