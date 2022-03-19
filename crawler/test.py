@@ -8,6 +8,8 @@ import requests
 from collections import OrderedDict
 import time
 from tqdm import tqdm
+import re 
+import datetime
 
 cospi = [
     "동화약품",
@@ -999,10 +1001,31 @@ def api(list, stock):
     else:
         print("Error Code:" + str(res.status_code)+" Stock name is "+str(stock))
 
-if __name__ == "__main__":
-    temp_list=[]
-    start = time.time()
-    for i in tqdm(cospi):
-        api(temp_list, i)
 
-    print(time.time() - start)
+def text_clean(inputString):
+    inputString = re.sub(r'\<[^)]*\>', '', inputString, 0).strip() # html 태그 제거
+    inputString = re.sub('[-=+,#/\?:^.@*\"※~ㆍ!』‘|\(\)\[\]`\'…》\”\“\’·]', '', inputString) # 특수문자 제거
+
+    return inputString
+
+if __name__ == "__main__":
+    # temp_list=[]
+    # start = time.time()
+    # for i in tqdm(cospi):
+    #     api(temp_list, i)
+
+    # print(time.time() - start)
+    # prd_names = "[동영상] <b>하이트진로</b>, 실적 모멘텀 기대에 주가 상승"
+    # prd_names = text_clean(prd_names)
+    # print("last " +prd_names)
+
+    test = "Tue, 14 Oct 2008 06:58:00 +0900"
+    month =["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    temp = test.split()
+
+
+    str_datetime = '2021-07-18 12:15:33'
+    format = '%a, '
+    dt_datetime = datetime.datetime.strptime(test,format)
+
+    a =  test.strftime("%Y%m%d")
