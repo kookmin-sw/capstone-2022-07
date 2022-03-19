@@ -1008,6 +1008,13 @@ def text_clean(inputString):
 
     return inputString
 
+def dateformat_change(date):
+    format ='%a, %d %b %Y %H:%M:%S %z'
+    date = datetime.datetime.strptime(date, format) # str to datetime
+    date = date.strftime("%Y-%m-%d %H:%M:%S") # changing datetime format
+    
+    return date
+
 if __name__ == "__main__":
     # temp_list=[]
     # start = time.time()
@@ -1018,14 +1025,22 @@ if __name__ == "__main__":
     # prd_names = "[동영상] <b>하이트진로</b>, 실적 모멘텀 기대에 주가 상승"
     # prd_names = text_clean(prd_names)
     # print("last " +prd_names)
+    prd_names = "[동영상] <b>하이트진로</b>, 실적 모멘텀 기대에 주가 상승"
+    prd_names = text_clean(prd_names)
+    print("last " +prd_names)
 
-    test = "Tue, 14 Oct 2008 06:58:00 +0900"
     month =["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-    temp = test.split()
 
 
     str_datetime = '2021-07-18 12:15:33'
-    format = '%a, '
-    dt_datetime = datetime.datetime.strptime(test,format)
+    format = '%Y-%m-%d %H:%M:%S'
 
-    a =  test.strftime("%Y%m%d")
+
+    test       = 'Tue, 08 Feb 2022 18:12:00 +0900'
+    
+    test = dateformat_change(test)
+
+
+    print(test)
+
+  

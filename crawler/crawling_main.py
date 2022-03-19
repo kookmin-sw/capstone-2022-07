@@ -5,7 +5,7 @@ import re
 import time
 import itertools
 import csv
-
+import datetime
 
 # 시간 측정 함수
 def logging_time(original_fn):
@@ -70,12 +70,22 @@ def getStockCode(market, url_param):
 def date_clean(inputdate):
     print()
 
-
+# 기사 제목 전처리 함수
 def text_clean(inputString):
-    inputString = inputString.replace("<b>","").replace("</b>","") # html 태그 제거
+    # inputString = inputString.replace("<b>","").replace("</b>","") # html 태그 제거  ## <b> <b/>
+    inputString = re.sub(r'\<[^)]*\>', '', inputString, 0).strip() # <> 안의 내용 제거  ## html태그 + 종목명
     inputString = re.sub('[-=+,#/\?:^.@*\"※~ㆍ!』‘|\(\)\[\]`\'…》\”\“\’·]', '', inputString) # 특수문자 제거
+    
 
     return inputString
+
+# 기사 날짜 전처리 함수
+def formatting_date(date):
+    format ='%a, %d %b %Y %H:%M:%S %z'
+    date = datetime.datetime.strptime(date, format) # str to datetime
+    date = date.strftime("%Y-%m-%d %H:%M:%S") # changing datetime format
+    
+    return date
 
 # Naver client key
 client_id= "4NnYXQRzNVwTEO2_rwpd"
@@ -85,7 +95,7 @@ client_secret = "mZP8JBDOBK"
 def api_search(tuple_list, stock):
     url = 'https://openapi.naver.com/v1/search/news.json' 
     header = {'X-Naver-Client-Id':client_id, 'X-Naver-Client-Secret':client_secret} 
-    param = {'query':stock, 'display':100, 'start':1, 'sort':'date'} 
+    param = {'query':stock, 'display':10, 'start':1, 'sort':'date'} 
     # query     : 검색할 단어
     # display   : 검색 출력 건수 (기본 10 / 최대 100)
     # start     : 검색 시작 위치 (기본 1  / 최대 1000)
@@ -108,13 +118,11 @@ def api_search(tuple_list, stock):
         pov_or neg로 저장
         """
 
-        
-        s = time.time()
         for dict in temp['items']:
-
             title  = text_clean(dict['title'])
-            tuple_list.append((stock ,title ,dict['originallink'] ,dict['pubDate'] ,pov_or_neg))
-        #print(time.time()-s)
+            date = formatting_date(dict['pubDate'])
+
+            tuple_list.append((stock ,title ,dict['originallink'] ,date ,pov_or_neg))
 
     else:
         print("Error Code:" + str(res.status_code)+" Stock name is "+ str(stock))
@@ -132,7 +140,7 @@ def run():
         api_search(tuple_list, query) 
 
     #tuple to csv 저장
-    with open('news_test.csv', 'w') as f:
+    with open('news.csv', 'w') as f:
         writer = csv.writer(f , lineterminator='\n')
         for tup in tuple_list:
             writer.writerow(tup)
