@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from bs4 import BeautifulSoup
 import requests
 import re
@@ -113,6 +114,7 @@ def api_search(tuple_list, stock):
         # TODO
         """
         긍부정 판별 코드 추가 필요
+
         긍부정 판별 변수   
         pov_or neg로 저장
         """
@@ -134,6 +136,7 @@ def run():
     company = list(itertools.chain.from_iterable(temp))
 
     tuple_list=[]
+    tuple_list.append(("stock" ,"title" ,"url" ,"date" ,"pov_or_neg"))
     for query in company:
 
         api_search(tuple_list, query) 
@@ -147,3 +150,4 @@ def run():
 
 if __name__ == "__main__":
     run()
+
