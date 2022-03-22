@@ -1,23 +1,27 @@
-// ignore_for_file: prefer_const_constructors_in_immutables, prefer_const_constructors, prefer_final_fields
+// ignore_for_file: prefer_const_constructors_in_immutables, prefer_const_constructors, prefer_final_fields, curly_braces_in_flow_control_structures
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Animation/fade_animation.dart';
-import 'package:flutter_application_1/screens/signin/find_password_input_verify_screen.dart';
+import 'package:flutter_application_1/screens/signup/register_screen.dart';
 import 'package:flutter_application_1/tool/validator.dart';
 
-class FindPasswordInputEmailScreen extends StatefulWidget {
-  FindPasswordInputEmailScreen({Key? key}) : super(key: key);
+class FindPasswordInputNewPassword extends StatefulWidget {
+  FindPasswordInputNewPassword({Key? key}) : super(key: key);
 
   @override
-  State<FindPasswordInputEmailScreen> createState() =>
-      _FindPasswordInputEmailScreenState();
+  State<FindPasswordInputNewPassword> createState() =>
+      _FindPasswordInputNewPasswordState();
 }
 
-class _FindPasswordInputEmailScreenState
-    extends State<FindPasswordInputEmailScreen> {
-  FocusNode _focus = FocusNode();
-  final _findEmailKey = GlobalKey<FormState>();
-  var _email = "";
+class _FindPasswordInputNewPasswordState
+    extends State<FindPasswordInputNewPassword> {
+  var _password = "";
+  var _checkPassword = "";
+  final _passwordKey = GlobalKey<FormState>();
+  final _checkPasswordKey = GlobalKey<FormState>();
+
+  FocusNode _passwordFocusNode = FocusNode();
+  FocusNode _checkPasswordFocusNode = FocusNode();
 
   Widget informaion(Size size) {
     return Container(
@@ -40,7 +44,7 @@ class _FindPasswordInputEmailScreenState
           Row(
             children: [
               Text(
-                "인증을 통해 ",
+                "새 ",
                 style: TextStyle(
                   color: Colors.grey.shade600,
                 ),
@@ -52,7 +56,7 @@ class _FindPasswordInputEmailScreenState
                 ),
               ),
               Text(
-                "를 복구해 드리겠습니다.",
+                " 를 입력해주세요!",
                 style: TextStyle(
                   color: Colors.grey.shade600,
                 ),
@@ -74,30 +78,71 @@ class _FindPasswordInputEmailScreenState
     );
   }
 
-  Widget emailInput(Size size) {
+  Widget passwordInput(Size size) {
     return Form(
-      key: _findEmailKey,
+      key: _passwordKey,
       child: Center(
         child: SizedBox(
           height: size.height * 0.1,
           width: size.width * 0.8,
           child: TextFormField(
+            obscureText: true,
             decoration: InputDecoration(
                 contentPadding: EdgeInsets.all(size.height * 0.02),
-                prefixIcon: Icon(Icons.email),
+                prefixIcon: Icon(Icons.lock),
                 border: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey[600]!),
+                    borderSide: BorderSide(color: Colors.black),
                     borderRadius: BorderRadius.circular(10)),
                 focusedBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Color(0xff0039A4)),
                     borderRadius: BorderRadius.circular(10)),
-                hintText: "abc@example.com",
+                hintText: "ㆍㆍㆍㆍㆍㆍㆍㆍ",
                 hintStyle: TextStyle(color: Colors.grey[400])),
-            validator: (value) => CheckValidate().validateEmail(_focus, value!),
+            validator: (value) =>
+                CheckValidate().validatePassword(_passwordFocusNode, value!),
             onChanged: (value) {
-              _email = value;
-              if (_findEmailKey.currentState != null) {
-                _findEmailKey.currentState!.validate();
+              _password = value;
+              if (_passwordKey.currentState != null) {
+                _passwordKey.currentState!.validate();
+              }
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget checkPasswordInput(Size size) {
+    return Form(
+      key: _checkPasswordKey,
+      child: Center(
+        child: SizedBox(
+          height: size.height * 0.1,
+          width: size.width * 0.8,
+          child: TextFormField(
+            obscureText: true,
+            decoration: InputDecoration(
+                contentPadding: EdgeInsets.all(size.height * 0.02),
+                prefixIcon: Icon(Icons.lock),
+                border: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.black),
+                    borderRadius: BorderRadius.circular(10)),
+                focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xff0039A4)),
+                    borderRadius: BorderRadius.circular(10)),
+                hintText: "ㆍㆍㆍㆍㆍㆍㆍㆍ",
+                hintStyle: TextStyle(color: Colors.grey[400])),
+            validator: (value) {
+              if (value!.isEmpty) {
+                return '비밀번호를 입력하세요.';
+              }
+              if (value != _password) return '비밀번호가 일치하지 않습니다.';
+              return null;
+            },
+            onChanged: (value) {
+              _checkPassword = value;
+              if (_checkPasswordKey.currentState != null) {
+                _checkPasswordKey.currentState!.validate();
               }
             },
           ),
@@ -122,7 +167,7 @@ class _FindPasswordInputEmailScreenState
               context,
               MaterialPageRoute(
                 builder: (context) {
-                  return FindPasswordInputVerifyScreen();
+                  return RegisterScreen();
                 },
               ),
             );
@@ -161,8 +206,10 @@ class _FindPasswordInputEmailScreenState
               children: [
                 informaion(size),
                 SizedBox(height: size.height * 0.05),
-                decoText(size, "이메일"),
-                emailInput(size),
+                decoText(size, "새로운 비밀번호"),
+                passwordInput(size),
+                decoText(size, "비밀번호 확인"),
+                checkPasswordInput(size),
                 confirmButton(size),
               ],
             ),
