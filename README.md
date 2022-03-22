@@ -27,7 +27,7 @@ This project aims to build a system that notifies users of of stocks that are sh
 <img src="https://user-images.githubusercontent.com/28581806/157243525-8ec4b6ff-a358-4039-b176-43f854b53c8e.png" width="300" height="300">
 
 ```markdown
-🐯 ****1664
+🐯 \*\*\*\*1664
 📧 ijkoo16@kookmin.ac.kr
 📌 UI/UX 디자인, 크롤링 모델 구현
 ```
@@ -37,7 +37,7 @@ This project aims to build a system that notifies users of of stocks that are sh
 <img src = "https://user-images.githubusercontent.com/28581806/157243453-d16c9a94-9a85-4807-82bf-616ab19b36a0.png" width="300px" height="300px">
 
 ```markdown
-🐮 ****1660
+🐮 \*\*\*\*1660
 📧 Email: lkm9709@kookmin.ac.kr
 📌
 ```
@@ -47,7 +47,7 @@ This project aims to build a system that notifies users of of stocks that are sh
 <img src = "https://user-images.githubusercontent.com/28581806/157242024-c557b7e8-d1ab-499e-9f92-8f4e40aa4ff8.jpeg" width="300px" height="300px">
 
 ```markdown
-🐯 ****1667
+🐯 \*\*\*\*1667
 📧 Email: juns519@kookmin.ac.kr
 📌
 ```
@@ -55,7 +55,7 @@ This project aims to build a system that notifies users of of stocks that are sh
 <img src = "https://user-images.githubusercontent.com/28581806/157245315-08383b96-17d7-4d6b-a057-2e75c6ddb1e5.jpeg" width="300px" height="300px">
 
 ```markdown
-🐭 ****1672
+🐭 \*\*\*\*1672
 📧 Email: hyeong3642@kookmin.ac.kr
 📌
 ```
@@ -86,7 +86,7 @@ https://flutter-ko.dev/docs/get-started/install
 
 https://flutter-ko.dev/docs/development/tools/sdk/releases
 
-- SDK version은 위 링크에서 2.0.5 설치 권장
+- SDK version은 최신 버전 설치 권장
 ```
 
 ##### step 3:
@@ -105,7 +105,7 @@ Flutter Sdk PATH 내 flutter_console.bat 실행
 아래 링크를 사용하여 이 저장소를 다운로드하거나 복제하세요:
 
 ```markdown
-https://github.com/NeuroAssociatesInternship/p1-review-app-flutter.git
+https://github.com/kookmin-sw/capstone-2022-07.git
 ```
 
 ##### step 5:
@@ -117,123 +117,6 @@ flutter pub get
 ```
 
 ##### step 6:
-
-프로젝트를 실행하세요:
-
-```markdown
-flutter run
-```
-
----
-
-### ios 앱 실행 환경설정 가이드
-
-##### step 1:
-
-VScode를 설치하세요:
-
-```markdown
-https://code.visualstudio.com/
-```
-
-##### step 2:
-
-Xcode를 설치하세요:
-
-```markdown
-앱스토어에서 xcode 설치 or
-
-1. http://developer.apple.com/download/more (Apple ID 로그인)
-2. 다운받을 Xcode 버전 검색
-3. Xcode xip 압축파일 다운로드
-4. 다운받은 xip 파일 실행
-5. 압축이 해제된 Xcode 파일 응용프로그램 폴더로 복사
-6. Xcode 실행
-```
-
-##### step 3:
-
-cocoapod를 설치하세요:
-
-```markdown
-$ sudo gem install cocoapods
-```
-
-##### step 4:
-
-iOS simulator 설정
-
-```markdown
-스팟라이트 단축키인 control + space 키를 이용하여 스팟라이트를 실행한다음 iOS 만 치면 최상단에 iOS Simulator 앱이 뜨게 됩니다.
-원하는 시뮬레이터 설정.
-```
-
-##### step 5:
-
-Flutter SDK를 설치하세요:
-
-```markdown
-https://flutter.dev/docs/development/tools/sdk/releases
-
-- SDK version 2.0.5 설치 권장
-```
-
-##### step 6:
-
-Flutter 환경변수설정
-
-```markdown
-https://flutter-ko.dev/docs/get-started/install/macos
-본인의 운영체제 버전에 따라 환경변수 설정하는 법이 다르므로 공식문서 활용하여 설정
-```
-
-##### step 7:
-
-설치 확인을 위하여 다음 명령을 실행
-
-```markdown
-1. terminal open
-2. flutter --doctor
-   (flutter —doctor 실행시 본인의 환경에서 플러터 코드 실행을 할수 있는지 확인가능)
-```
-
-##### step 7-1:
-
-flutter doctor 실행후 나오는 아래와 같은 에러는 ios앱 빌드시에는 무시
-이외에 에러 발생시에 flutter doctor가 어떤 것을 해야하는지 상세히 보여주니 따라서 진행할 것.
-
-```markdown
-Android toolchain - develop for Android devices
-✗ Unable to locate Android SDK.
-Install Android Studio from:
-https://developer.android.com/studio/index.html
-On first launch it will assist you in installing the Android SDK
-components.
-(or visit https://flutter.dev/docs/get-started/install/macos#android-setup
-for detailed instructions).
-If the Android SDK has been installed to a custom location, please use
-`flutter config --android-sdk` to update to that location.
-```
-
-##### step 8:
-
-아래 링크를 사용하여 이 저장소를 다운로드하거나 복제하세요:
-
-```markdown
-https://github.com/NeuroAssociatesInternship/p1-review-app-flutter.git
-```
-
-##### step 9:
-
-프로젝트 루트로 이동하고 콘솔에서 다음 명령을 실행하여 필요한 패키지를 가져오고, cd ios를 통해 ios폴더에서 필요한 라이브러리들을 추가 설치해주세요:
-
-```markdown
-flutter pub get
-cd ios
-pod install
-```
-
-##### step 10:
 
 프로젝트를 실행하세요:
 
