@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_application_1/screens/login_screen.dart';
+import 'package:flutter_application_1/screens/register.dart';
 
 class Init extends StatelessWidget {
   @override
@@ -9,8 +10,7 @@ class Init extends StatelessWidget {
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
         if (!snapshot.hasData) {
-          print(snapshot.data);
-          return LoginScreen();
+          return RegisterScreen();
         }
         return LoginScreen();
       },

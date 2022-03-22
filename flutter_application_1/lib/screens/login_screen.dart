@@ -186,7 +186,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget googleLoginButton(Size size) {
     return Center(
       child: Container(
-        height: size.height * 0.06,
+        height: size.height * 0.1,
         width: size.width * 0.8,
         margin: EdgeInsets.only(bottom: size.height * 0.01),
         decoration: BoxDecoration(
@@ -222,7 +222,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget emailLoginButton(BuildContext context, Size size) {
     return Center(
       child: Container(
-        height: size.height * 0.06,
+        height: size.height * 0.1,
         width: size.width * 0.8,
         margin: EdgeInsets.only(bottom: size.height * 0.01),
         decoration: BoxDecoration(
