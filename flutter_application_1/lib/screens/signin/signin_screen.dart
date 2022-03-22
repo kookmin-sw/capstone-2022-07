@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_application_1/Animation/fade_animation.dart';
 import 'package:flutter_application_1/screens/signin/find_password_input_email_screen.dart';
 import 'package:flutter_application_1/tool/validator.dart';
@@ -258,9 +259,11 @@ class _SigninScreenState extends State<SigninScreen> {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
+        systemOverlayStyle: SystemUiOverlayStyle(),
         leading: BackButton(
           color: Colors.black,
         ),
+        leadingWidth: 70,
         backgroundColor: Colors.transparent,
         elevation: 0.0,
       ),

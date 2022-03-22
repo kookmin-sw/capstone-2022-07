@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Animation/fade_animation.dart';
 import 'package:flutter_application_1/screens/signin/signin_screen.dart';
+import 'package:flutter_application_1/screens/signup/input_nickname_screen.dart';
 import 'package:flutter_application_1/screens/signup/register_screen.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_application_1/Signin/function.dart';
@@ -145,7 +146,15 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         child: TextButton(
           onPressed: () async {
-            await signInWithGoogle();
+            // await signInWithGoogle();
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  return InputNicknameScreen();
+                },
+              ),
+            );
           },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -245,10 +254,10 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: FadeAnimation(
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: FadeAnimation(
           2,
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -268,7 +277,6 @@ class _LoginScreenState extends State<LoginScreen> {
             ],
           ),
         ),
-        // bottomNavigationBar: Navbar(),
       ),
     );
   }

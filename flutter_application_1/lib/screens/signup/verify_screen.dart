@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors_in_immutables, prefer_const_constructors, prefer_final_fields
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_application_1/Animation/fade_animation.dart';
 import 'package:flutter_application_1/screens/signup/register_screen.dart';
 import 'package:flutter_application_1/tool/validator.dart';
@@ -143,9 +144,11 @@ class _VerifyScreenState extends State<VerifyScreen> {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
+        systemOverlayStyle: SystemUiOverlayStyle(),
         leading: BackButton(
           color: Colors.black,
         ),
+        leadingWidth: 70,
         backgroundColor: Colors.transparent,
         elevation: 0.0,
       ),
