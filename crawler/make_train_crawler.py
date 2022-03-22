@@ -1,17 +1,134 @@
-# 네이버 검색 API예제는 블로그를 비롯 전문자료까지 호출방법이 동일하므로 blog검색만 대표로 예제를 올렸습니다.
-# 네이버 검색 Open API 예제 - 블로그 검색
-import os
-import sys
-import csv
-import urllib.request
+from multiprocessing.spawn import freeze_support
+import multiprocessing
 import requests
-from collections import OrderedDict
+from bs4 import BeautifulSoup
 import time
-from tqdm import tqdm
-import re 
-import datetime
-import pandas as pd
+import urllib.request
+from urllib.parse import urlparse
+from multiprocessing import Manager, Pool, freeze_support  # Pool import하기
+import csv
+from datetime import datetime, timedelta
 
+url = "http://api.seibro.or.kr/openapi/service/StockSvc/getKDRSecnInfo"  # 공공데이터포털 api 주소(Without param)
+api_service_key_stock = "RXhGWArdgsytKaKf0g%2FWxNuo27wXxg4iChLUs9ePc39VvneddFbQ9v9ZXCDWJkdFbhqCvbw9kdMGy%2F%2Bv3it50A%3D%3D"  # service api key
+api_decode_key_stock = requests.utils.unquote(
+    api_service_key_stock, encoding="utf-8"
+)  # api decode code
+
+# Naver client key
+client_id= "4NnYXQRzNVwTEO2_rwpd"
+client_secret = "mZP8JBDOBK"
+now = datetime.now()
+
+# 시간 측정 함수
+def logging_time(original_fn):
+    def wrapper_fn(*args, **kwargs):
+        start_time = time.time()
+        result = original_fn(*args, **kwargs)
+        end_time = time.time()
+        print(
+            "WorkingTime[{}]: {} sec".format(
+                original_fn.__name__, end_time - start_time
+            )
+        )
+        return result
+
+    return wrapper_fn
+
+
+# 종목 이름 가져오는 코드
+@logging_time
+def getStockCode(market, url_param):
+    """
+    market: 상장구분 (11=유가증권, 12=코스닥, 13=K-OTC, 14=코넥스, 50=기타비상장)
+    """
+    url_base = f"http://api.seibro.or.kr/openapi/service/{url_param}"
+    url_spec = "getShotnByMartN1"
+    url = url_base + "/" + url_spec
+    api_key_decode = requests.utils.unquote(api_decode_key_stock, encoding="utf-8")
+
+    params = {
+        "serviceKey": api_key_decode,
+        "pageNo": 1,
+        "numOfRows": 100000,
+        "martTpcd": market,
+    }
+
+    response = requests.get(url, params=params)
+    # print(response.text)
+    xml = BeautifulSoup(response.text, "lxml")
+    items = xml.find("items")
+    item_list = []
+    for item in items:
+        item_list.append(item.find("korsecnnm").text.strip())
+
+    return item_list
+
+
+
+# 크롤링 함수
+def search_crawl(tuple_list,query):
+    page = 1
+    maxpage = 1
+    
+
+    # 11= 2페이지 21=3페이지 31=4페이지  ...81=9페이지 , 91=10페이지, 101=11페이지
+    maxpage_t = (int(maxpage) - 1) * 10 + 1
+
+    sort = 0 #0=관련도순 1=최신순 
+
+    while page <= maxpage_t:
+        url = (
+            "https://search.naver.com/search.naver?where=news&query="
+            + query
+            + "&sort="
+            + str(sort)
+            + "&start="
+            + str(page)
+        )
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36"
+        }
+        response = requests.get(url, headers=headers)
+        html = response.text
+
+        # 뷰티풀소프의 인자값 지정
+        soup = BeautifulSoup(html, "html.parser")
+
+        atags = soup.select(".news_tit")
+        news_name =""
+        news_date =""
+        news_url = ""
+        pov_or_neg = 0 #긍부정 라벨링 값
+
+        # <a>태그에서 제목과 링크주소 추출
+        # 기사 제목, 기사url 저장 
+        for atag in atags:
+            # title_text.append(atag.text)  # 제목
+            # link_text.append(atag["href"])  # 링크주소
+            # title_list.append(atag.text)
+            # url_list.append(atag["href"])
+            
+            news_name = atag.text
+            news_url = atag["href"]
+            
+            # TODO
+            """
+            긍부정 판별 코드 추가 필요
+
+            긍부정 판별 변수   
+            pov_or neg로 저장
+            """
+
+        # tuple_list.append((query, news_name, news_url, news_date, pov_or_neg))
+            tuple_list.append((news_name, pov_or_neg))
+
+        page += 10
+
+
+#cospi = getStockCode(11, "StockSvc")
+# print(cospi)
+#cosdak = getStockCode(12, "StockSvc")
 cospi = [
     "동화약품",
     "케이알모터스",
@@ -957,79 +1074,43 @@ cospi = [
     "신한서부티엔디위탁관리부동산투자회사",
 ]
 
-client_id = "4NnYXQRzNVwTEO2_rwpd"
-client_secret= "mZP8JBDOBK"
+# if __name__ == "__main__":
 
-def search(stock):
-    encText = urllib.parse.quote(stock)
-    url = "https://openapi.naver.com/v1/search/news.json?query=" + encText # json 결과
-    # url = "https://openapi.naver.com/v1/search/blog.xml?query=" + encText # xml 결과
-    request = urllib.request.Request(url)
-    request.add_header("X-Naver-Client-Id",client_id)
-    request.add_header("X-Naver-Client-Secret",client_secret)
-    response = urllib.request.urlopen(request)
-    rescode = response.getcode()
-    if(rescode==200):
-        response_body = response.read()
-        print(response_body.decode('utf-8'))
-    else:
-        print("Error Code:" + rescode)
-
-
-def api(list, stock):
-    url = 'https://openapi.naver.com/v1/search/news.json' 
-    header = {'X-Naver-Client-Id':client_id, 'X-Naver-Client-Secret':client_secret} 
-    param = {'query':stock, 'display':5, 'start':1, 'sort':'date'} 
-    res = requests.get(url, params=param, headers=header)
-
-    if res.status_code == 200:
-        temp = res.json()
-
-        # print(type(temp))
-
-        # for index, item in enumerate(temp['items']):
-        #     print(index+1, item['title'], item['link'], item['description'],item['pubDate'])
-
-        list.append(())
-
-        with open('test_api.csv','w') as f:
-            w = csv.writer(f)
-            for i in temp['items']:
-                i['name']=stock
-                w.writerow(i.values())
-        # print(temp['items'])
-    else:
-        print("Error Code:" + str(res.status_code)+" Stock name is "+str(stock))
-
-
-def text_clean(inputString):
-    inputString = re.sub(r'\<[^)]*\>', '', inputString, 0).strip() # html 태그 제거
-    inputString = re.sub('[-=+,#/\?:^.@*\"※~ㆍ!』‘|\(\)\[\]`\'…》\”\“\’·]', '', inputString) # 특수문자 제거
-
-    return inputString
-
-"""
-prd_names = "[동영상] <b>하이트진로</b>, 실적 모멘텀 기대에 주가 상승"
-prd_names = text_clean(prd_names)
-print("last " +prd_names)
-"""
-
-def dateformat_change(date):
-    format ='%a, %d %b %Y %H:%M:%S %z'
-    date = datetime.datetime.strptime(date, format) # str to datetime
-    date = date.strftime("%Y-%m-%d %H:%M:%S") # changing datetime format
+@logging_time
+def run():
+    # 운영체제랑 코드랑 연동?을 해줘야된다
     
-    return date
+    pool = Pool(4)
+    m = Manager()
+
+    title_list = m.list()
+    url_list = m.list()
+    result_dict = m.dict()
+
+    tuple_list = m.list()
+    tuple_list.append(('title','pov_neg'))
+
+    process = multiprocessing.cpu_count() * 2
+    # # print(company)
+    with Pool(processes=process) as pool:
+        pool.starmap(
+            search_crawl, [(tuple_list, query) for query in cospi] ###### 크롤링 함수 사용시
+            # api_search, [(tuple_list, query) for query in cospi] ###### api 함수 사용시
+        )
+        pool.close()
+        pool.join()
+
+    return tuple_list
+
+
 
 if __name__ == "__main__":
-    temp_list=[]
-    start = time.time()
+    tuple = run()
 
-    data = pd.read_csv("news_test.csv")
-    print(data)
-
-
-    print(time.time() - start)
+    with open('../model/train.csv', 'w') as f:
+        writer = csv.writer(f , lineterminator='\n')
+        for tup in tuple:
+            writer.writerow(tup)
 
 
-  
+    

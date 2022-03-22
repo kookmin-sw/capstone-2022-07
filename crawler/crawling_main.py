@@ -136,6 +136,7 @@ def run():
     company = list(itertools.chain.from_iterable(temp))
 
     tuple_list=[]
+    tuple_list.append(("stock" ,"title" ,"url" ,"date" ,"pov_or_neg"))
     for query in company:
 
         api_search(tuple_list, query) 
