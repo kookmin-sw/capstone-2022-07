@@ -8,6 +8,8 @@ from urllib.parse import urlparse
 from multiprocessing import Manager, Pool, freeze_support  # Pool import하기
 import csv
 from datetime import datetime, timedelta
+import codecs
+import re
 
 url = "http://api.seibro.or.kr/openapi/service/StockSvc/getKDRSecnInfo"  # 공공데이터포털 api 주소(Without param)
 api_service_key_stock = "RXhGWArdgsytKaKf0g%2FWxNuo27wXxg4iChLUs9ePc39VvneddFbQ9v9ZXCDWJkdFbhqCvbw9kdMGy%2F%2Bv3it50A%3D%3D"  # service api key
@@ -64,13 +66,50 @@ def getStockCode(market, url_param):
 
     return item_list
 
+def pov_neg():
+    positive = []
+    negative = []
+    posneg = []
+
+    pos = codecs.open("/Users/seungjun/Desktop/git/capstone-2022-07/model/positive_words.txt", 'rb', encoding='UTF-8')
+    while True :
+        line = pos.readline()
+        line = line.replace('\n','')
+        positive.append(line)
+        posneg.append(line)
+        
+        if not line : break
+    pos.close()
+
+    neg = codecs.open("/Users/seungjun/Desktop/git/capstone-2022-07/model/negative_words.txt", 'rb', encoding='UTF-8')
+    while True :
+        line = neg.readline()
+        line = line.replace('\n','')
+        negative.append(line)
+        posneg.append(line)
+        
+        if not line : break
+    neg.close()
+
+    return posneg, positive, negative
+
+
+def text_clean(inputString):
+    # inputString = inputString.replace("<b>","").replace("</b>","") # html 태그 제거  ## <b> <b/>
+    inputString = re.sub(r'\<[^)]*\>', '', inputString, 0).strip() # <> 안의 내용 제거  ## html태그 + 종목명
+    inputString = re.sub('[-=+,#/\?:^.@*\"※~ㆍ!』‘|\(\)\[\]`\'…》\”\“\’·]', ' ', inputString) # 특수문자 제거
+    inputString = inputString.replace("&quot;"," ").replace("amp;","").replace("&gt; "," ").replace("&lt;"," ")
+    inputString = ' '.join(inputString.split())
+    
+    return inputString
 
 
 # 크롤링 함수
-def search_crawl(tuple_list,query):
+def search_crawl(posneg, positive,tuple_list,query):
+    
+
     page = 1
     maxpage = 1
-    
 
     # 11= 2페이지 21=3페이지 31=4페이지  ...81=9페이지 , 91=10페이지, 101=11페이지
     maxpage_t = (int(maxpage) - 1) * 10 + 1
@@ -109,9 +148,9 @@ def search_crawl(tuple_list,query):
             # title_list.append(atag.text)
             # url_list.append(atag["href"])
             
-            news_name = atag.text
+            news_name = text_clean(atag.text)
             news_url = atag["href"]
-            
+
             # TODO
             """
             긍부정 판별 코드 추가 필요
@@ -119,6 +158,33 @@ def search_crawl(tuple_list,query):
             긍부정 판별 변수   
             pov_or neg로 저장
             """
+
+            for i in range(len(posneg)):
+                posflag = False
+                negflag = False
+                if i < (len(positive)-1):
+                    #print(title_data.find(posneg[i]))
+                    if news_name.find(posneg[i]) != "-1":
+                        posflag = True
+                        print(i, "positive?", "테스트 : ", news_name.find(posneg[i]), "비교단어 : ", posneg[i], "인덱스 : ", i, news_name)
+                        break
+                if i > (len(positive)-2):
+                    if news_name.find(posneg[i] !="-1"):
+                        negflag = True
+                        print(i, "negative?", "테스트 : ", news_name.find(posneg[i]), "비교단어 : ", posneg[i], "인덱스 : ", i, news_name)
+                        break
+            
+            if posflag == True:
+                pov_or_neg = 1
+                #print("positive", j)
+            elif negflag == True :
+                pov_or_neg = -1
+                #print("negative", j)
+            elif negflag == False and posflag == False:
+                pov_or_neg = 0              
+
+            
+            
 
         # tuple_list.append((query, news_name, news_url, news_date, pov_or_neg))
             tuple_list.append((news_name, pov_or_neg))
@@ -1078,27 +1144,33 @@ cospi = [
 
 @logging_time
 def run():
-    # 운영체제랑 코드랑 연동?을 해줘야된다
+    posneg, positive, negative = pov_neg()
     
-    pool = Pool(4)
-    m = Manager()
+    # pool = Pool(4)
+    # m = Manager()
 
-    title_list = m.list()
-    url_list = m.list()
-    result_dict = m.dict()
+    # title_list = m.list()
+    # url_list = m.list()
+    # result_dict = m.dict()
 
-    tuple_list = m.list()
-    tuple_list.append(('title','pov_neg'))
+    # tuple_list = m.list()
+    # tuple_list.append(('title','pov_neg'))
 
-    process = multiprocessing.cpu_count() * 2
-    # # print(company)
-    with Pool(processes=process) as pool:
-        pool.starmap(
-            search_crawl, [(tuple_list, query) for query in cospi] ###### 크롤링 함수 사용시
-            # api_search, [(tuple_list, query) for query in cospi] ###### api 함수 사용시
-        )
-        pool.close()
-        pool.join()
+    # process = multiprocessing.cpu_count() * 2
+    # # # print(company)
+    # with Pool(processes=process) as pool:
+    #     pool.starmap(
+    #         search_crawl, [(posneg, positive,tuple_list, query) for query in cospi[:5]] ###### 크롤링 함수 사용시
+    #         # api_search, [(tuple_list, query) for query in cospi] ###### api 함수 사용시
+    #     )
+    #     pool.close()
+    #     pool.join()
+
+    tuple_list = list()
+    tuple_list.append(('title','label'))
+    for query in cospi[:5]:
+        search_crawl(posneg, positive,tuple_list, query)
+
 
     return tuple_list
 
@@ -1106,8 +1178,9 @@ def run():
 
 if __name__ == "__main__":
     tuple = run()
+    print(tuple)
 
-    with open('../model/train.csv', 'w') as f:
+    with open('./train.csv', 'w') as f:
         writer = csv.writer(f , lineterminator='\n')
         for tup in tuple:
             writer.writerow(tup)
