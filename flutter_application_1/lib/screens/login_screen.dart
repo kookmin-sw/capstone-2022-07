@@ -2,10 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Animation/fade_animation.dart';
-import 'package:flutter_application_1/Components/nav_bar.dart';
-import 'package:flutter_application_1/screens/landing_screen.dart';
-import 'package:flutter_application_1/screens/register_screen.dart';
-import 'package:flutter_application_1/screens/verify_screen.dart';
+import 'package:flutter_application_1/screens/signin/signin_screen.dart';
+import 'package:flutter_application_1/screens/signup/register_screen.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_application_1/Signin/function.dart';
 
@@ -221,15 +219,25 @@ class _LoginScreenState extends State<LoginScreen> {
               TextStyle(fontSize: size.width * 0.03, color: Colors.grey[600]),
         ),
         TextButton(
-            onPressed: () {},
-            child: Text(
-              "로그인",
-              style: TextStyle(
-                  fontSize: size.width * 0.03,
-                  decoration: TextDecoration.underline,
-                  color: Color(0xff0039A4),
-                  fontWeight: FontWeight.bold),
-            ))
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  return SigninScreen();
+                },
+              ),
+            );
+          },
+          child: Text(
+            "로그인",
+            style: TextStyle(
+                fontSize: size.width * 0.03,
+                decoration: TextDecoration.underline,
+                color: Color(0xff0039A4),
+                fontWeight: FontWeight.bold),
+          ),
+        )
       ],
     );
   }

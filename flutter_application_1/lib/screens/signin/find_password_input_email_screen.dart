@@ -2,20 +2,21 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Animation/fade_animation.dart';
-import 'package:flutter_application_1/screens/signup/register_screen.dart';
 import 'package:flutter_application_1/tool/validator.dart';
 
-class VerifyScreen extends StatefulWidget {
-  VerifyScreen({Key? key}) : super(key: key);
+class FindPasswordInputEmailScreen extends StatefulWidget {
+  FindPasswordInputEmailScreen({Key? key}) : super(key: key);
 
   @override
-  State<VerifyScreen> createState() => _VerifyScreenState();
+  State<FindPasswordInputEmailScreen> createState() =>
+      _FindPasswordInputEmailScreenState();
 }
 
-class _VerifyScreenState extends State<VerifyScreen> {
+class _FindPasswordInputEmailScreenState
+    extends State<FindPasswordInputEmailScreen> {
   FocusNode _focus = FocusNode();
-  final _verifyKey = GlobalKey<FormState>();
-  var _verify = "";
+  final _findEmailKey = GlobalKey<FormState>();
+  var _email = "";
 
   Widget informaion(Size size) {
     return Container(
@@ -27,7 +28,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
           Container(
             padding: EdgeInsets.only(bottom: size.height * 0.02),
             child: Text(
-              "회원가입",
+              "비밀번호를 잊으셨나요?",
               style: TextStyle(
                 color: Color(0xff0039A4),
                 fontSize: size.width * 0.07,
@@ -38,19 +39,19 @@ class _VerifyScreenState extends State<VerifyScreen> {
           Row(
             children: [
               Text(
-                "입력하신 이메일 계정으로 ",
+                "인증을 통해 ",
                 style: TextStyle(
                   color: Colors.grey.shade600,
                 ),
               ),
               Text(
-                "인증번호",
+                "비밀번호",
                 style: TextStyle(
                   color: Color(0xff0039A4),
                 ),
               ),
               Text(
-                "를 보냈습니다!",
+                "를 복구해 드리겠습니다.",
                 style: TextStyle(
                   color: Colors.grey.shade600,
                 ),
@@ -72,31 +73,30 @@ class _VerifyScreenState extends State<VerifyScreen> {
     );
   }
 
-  Widget verifyInput(Size size) {
+  Widget emailInput(Size size) {
     return Form(
-      key: _verifyKey,
+      key: _findEmailKey,
       child: Center(
         child: SizedBox(
           height: size.height * 0.1,
           width: size.width * 0.8,
           child: TextFormField(
-            textAlign: TextAlign.center,
             decoration: InputDecoration(
                 contentPadding: EdgeInsets.all(size.height * 0.02),
+                prefixIcon: Icon(Icons.email),
                 border: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey[600]!),
                     borderRadius: BorderRadius.circular(10)),
                 focusedBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Color(0xff0039A4)),
                     borderRadius: BorderRadius.circular(10)),
-                hintText: "123456",
+                hintText: "abc@example.com",
                 hintStyle: TextStyle(color: Colors.grey[400])),
-            validator: (value) =>
-                CheckValidate().validateVerification(_focus, value!),
+            validator: (value) => CheckValidate().validateEmail(_focus, value!),
             onChanged: (value) {
-              _verify = value;
-              if (_verifyKey.currentState != null) {
-                _verifyKey.currentState!.validate();
+              _email = value;
+              if (_findEmailKey.currentState != null) {
+                _findEmailKey.currentState!.validate();
               }
             },
           ),
@@ -105,7 +105,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
     );
   }
 
-  Widget registerButton(Size size) {
+  Widget confirmButton(Size size) {
     return Center(
       child: Container(
         height: size.height * 0.06,
@@ -117,17 +117,17 @@ class _VerifyScreenState extends State<VerifyScreen> {
         ),
         child: TextButton(
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) {
-                  return RegisterScreen();
-                },
-              ),
-            );
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(
+            //     builder: (context) {
+            //       return FindPasswordInputVerifyScreen();
+            //     },
+            //   ),
+            // );
           },
           child: Text(
-            "회원가입",
+            "확인",
             style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: size.width * 0.035,
@@ -160,9 +160,9 @@ class _VerifyScreenState extends State<VerifyScreen> {
               children: [
                 informaion(size),
                 SizedBox(height: size.height * 0.05),
-                decoText(size, "인증번호"),
-                verifyInput(size),
-                registerButton(size),
+                decoText(size, "이메일"),
+                emailInput(size),
+                confirmButton(size),
               ],
             ),
           ),

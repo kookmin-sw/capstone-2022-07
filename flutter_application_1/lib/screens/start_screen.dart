@@ -1,12 +1,12 @@
 // ignore_for_file: prefer_const_constructors_in_immutables, prefer_final_fields, prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/screens/signup/register_screen.dart';
+import 'package:flutter_application_1/screens/signup/verify_screen.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:badges/badges.dart';
 import 'package:flutter_application_1/screens/landing_screen.dart';
 import 'package:flutter_application_1/screens/login_screen.dart';
-import 'package:flutter_application_1/screens/register_screen.dart';
-import 'package:flutter_application_1/screens/verify_screen.dart';
 
 class StartScreen extends StatefulWidget {
   StartScreen({Key? key}) : super(key: key);
