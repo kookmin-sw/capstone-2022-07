@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Animation/fade_animation.dart';
+import 'package:flutter_application_1/screens/verify_screen.dart';
 import 'package:flutter_application_1/tool/validator.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -12,7 +13,7 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  FocusNode _emailFocus = FocusNode();
+  FocusNode _focus = FocusNode();
   final _emailKey = GlobalKey<FormState>();
   final _nameKey = GlobalKey<FormState>();
   final _passwordKey = GlobalKey<FormState>();
@@ -93,8 +94,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     borderRadius: BorderRadius.circular(10)),
                 hintText: "abc@example.com",
                 hintStyle: TextStyle(color: Colors.grey[400])),
-            validator: (value) =>
-                CheckValidate().validateEmail(_emailFocus, value!),
+            validator: (value) => CheckValidate().validateEmail(_focus, value!),
             onChanged: (value) {
               _email = value;
               if (_emailKey.currentState != null) {
@@ -127,7 +127,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 hintText: "이름",
                 hintStyle: TextStyle(color: Colors.grey[400])),
             validator: (value) =>
-                CheckValidate().validateNickname(_emailFocus, value!),
+                CheckValidate().validateNickname(_focus, value!),
             onChanged: (value) {
               _nickname = value;
               if (_nameKey.currentState != null) {
@@ -160,7 +160,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 hintText: "ㆍㆍㆍㆍㆍㆍㆍㆍ",
                 hintStyle: TextStyle(color: Colors.grey[400])),
             validator: (value) =>
-                CheckValidate().validatePassword(_emailFocus, value!),
+                CheckValidate().validatePassword(_focus, value!),
             onChanged: (value) {
               _password = value;
               if (_passwordKey.currentState != null) {
@@ -184,7 +184,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
           borderRadius: BorderRadius.circular(10),
         ),
         child: TextButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  return VerifyScreen();
+                },
+              ),
+            );
+          },
           child: Text(
             "회원가입",
             style: TextStyle(
@@ -201,6 +210,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
+      appBar: AppBar(
+        leading: BackButton(
+          color: Colors.black,
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0.0,
+      ),
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Center(
@@ -226,7 +242,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
         ),
       ),
-      // bottomNavigationBar: Navbar(),
     );
   }
 }

@@ -1,7 +1,12 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_application_1/screens/landing_screen.dart';
 import 'package:flutter_application_1/screens/login_screen.dart';
-import 'package:flutter_application_1/screens/register.dart';
+import 'package:flutter_application_1/screens/register_screen.dart';
+import 'package:flutter_application_1/screens/start_screen.dart';
+import 'package:flutter_application_1/screens/verify_screen.dart';
 
 class Init extends StatelessWidget {
   @override
@@ -10,7 +15,7 @@ class Init extends StatelessWidget {
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
         if (!snapshot.hasData) {
-          return RegisterScreen();
+          return LoginScreen();
         }
         return LoginScreen();
       },

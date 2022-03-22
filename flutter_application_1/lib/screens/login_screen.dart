@@ -1,8 +1,11 @@
-// ignore_for_file: prefer_const_constructors_in_immutables, unnecessary_new, prefer_const_constructors, prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_const_constructors_in_immutables, unnecessary_new, prefer_const_constructors, prefer_const_literals_to_create_immutables, prefer_final_fields
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Animation/fade_animation.dart';
-import 'package:flutter_application_1/screens/register.dart';
+import 'package:flutter_application_1/Components/nav_bar.dart';
+import 'package:flutter_application_1/screens/landing_screen.dart';
+import 'package:flutter_application_1/screens/register_screen.dart';
+import 'package:flutter_application_1/screens/verify_screen.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_application_1/Signin/function.dart';
 
@@ -96,58 +99,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget loginButton(Size size) {
-    return Column(
-      children: <Widget>[
-        Center(
-          child: Container(
-            height: size.height * 0.05,
-            width: size.width * 0.4,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.white),
-            ),
-            child: OutlinedButton(
-              onPressed: () {},
-              child: Text(
-                "로그인",
-                style:
-                    TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-        )
-      ],
-    );
-  }
-
-  Widget signInButton(Size size) {
-    return Column(
-      children: <Widget>[
-        Center(
-          child: Container(
-            height: size.height * 0.05,
-            width: size.width * 0.4,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.white),
-            ),
-            child: OutlinedButton(
-              onPressed: () {},
-              child: Text(
-                "회원가입",
-                style:
-                    TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-        )
-      ],
-    );
-  }
-
   // Widget emailLoginButton(Size size) {
   //   return Column(
   //     children: <Widget>[
@@ -186,7 +137,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget googleLoginButton(Size size) {
     return Center(
       child: Container(
-        height: size.height * 0.1,
+        height: size.height * 0.06,
         width: size.width * 0.8,
         margin: EdgeInsets.only(bottom: size.height * 0.01),
         decoration: BoxDecoration(
@@ -222,7 +173,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget emailLoginButton(BuildContext context, Size size) {
     return Center(
       child: Container(
-        height: size.height * 0.1,
+        height: size.height * 0.06,
         width: size.width * 0.8,
         margin: EdgeInsets.only(bottom: size.height * 0.01),
         decoration: BoxDecoration(
