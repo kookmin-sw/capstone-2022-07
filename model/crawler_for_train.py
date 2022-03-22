@@ -1,114 +1,161 @@
-from bs4 import BeautifulSoup
-from datetime import datetime
+from multiprocessing.spawn import freeze_support
+import multiprocessing
+from numpy import negative
 import requests
-import pandas as pd
+from bs4 import BeautifulSoup
+import time
+import urllib.request
+from urllib.parse import urlparse
+from multiprocessing import Manager, Pool, freeze_support  # Pool import하기
+import csv
+from datetime import datetime, timedelta
+import codecs
 import re
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-< naver 뉴스 검색시 리스트 크롤링하는 프로그램 > _select사용
-- 크롤링 해오는 것 : 링크,제목,신문사,날짜,내용요약본
-- 날짜,내용요약본  -> 정제 작업 필요
-- 리스트 -> 딕셔너리 -> df -> 엑셀로 저장 
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-#각 크롤링 결과 저장하기 위한 리스트 선언 
-title_text=[]
-link_text=[]
-source_text=[]
-date_text=[]
-contents_text=[]
-result={}
+url = "http://api.seibro.or.kr/openapi/service/StockSvc/getKDRSecnInfo"  # 공공데이터포털 api 주소(Without param)
+api_service_key_stock = "RXhGWArdgsytKaKf0g%2FWxNuo27wXxg4iChLUs9ePc39VvneddFbQ9v9ZXCDWJkdFbhqCvbw9kdMGy%2F%2Bv3it50A%3D%3D"  # service api key
+api_decode_key_stock = requests.utils.unquote(
+    api_service_key_stock, encoding="utf-8"
+)  # api decode code
 
-#엑셀로 저장하기 위한 변수
-RESULT_PATH ='C:/Users/hyeon/Desktop/naver_news_crawling-master/result'  #결과 저장할 경로
-now = datetime.now() #파일이름 현 시간으로 저장하기
+# Naver client key
+client_id= "4NnYXQRzNVwTEO2_rwpd"
+client_secret = "mZP8JBDOBK"
+now = datetime.now()
 
-#날짜 정제화 함수
-def date_cleansing(test):
-    try:
-        #지난 뉴스
-        #머니투데이  10면1단  2018.11.05.  네이버뉴스   보내기  
-        pattern = '\d+.(\d+).(\d+).'  #정규표현식 
+# 시간 측정 함수
+def logging_time(original_fn):
+    def wrapper_fn(*args, **kwargs):
+        start_time = time.time()
+        result = original_fn(*args, **kwargs)
+        end_time = time.time()
+        print(
+            "WorkingTime[{}]: {} sec".format(
+                original_fn.__name__, end_time - start_time
+            )
+        )
+        return result
+
+    return wrapper_fn
+
+
+# 종목 이름 가져오는 코드
+@logging_time
+def getStockCode(market, url_param):
+    """
+    market: 상장구분 (11=유가증권, 12=코스닥, 13=K-OTC, 14=코넥스, 50=기타비상장)
+    """
+    url_base = f"http://api.seibro.or.kr/openapi/service/{url_param}"
+    url_spec = "getShotnByMartN1"
+    url = url_base + "/" + url_spec
+    api_key_decode = requests.utils.unquote(api_decode_key_stock, encoding="utf-8")
+
+    params = {
+        "serviceKey": api_key_decode,
+        "pageNo": 1,
+        "numOfRows": 100000,
+        "martTpcd": market,
+    }
+
+    response = requests.get(url, params=params)
+    # print(response.text)
+    xml = BeautifulSoup(response.text, "lxml")
+    items = xml.find("items")
+    item_list = []
+    for item in items:
+        item_list.append(item.find("korsecnnm").text.strip())
+
+    return item_list
+
+def text_clean(inputString):
+    # inputString = inputString.replace("<b>","").replace("</b>","") # html 태그 제거  ## <b> <b/>
+    inputString = re.sub(r'\<[^)]*\>', '', inputString, 0).strip() # <> 안의 내용 제거  ## html태그 + 종목명
+    inputString = re.sub('[-=+,#/\?:^.@*\"※~ㆍ!』‘|\(\)\[\]`\'…》\”\“\’·]', ' ', inputString) # 특수문자 제거
+    inputString = inputString.replace("&quot;"," ").replace("amp;","").replace("&gt; "," ").replace("&lt;"," ")
+    inputString = ' '.join(inputString.split())
     
-        r = re.compile(pattern)
-        match = r.search(test).group(0)  # 2018.11.05.
-        date_text.append(match)
-        
-    except AttributeError:
-        #최근 뉴스
-        #이데일리  1시간 전  네이버뉴스   보내기  
-        pattern = '\w* (\d\w*)'     #정규표현식 
-        
-        r = re.compile(pattern)
-        match = r.search(test).group(1)
-        #print(match)
-        date_text.append(match)
+    return inputString
 
 
-#내용 정제화 함수 
-def contents_cleansing(contents):
-    first_cleansing_contents = re.sub('<dl>.*?</a> </div> </dd> <dd>', '', 
-                                      str(contents)).strip()  #앞에 필요없는 부분 제거
-    second_cleansing_contents = re.sub('<ul class="relation_lst">.*?</dd>', '', 
-                                       first_cleansing_contents).strip()#뒤에 필요없는 부분 제거 (새끼 기사)
-    third_cleansing_contents = re.sub('<.+?>', '', second_cleansing_contents).strip()
-    contents_text.append(third_cleansing_contents)
-    #print(contents_text)
-    
-
-def crawler(maxpage,query,sort,s_date,e_date):
-
-    s_from = s_date.replace(".","")
-    e_to = e_date.replace(".","")
-    page = 1  
-    maxpage_t =(int(maxpage)-1)*10+1   # 11= 2페이지 21=3페이지 31=4페이지  ...81=9페이지 , 91=10페이지, 101=11페이지
-    
+# 크롤링 함수
+def search_crawl(tuple_list,query):
+    page = 1
+    maxpage = 1
+    # 11= 2페이지 21=3페이지 31=4페이지  ...81=9페이지 , 91=10페이지, 101=11페이지
+    maxpage_t = (int(maxpage) - 1) * 10 + 1
+    sort = 0 #0=관련도순 1=최신순 
     while page <= maxpage_t:
-        url = "https://search.naver.com/search.naver?where=news&query=" + query + "&sort="+sort+"&ds=" + s_date + "&de=" + e_date + "&nso=so%3Ar%2Cp%3Afrom" + s_from + "to" + e_to + "%2Ca%3A&start=" + str(page)
-        
-        response = requests.get(url)
+        url = (
+            "https://search.naver.com/search.naver?where=news&query="
+            + query
+            + "&sort="
+            + str(sort)
+            + "&start="
+            + str(page)
+        )
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36"
+        }
+        response = requests.get(url, headers=headers)
         html = response.text
- 
-        #뷰티풀소프의 인자값 지정
-        soup = BeautifulSoup(html, 'html.parser')
- 
-        #<a>태그에서 제목과 링크주소 추출
-        atags = soup.select('.news_tit')
-        for atag in atags:
-            title_text.append(atag.text)     #제목
-            link_text.append(atag['href'])   #링크주소
-            
-        #신문사 추출
-        source_lists = soup.select('.info_group > .press')
-        for source_list in source_lists:
-            source_text.append(source_list.text)    #신문사
-        
-        #날짜 추출 
-        date_lists = soup.select('.info_group > span.info')
-        for date_list in date_lists:
-            # 1면 3단 같은 위치 제거
-            if date_list.text.find("면") == -1:
-                date_text.append(date_list.text)
-        
-        #본문요약본
-        contents_lists = soup.select('.news_dsc')
-        for contents_list in contents_lists:
-            contents_cleansing(contents_list) #본문요약 정제화
-        
 
-        #모든 리스트 딕셔너리형태로 저장
-        result= {"date" : date_text , "title":title_text ,  "source" : source_text ,"contents": contents_text ,"link":link_text }  
-        #print(page)
+        # 뷰티풀소프의 인자값 지정
+        soup = BeautifulSoup(html, "html.parser")
+        atags = soup.select(".news_tit")
+        news_name =""
+        news_date =""
+        news_url = ""
+        pov_or_neg = 0 #긍부정 라벨링 값
         
-        df = pd.DataFrame(result)  #df로 변환
-        print(result['title'])
+        #긍부정 단어장 오픈
+        with open("./negative_words.txt", encoding='utf-8') as neg:
+            negative = neg.readlines()
+        negative = [neg.replace("\n", "") for neg in negative]
+    
+        with open("./positive_words.txt", encoding='utf-8') as pos:
+            positive = pos.readlines()
+        positive = [pos.replace("\n", "") for pos in positive]
+
+
+        # <a>태그에서 제목과 링크주소 추출
+        # 기사 제목, 기사url 저장 
+        for atag in atags:
+            # title_text.append(atag.text)  # 제목
+            # link_text.append(atag["href"])  # 링크주소
+            # title_list.append(atag.text)
+            # url_list.append(atag["href"])
+            
+            news_name = text_clean(atag.text)
+            news_url = atag["href"]
+            label =0
+
+            for i in range(len(positive)):
+                if news_name.find(positive[i]) != -1:
+                    label = 1
+                    break
+            for i in range(len(negative)):
+                if news_name.find(negative[i]) != -1:
+                    label = -1
+                    break
+            
+            if label == 1:
+                pov_or_neg = 1
+                #print("positive", j)
+            elif label == -1 :
+                pov_or_neg = -1
+                #print("negative", j)
+            elif label == 0:
+                pov_or_neg = 0              
+
+        # tuple_list.append((query, news_name, news_url, news_date, pov_or_neg))
+            tuple_list.append((news_name, pov_or_neg))
+
         page += 10
-    
-    
-    # 새로 만들 파일이름 지정
-    outputFileName = '%s-%s-%s  %s시 %s분 %s초 merging.xlsx' % (now.year, now.month, now.day, now.hour, now.minute, now.second)
-    #df.to_excel(RESULT_PATH+outputFileName,sheet_name='sheet1')
-    
-    
+
+
+#cospi = getStockCode(11, "StockSvc")
+# print(cospi)
+#cosdak = getStockCode(12, "StockSvc")
 cospi = [
     "동화약품",
     "케이알모터스",
@@ -1054,16 +1101,44 @@ cospi = [
     "신한서부티엔디위탁관리부동산투자회사",
 ]
 
-def main():
-    info_main = input("="*50+"\n"+"입력 형식에 맞게 입력해주세요."+"\n"+" 시작하시려면 Enter를 눌러주세요."+"\n"+"="*50)
+# if __name__ == "__main__":
+
+@logging_time
+def run():
     
-    maxpage = input("최대 크롤링할 페이지 수 입력하시오: ")  
-    #query = input("검색어 입력: ")  
-    sort = input("뉴스 검색 방식 입력(관련도순=0  최신순=1  오래된순=2): ")    #관련도순=0  최신순=1  오래된순=2
-    s_date = input("시작날짜 입력(2019.01.04):")  #2019.01.04
-    e_date = input("끝날짜 입력(2019.01.05):")   #2019.01.05
-    
-    # for query in cospi:
-    #     crawler(maxpage,query,sort,s_date,e_date) 
-    crawler(maxpage,cospi[5],sort,s_date,e_date) 
-main()
+    # pool = Pool(4)
+    # m = Manager()
+
+    # title_list = m.list()
+    # url_list = m.list()
+    # result_dict = m.dict()
+
+    # tuple_list = m.list()
+    # tuple_list.append(('title','pov_neg'))
+
+    # process = multiprocessing.cpu_count() * 2
+    # # # print(company)
+    # with Pool(processes=process) as pool:
+    #     pool.starmap(
+    #         search_crawl, [(posneg, positive,tuple_list, query) for query in cospi[:5]] ###### 크롤링 함수 사용시
+    #         # api_search, [(tuple_list, query) for query in cospi] ###### api 함수 사용시
+    #     )
+    #     pool.close()
+    #     pool.join()
+
+    tuple_list = list()
+    tuple_list.append(('title','label'))
+    for query in cospi[:5]:
+        search_crawl(tuple_list, query)
+
+
+    return tuple_list
+
+
+
+if __name__ == "__main__":
+    tuple = run()
+    with open('./train.csv', 'w') as f:
+        writer = csv.writer(f , lineterminator='\n')
+        for tup in tuple:
+            writer.writerow(tup)
