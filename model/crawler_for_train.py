@@ -80,10 +80,10 @@ def text_clean(inputString):
 # 크롤링 함수
 def search_crawl(tuple_list,query):
     page = 1
-    maxpage = 1
+    maxpage = 3
     # 11= 2페이지 21=3페이지 31=4페이지  ...81=9페이지 , 91=10페이지, 101=11페이지
     maxpage_t = (int(maxpage) - 1) * 10 + 1
-    sort = 0 #0=관련도순 1=최신순 
+    sort = 1 #0=관련도순 1=최신순 
     while page <= maxpage_t:
         url = (
             "https://search.naver.com/search.naver?where=news&query="
@@ -148,7 +148,7 @@ def search_crawl(tuple_list,query):
                 pov_or_neg = 0              
 
         # tuple_list.append((query, news_name, news_url, news_date, pov_or_neg))
-            tuple_list.append((news_name, pov_or_neg))
+            tuple_list.append((news_name, pov_or_neg, query))
 
         page += 10
 
@@ -1127,8 +1127,8 @@ def run():
     #     pool.join()
 
     tuple_list = list()
-    tuple_list.append(('title','label'))
-    for query in cospi[:5]:
+    tuple_list.append(('title','label','company'))
+    for query in cospi[:100]:
         search_crawl(tuple_list, query)
 
 
