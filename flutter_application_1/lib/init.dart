@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_application_1/screens/MainScreen/mainscreen.dart';
 import 'package:flutter_application_1/screens/login_screen.dart';
 
 class Init extends StatelessWidget {
@@ -14,7 +15,7 @@ class Init extends StatelessWidget {
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
         if (!snapshot.hasData) {
-          return LoginScreen();
+          return Mainscreen();
         }
         return LoginScreen();
       },
