@@ -126,6 +126,7 @@ def search_crawl(tuple_list,query):
             # url_list.append(atag["href"])
             
             news_name = text_clean(atag.text)
+            print(news_name)
             news_url = atag["href"]
             label =0
 
@@ -1107,29 +1108,29 @@ cospi = [
 def run():
     
     # pool = Pool(4)
-    # m = Manager()
+    m = Manager()
 
     # title_list = m.list()
     # url_list = m.list()
     # result_dict = m.dict()
 
-    # tuple_list = m.list()
-    # tuple_list.append(('title','pov_neg'))
+    tuple_list = m.list()
+    tuple_list.append(('title','pov_neg'))
 
-    # process = multiprocessing.cpu_count() * 2
-    # # # print(company)
-    # with Pool(processes=process) as pool:
-    #     pool.starmap(
-    #         search_crawl, [(posneg, positive,tuple_list, query) for query in cospi[:5]] ###### 크롤링 함수 사용시
-    #         # api_search, [(tuple_list, query) for query in cospi] ###### api 함수 사용시
-    #     )
-    #     pool.close()
-    #     pool.join()
+    process = multiprocessing.cpu_count() * 2
+    # # print(company)
+    with Pool(processes=process) as pool:
+        pool.starmap(
+            search_crawl, [(tuple_list, query) for query in cospi] ###### 크롤링 함수 사용시
+            # api_search, [(tuple_list, query) for query in cospi] ###### api 함수 사용시
+        )
+        pool.close()
+        pool.join()
 
-    tuple_list = list()
-    tuple_list.append(('title','label'))
-    for query in cospi[:5]:
-        search_crawl(tuple_list, query)
+    # tuple_list = list()
+    # tuple_list.append(('title','label'))
+    # for query in cospi:
+    #     search_crawl(tuple_list, query)
 
 
     return tuple_list
