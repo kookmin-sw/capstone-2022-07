@@ -7,7 +7,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Components/main_app_bar.dart';
-import 'package:flutter_application_1/Components/Cardlist.dart';
+import 'package:flutter_application_1/Components/stock_list.dart';
 
 
 class Recentscreen extends StatefulWidget {
@@ -25,7 +25,7 @@ class _RecentscreenState extends State<Recentscreen> {
       appBar: mainAppBar(context, "최근 조회 종목"),
       body: Column(
         children: [
-          CardList(size),
+          Cardlist(size),
         ],
       ),
     );

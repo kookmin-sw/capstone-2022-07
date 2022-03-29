@@ -3,16 +3,15 @@
 // found in the LICENSE file.
 
 
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_application_1/Components/main_app_bar.dart';
-
-const SEARCH = Color.fromRGBO(0, 0, 0, 0.25);
-void main() => runApp(Searchscreen());
+import 'package:flutter_application_1/Color/Color.dart';
 
 class Searchscreen extends StatefulWidget {
   Searchscreen({Key? key}) : super(key: key);
-
   @override
   State<Searchscreen> createState() => _SearchscreenState();
 }
@@ -65,17 +64,15 @@ class _SearchscreenState extends State<Searchscreen> {
                 )
             ),
             Expanded(
-              child: Container(
-                  child : Text(
-                    '찾으시는 종목을 입력하세요', textAlign: TextAlign.left, style: TextStyle(
-                      color: Color.fromRGBO(91, 99, 106, 1),
-                      fontFamily: 'ABeeZee',
-                      fontSize: 14,
-                      letterSpacing: 0,
-                      fontWeight: FontWeight.normal,
-                      height: 1
-                  ),)
-              ),
+              child: Text(
+                '찾으시는 종목을 입력하세요', textAlign: TextAlign.left, style: TextStyle(
+                  color: Color.fromRGBO(91, 99, 106, 1),
+                  fontFamily: 'ABeeZee',
+                  fontSize: 14,
+                  letterSpacing: 0,
+                  fontWeight: FontWeight.normal,
+                  height: 1
+              ),),
             )
           ],
         )

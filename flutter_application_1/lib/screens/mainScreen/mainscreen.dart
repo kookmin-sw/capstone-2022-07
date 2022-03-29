@@ -94,7 +94,7 @@ class _MainscreenState extends State<Mainscreen> {
   Widget Idontknow(Size size) {
     return Container(
         width: size.width * 0.9,
-        height: size.height * 0.3,
+        height: size.height * 0.25,
         decoration: widgetBoxDecoration(8, 255, 4, 255));
   }
 

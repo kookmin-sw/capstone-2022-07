@@ -43,7 +43,7 @@ Widget Stockcard(Size size, var name, var price, var perc, var volume) {
     width: size.width * 0.9,
     decoration: widgetBoxDecoration(8,255,4,255),
     padding: EdgeInsets.symmetric(
-        horizontal: size.width * 0.03, vertical: size.height * 0.01),
+        horizontal: size.width * 0.03, vertical: size.height * 0.005),
     margin: EdgeInsets.only(bottom: size.height * 0.03),
     child: Column(
       children: [
@@ -204,7 +204,7 @@ Widget Stockcard(Size size, var name, var price, var perc, var volume) {
 }
 
 // 종목카드를 모은 리스트
-Widget CardList(Size size) {
+Widget Cardlist(Size size) {
   return Expanded(
     child: ListView.builder(
       scrollDirection: Axis.vertical,

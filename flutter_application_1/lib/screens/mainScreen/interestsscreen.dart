@@ -6,7 +6,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Components/main_app_bar.dart';
-import 'package:flutter_application_1/Components/Cardlist.dart';
+import 'package:flutter_application_1/Components/stock_list.dart';
 
 
 class InterestScreen extends StatefulWidget {
@@ -24,7 +24,7 @@ class _InterestScreenState extends State<InterestScreen> {
       appBar: mainAppBar(context, "관심 종목"),
       body: Column(
         children: [
-          CardList(size),
+          Cardlist(size),
         ],
       ),
     );

@@ -24,8 +24,8 @@ class _StartScreenState extends State<StartScreen> {
   List<Widget> _widgetOptions = <Widget>[
     Mainscreen(),
     InterestScreen(),
-    Recentscreen(),
     Searchscreen(),
+    Stockscreen(),
   ];
 
   int selectedIndex = 0;
