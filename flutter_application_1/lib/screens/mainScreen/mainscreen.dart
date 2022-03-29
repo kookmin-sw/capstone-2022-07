@@ -8,8 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Components/main_app_bar.dart';
 import 'package:flutter_application_1/Components/setting_button.dart';
 import 'package:flutter_application_1/Components/widget_box.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter/services.dart';
 
 class Mainscreen extends StatefulWidget {
   Mainscreen({Key? key}) : super(key: key);
@@ -25,7 +23,7 @@ class _MainscreenState extends State<Mainscreen> {
       child: Container(
         width: size.width * 0.9,
         height: size.height * 0.4,
-        decoration: widgetBoxDecoration(),
+        decoration: widgetBoxDecoration(8, 255, 4, 255),
         child: Column(
           children: [
             Container(
@@ -97,7 +95,7 @@ class _MainscreenState extends State<Mainscreen> {
     return Container(
         width: size.width * 0.9,
         height: size.height * 0.3,
-        decoration: widgetBoxDecoration());
+        decoration: widgetBoxDecoration(8, 255, 4, 255));
   }
 
   @override

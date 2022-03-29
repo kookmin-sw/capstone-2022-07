@@ -5,11 +5,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter/services.dart';
-
-const MINUS = Color.fromRGBO(0, 57, 164, 0.9);
-const PLUS = Color.fromRGBO(238, 71, 81, 0.9);
-
+import 'package:flutter_application_1/Color/Color.dart';
+import 'package:flutter_application_1/Components/main_app_bar.dart';
 
 void main() => runApp(Stockscreen());
 
@@ -17,116 +14,29 @@ class Stockscreen extends StatefulWidget {
   Stockscreen({Key? key}) : super(key: key);
 
   @override
-  State<Stockscreen> createState() => _stockscreenState();
+  State<Stockscreen> createState() => _StockscreenState();
 }
 
-class _stockscreenState extends State<Stockscreen> {
 
+
+class _StockscreenState extends State<Stockscreen> {
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.top]);
-    return MaterialApp(
-      title: "stockscreen",
-
-      home: Scaffold(
-
-          body: Builder(
-              builder: (BuildContext ctx) {
-                var mediaQuery = MediaQuery.of(ctx);
-
-                return Container(
-                    child: Column(
-                      children: [
-                        tempStatusbar(mediaQuery),
-                        Navigationbar(mediaQuery),
-                        SizedBox(height: mediaQuery.size.height*0.01,),
-                        Stockmain(mediaQuery),
-                        Stockchart(mediaQuery),
-                        Stockinfo(mediaQuery),
-                      ],
-                    )
-                );
-              }
-
-          )
+    Size size = MediaQuery.of(context).size;
+    return Scaffold(
+      appBar: mainAppBar(context, "종목 정보"),
+      body: Column(
+        children: [
+        SizedBox(height: size.height*0.01,),
+        Stockmain(size),
+        Stockchart(size),
+        Stockinfo(size),
+        ],
       ),
-
-
     );
   }
 }
 
-// Flutter 기본 statusbar만큼의 공간 나중에 삭제
-Widget tempStatusbar(var mediaQuery){
-  return Container(padding: EdgeInsets.only(top: mediaQuery.padding.top));
-}
-
-// navigator 홈화면은 vectorstroke 생략
-Widget Navigationbar(var mediaQuery){
-  Size size = mediaQuery.size;
-  return Container(
-      decoration: BoxDecoration(
-
-        color : Color.fromRGBO(255, 255, 255, 1),
-      ),
-
-      padding: EdgeInsets.symmetric(horizontal: size.width*0.016, vertical: size.height*0.008),
-
-      child : Row(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Container(
-              width : size.width * 0.25,
-              height : size.height * 0.04,
-              child: Container(
-                  padding: EdgeInsets.only(left: size.width * 0.25 * 0.1),
-                  alignment: Alignment.centerLeft,
-                  child : SvgPicture.asset(
-                      'assets/images/vectorstroketoleft.svg',
-                      semanticsLabel: 'vectorstroketoleft'
-                  )
-              )
-          ),
-          SizedBox(width : size.width * 0.25 * 0.1),
-          Text(
-              '종목',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Color.fromRGBO(0, 0, 0, 1),
-                fontFamily: 'Content',
-                fontSize: 18,
-                letterSpacing: 0,
-                fontWeight: FontWeight.normal,
-                height:1,
-              )
-          ),
-          SizedBox(width : size.width * 0.25 * 0.1),
-          Container(
-              width : size.width * 0.25,
-              height : size.height * 0.04,
-              padding: EdgeInsets.only(right: size.width * 0.25 * 0.1),
-              decoration: BoxDecoration(
-                border : Border.all(
-                  color: Color.fromRGBO(255, 255, 255, 1),
-                  width: 1,
-                ),
-              ),
-              child : Stack(
-                children: [
-                  Align(
-                      alignment: Alignment.centerRight,
-                      child: SvgPicture.asset(
-                          'assets/images/vectorset.svg',
-                          semanticsLabel: 'vectorset'
-                      )
-                  )],
-              )
-          ),
-        ],
-      )
-  );
-}
 
 // 종목 이름,가격,대비,긍/부정, 관심
 Widget Stockmain(var mediaQuery){
@@ -181,7 +91,7 @@ Widget Stockmain(var mediaQuery){
                     '69,900',
                     textAlign: TextAlign.left,
                     style: TextStyle(
-                      color: MINUS,
+                      color: CHART_MINUS,
                       fontFamily: 'Content',
                       fontSize: 22,
                       letterSpacing: 0,
@@ -197,7 +107,7 @@ Widget Stockmain(var mediaQuery){
                     '-203(-2.49%)',
                     textAlign: TextAlign.left,
                     style: TextStyle(
-                      color: MINUS,
+                      color: CHART_MINUS,
                       fontFamily: 'Content',
                       fontSize: 14,
                       letterSpacing: 0,
@@ -315,7 +225,7 @@ Widget Stockchart(var mediaQuery){
                   bottomLeft: Radius.circular(8),
                   bottomRight: Radius.circular(8),
                 ),
-                color: MINUS,
+                color: CHART_MINUS,
                 ),
 
                   child : Text(

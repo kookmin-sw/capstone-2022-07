@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/screens/mainScreen/interestsscreen.dart';
 import 'package:flutter_application_1/screens/mainScreen/mainscreen.dart';
+import 'package:flutter_application_1/screens/mainScreen/recentscreen.dart';
 import 'package:flutter_application_1/screens/mainScreen/searchscreen.dart';
 import 'package:flutter_application_1/screens/mainScreen/stockscreen.dart';
 import 'package:flutter_application_1/screens/signup/register_screen.dart';
@@ -23,8 +24,8 @@ class _StartScreenState extends State<StartScreen> {
   List<Widget> _widgetOptions = <Widget>[
     Mainscreen(),
     InterestScreen(),
-    Mainscreen(),
-    InterestScreen(),
+    Recentscreen(),
+    Searchscreen(),
   ];
 
   int selectedIndex = 0;

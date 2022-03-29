@@ -2,20 +2,26 @@
 
 import 'package:flutter/material.dart';
 
-BoxDecoration widgetBoxDecoration() {
+BoxDecoration widgetBoxDecoration(
+    double radius,               // 테두리 경계선
+    int boxshadowcolor,       // 테두리 색
+    double boxshadowblur,        // 테두리 흐림 정도
+    int boxcolor              // 박스 색
+    )
+{
   return BoxDecoration(
     borderRadius: BorderRadius.only(
-      topLeft: Radius.circular(8),
-      topRight: Radius.circular(8),
-      bottomLeft: Radius.circular(8),
-      bottomRight: Radius.circular(8),
+      topLeft: Radius.circular(radius),
+      topRight: Radius.circular(radius),
+      bottomLeft: Radius.circular(radius),
+      bottomRight: Radius.circular(radius),
     ),
     boxShadow: [
       BoxShadow(
-          color: Color.fromRGBO(0, 0, 0, 0.25),
+          color: Color.fromRGBO(boxshadowcolor, boxshadowcolor, boxshadowcolor, 0.25),
           offset: Offset(0, 4),
-          blurRadius: 4)
+          blurRadius: boxshadowblur)
     ],
-    color: Color.fromRGBO(255, 255, 255, 1),
+    color: Color.fromRGBO(boxcolor, boxcolor, boxcolor, 1),
   );
 }
