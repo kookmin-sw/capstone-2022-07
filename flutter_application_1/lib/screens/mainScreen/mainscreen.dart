@@ -2,12 +2,13 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, sized_box_for_whitespace, avoid_unnecessary_containers, non_constant_identifier_names, prefer_const_constructors_in_immutables
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, sized_box_for_whitespace, avoid_unnecessary_containers, non_constant_identifier_names, prefer_const_constructors_in_immutables, avoid_print
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Components/main_app_bar.dart';
 import 'package:flutter_application_1/Components/setting_button.dart';
 import 'package:flutter_application_1/Components/widget_box.dart';
+import 'package:yahoofin/yahoofin.dart';
 
 class Mainscreen extends StatefulWidget {
   Mainscreen({Key? key}) : super(key: key);
@@ -17,7 +18,8 @@ class Mainscreen extends StatefulWidget {
 }
 
 class _MainscreenState extends State<Mainscreen> {
-// 주요지수를 알려주는 위젯
+  final finance = YahooFin();
+  // 주요지수를 알려주는 위젯
   Widget Stockindex(Size size) {
     return Center(
       child: Container(
@@ -93,9 +95,11 @@ class _MainscreenState extends State<Mainscreen> {
 //뭐넣을지 미정
   Widget Idontknow(Size size) {
     return Container(
-        width: size.width * 0.9,
-        height: size.height * 0.25,
-        decoration: widgetBoxDecoration(8, 255, 4, 255));
+      width: size.width * 0.9,
+      height: size.height * 0.25,
+      decoration: widgetBoxDecoration(8, 255, 4, 255),
+      child: Text("press"),
+    );
   }
 
   @override
