@@ -104,6 +104,7 @@ class _StockscreenState extends State<Stockscreen> {
                 )
             ),
             // 긍/부정
+            // Firebase 적용 사항
             Expanded(
                 child : SvgPicture.asset(
                     'assets/icons/nice.svg',
@@ -112,6 +113,7 @@ class _StockscreenState extends State<Stockscreen> {
             ),
 
             //관심
+            // Firebase 적용 사항
             Stack(
               children: [
                 Align(
@@ -135,6 +137,7 @@ class _StockscreenState extends State<Stockscreen> {
   }
 
 // 종목 차트
+  // Firebase 적용 사항
   Widget Stockchart(Size size){
 
     return Container(
@@ -288,55 +291,44 @@ class _StockscreenState extends State<Stockscreen> {
   }
 
 //종목 정보
+// Firebase 적용 사항
   Widget Stockinfo(Size size){
 
     return Container(
-        width : size.width*0.9,
-        height: size.height*0.08,
-        color: Colors.white,
-        child :ExpansionTile(
+        decoration: BoxDecoration(
 
-          title: Text(
-            '종목정보',
-            textAlign: TextAlign.left,
-            style: TextStyle(
-              color: Color.fromRGBO(0, 0, 0, 1),
-              fontFamily: 'Content',
-              fontSize: size.width * 0.05,
-              fontWeight: FontWeight.normal,
-              height:1,
-            ),
-
+          borderRadius : BorderRadius.only(
+            topLeft: Radius.circular(8),
+            topRight: Radius.circular(8),
+            bottomLeft: Radius.circular(8),
+            bottomRight: Radius.circular(8),
           ),
-          initiallyExpanded : false,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                borderRadius : BorderRadius.only(
-                  topLeft: Radius.circular(8),
-                  topRight: Radius.circular(8),
-                  bottomLeft: Radius.circular(8),
-                  bottomRight: Radius.circular(8),
-                ),
-                border: Border.all(width:3, color: Colors.black),
-                color : Color.fromRGBO(142, 142, 142, 1),
-                boxShadow : [
-                  BoxShadow(
-                      color: Color.fromRGBO(0, 0, 0, 0.25),
-                      offset: Offset(0,4),
-                      blurRadius: 2
-                  )],
-              ),
+          color : Colors.white,
+          boxShadow : [
+            BoxShadow(
+                color: Color.fromRGBO(0, 0, 0, 0.25),
+                offset: Offset(0,4),
+                blurRadius: 2
+            )],
+        ),
+        width : size.width*0.9,
+        child :ExpansionTile(
+          initiallyExpanded : !false,
+          title: Container(
+            child :Text(
+                '종목정보',
+                textAlign: TextAlign.left,
+                style: TextStyle(
+                  color: Color.fromRGBO(0, 0, 0, 1),
+                  fontFamily: 'Content',
+                  fontSize: size.width * 0.05,
+                  fontWeight: FontWeight.normal,
+                  height:1,
+                )
+          ),
 
-              child: Column(
-                children: [
-                  Container(
-                      child : Text('123'))
-                ],
-              ),
-            )
-          ],
-        )
+          )
+    ),
     );
   }
 

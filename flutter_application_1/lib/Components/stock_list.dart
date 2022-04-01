@@ -39,7 +39,7 @@ Widget Stockcard(Size size, var name, var price, var perc, var volume) {
   volume = intl.format(volume);
 
   return Container(
-    height: size.height * 0.18,
+    height: size.height * 0.185,
     width: size.width * 0.9,
     decoration: widgetBoxDecoration(8,255,4,255),
     padding: EdgeInsets.symmetric(
@@ -176,6 +176,7 @@ Widget Stockcard(Size size, var name, var price, var perc, var volume) {
                       ),
                       child: Row(
                         children: [
+                          // Firebase 적용 사항
                           const Text(
                             '자세히',
                             style: TextStyle(
@@ -187,7 +188,7 @@ Widget Stockcard(Size size, var name, var price, var perc, var volume) {
                           ),
                           SizedBox(width: size.width * 0.03),
                           SvgPicture.asset(
-                              'assets/images/vectorstroketoright.svg',
+                              'assets/icons/vectorstroketoright.svg',
                               semanticsLabel: 'vectorstroketoright')
                         ],
                       ),

@@ -28,7 +28,7 @@ class _StartScreenState extends State<StartScreen> {
     Stockscreen(),
   ];
 
-  int selectedIndex = 0;
+  int selectedIndex = 3;
   int badge = 0;
   final padding = EdgeInsets.symmetric(horizontal: 18, vertical: 12);
   double gap = 10;
