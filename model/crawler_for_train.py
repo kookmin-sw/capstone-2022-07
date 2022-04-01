@@ -67,11 +67,13 @@ def getStockCode(market, url_param):
 
     return item_list
 
-def text_clean(inputString):
+def text_clean(inputString, query):
     # inputString = inputString.replace("<b>","").replace("</b>","") # html 태그 제거  ## <b> <b/>
     inputString = re.sub(r'\<[^)]*\>', '', inputString, 0).strip() # <> 안의 내용 제거  ## html태그 + 종목명
     inputString = re.sub('[-=+,#/\?:^.@*\"※~ㆍ!』‘|\(\)\[\]`\'…》\”\“\’·]', ' ', inputString) # 특수문자 제거
     inputString = inputString.replace("&quot;"," ").replace("amp;","").replace("&gt; "," ").replace("&lt;"," ")
+    inputString = inputString.replace(query," ")
+
     inputString = ' '.join(inputString.split())
     
     return inputString
@@ -79,16 +81,18 @@ def text_clean(inputString):
 
 # 크롤링 함수
 def search_crawl(tuple_list,query):
+    del_list = ["오늘의", "뉴스", "급락주","마감","주요","급등주"]
+
     page = 1
     maxpage = 3
     # 11= 2페이지 21=3페이지 31=4페이지  ...81=9페이지 , 91=10페이지, 101=11페이지
     maxpage_t = (int(maxpage) - 1) * 10 + 1
-    sort = 1 #0=관련도순 1=최신순 
+    sort = 0 #0=관련도순 1=최신순 
     while page <= maxpage_t:
         url = (
-            "https://search.naver.com/search.naver?where=news&query="
+            "https://search.naver.com/search.naver?where=news&query=\""
             + query
-            + "&sort="
+            + "\"&sort="
             + str(sort)
             + "&start="
             + str(page)
@@ -122,20 +126,24 @@ def search_crawl(tuple_list,query):
         for atag in atags:
             # title_text.append(atag.text)  # 제목
             # link_text.append(atag["href"])  # 링크주소
-            # title_list.append(atag.text)
-            # url_list.append(atag["href"])
             
-            news_name = text_clean(atag.text)
+            
+            news_name = text_clean(atag.text,query)
             news_url = atag["href"]
             label =0
+            tag = ""
+            if any(keyword in news_name for keyword in del_list):
+                continue
 
             for i in range(len(positive)):
                 if news_name.find(positive[i]) != -1:
                     label = 1
+                    tag = positive[i]
                     break
             for i in range(len(negative)):
                 if news_name.find(negative[i]) != -1:
                     label = -1
+                    tag = negative[i]
                     break
             
             if label == 1:
@@ -148,7 +156,7 @@ def search_crawl(tuple_list,query):
                 pov_or_neg = 0              
 
         # tuple_list.append((query, news_name, news_url, news_date, pov_or_neg))
-            tuple_list.append((news_name, pov_or_neg, query))
+            tuple_list.append((news_name, pov_or_neg, query, tag))
 
         page += 10
 
@@ -1128,7 +1136,7 @@ def run():
 
     tuple_list = list()
     tuple_list.append(('title','label','company'))
-    for query in cospi[:100]:
+    for query in cospi[101:200]:
         search_crawl(tuple_list, query)
 
 
