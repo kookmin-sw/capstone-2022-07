@@ -1139,7 +1139,7 @@ def run():
 
     tuple_list = list()
     tuple_list.append(('title','label'))
-    for query in cospi[0:300]:
+    for query in cospi[69:136]:
         search_crawl(tuple_list, query)
 
 
@@ -1149,7 +1149,7 @@ def run():
 
 if __name__ == "__main__":
     tuple = run()
-    with open('./train.csv', 'w') as f:
+    with open('./testforwh.csv', 'w') as f:
         writer = csv.writer(f , lineterminator='\n')
         for tup in tuple:
             writer.writerow(tup)
