@@ -10,7 +10,12 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_application_1/Color/Color.dart';
 import 'package:flutter_application_1/Components/main_app_bar.dart';
 
-void main() => runApp(Stockscreen());
+//Firebase 적용 사항
+List<String> stockIcon = <String>['price', 'perc', 'eps', 'marketcap', 'dividend'];
+List<String> stockInfodetail = <String>['주가', '주가수익률', '주당순이익', '시가총액', '배당'];
+List<String> stockValue = <String>['99,900원(+2.49%)', '45.79%', '32.54', '240.73', '1.50%(FY:2077'];
+List<String> mediaName = <String>['건민일보','어쩔티비','123'];
+List<String> newsTitle = <String>['저녁 만찬으로 비비큐먹어...충격', '코로나 언제 끝나냐', '123'];
 
 class Stockscreen extends StatefulWidget {
   Stockscreen({Key? key}) : super(key: key);
@@ -292,7 +297,7 @@ class _StockscreenState extends State<Stockscreen> {
 
 //종목 정보
 // Firebase 적용 사항
-  Widget Stockinfo(Size size){
+  Widget Stockinfolist(Size size){
 
     return Container(
         decoration: BoxDecoration(
@@ -313,38 +318,164 @@ class _StockscreenState extends State<Stockscreen> {
         ),
         width : size.width*0.9,
         child :ExpansionTile(
-          initiallyExpanded : !false,
-          title: Container(
-            child :Text(
-                '종목정보',
-                textAlign: TextAlign.left,
-                style: TextStyle(
-                  color: Color.fromRGBO(0, 0, 0, 1),
-                  fontFamily: 'Content',
-                  fontSize: size.width * 0.05,
-                  fontWeight: FontWeight.normal,
-                  height:1,
-                )
+          initiallyExpanded : false,
+          title: Text('종목 정보'
           ),
+            children : [ListView.builder(
+              scrollDirection: Axis.vertical,
+              shrinkWrap: true,
+             physics: NeverScrollableScrollPhysics(),
+              padding: EdgeInsets.symmetric(horizontal: size.width * 0.03, ),
+              itemCount: stockIcon.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Stockinfo(size, stockIcon[index], stockInfodetail[index], stockValue[index]);
+              },
+            )]
 
-          )
     ),
     );
   }
+  Widget Stockinfo(Size size, String Icon, String Infodetail, String Value) {
+    return Container(
+      margin : EdgeInsets.only(bottom: size.height * 0.06),
+      child : Row(
+        children: [
+          Container(
 
+            width: size.width * 0.04,
+            height: size.width * 0.04 ,
+            child : (SvgPicture.asset('assets/icons/stock${Icon}.svg',
+            semanticsLabel: '${stockIcon}',
+            color : CHART_MINUS))
+
+          ),
+          SizedBox(width : size.width * 0.02),
+          Text(
+            '${Infodetail}', textAlign: TextAlign.left, style: TextStyle(
+              color: Color.fromRGBO(91, 99, 106, 1),
+              fontFamily: 'ABeeZee',
+              fontSize: 16,
+              letterSpacing: 0,
+              fontWeight: FontWeight.bold,
+              height: 1
+          ),
+          ),
+          Expanded(
+            child : Text(
+              '${Value}',
+              textAlign: TextAlign.right,
+              style: TextStyle(
+                color: Color.fromRGBO(91, 99, 106, 1),
+
+                fontFamily: 'ABeeZee',
+                fontSize: 14,
+                letterSpacing: 0,
+                fontWeight: FontWeight.normal,
+                height: 1
+            ),
+            )
+          )
+
+        ],
+      )
+    );
+  }
+
+//종목 뉴스
+  Widget Stocknewslist(Size size){
+
+    return Container(
+      decoration: BoxDecoration(
+
+        borderRadius : BorderRadius.only(
+          topLeft: Radius.circular(8),
+          topRight: Radius.circular(8),
+          bottomLeft: Radius.circular(8),
+          bottomRight: Radius.circular(8),
+        ),
+        color : Colors.white,
+        boxShadow : [
+          BoxShadow(
+              color: Color.fromRGBO(0, 0, 0, 0.25),
+              offset: Offset(0,4),
+              blurRadius: 2
+          )],
+      ),
+      width : size.width*0.9,
+      child :ExpansionTile(
+          initiallyExpanded : false,
+          title: Text('종목 뉴스'
+          ),
+          children : [
+            ListView.separated(
+              scrollDirection: Axis.vertical,
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              padding: EdgeInsets.symmetric(horizontal: size.width * 0.04 ),
+              itemCount: mediaName.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Stocknews(size, mediaName[index], newsTitle[index]);
+              },
+              separatorBuilder: (BuildContext context, int index) => const Divider(color: GREY),
+          )
+          ]
+
+      ),
+    );
+  }
+  Widget Stocknews(Size size, String Name, String Title){
+    return Container(
+
+      child : Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children : [
+          Text(
+            Name,
+            textAlign: TextAlign.right,
+            style: const TextStyle(
+              color: Color.fromRGBO(0, 0, 0, 1),
+              fontFamily: 'Content',
+              fontSize: 14,
+              letterSpacing: 0,
+              fontWeight: FontWeight.bold,
+              height: 1,
+            ),
+          ),
+          SizedBox(height: size.height*0.01),
+          Text(
+            Title,
+            textAlign: TextAlign.left,
+            style: const TextStyle(
+              color: Color.fromRGBO(0, 0, 0, 0.8),
+              fontFamily: 'Content',
+              fontSize: 10,
+              letterSpacing: 0,
+              fontWeight: FontWeight.normal,
+              height: 1,
+            ),
+          ),
+
+        ]
+      )
+    );
+  }
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: mainAppBar(context, "종목 정보"),
-      body: Column(
-        children: [
-        SizedBox(height: size.height*0.01,),
-        Stockmain(size),
-        Stockchart(size),
-        Stockinfo(size),
-        ],
-      ),
+      body: SingleChildScrollView(
+        child : Column(
+          children: [
+            SizedBox(height: size.height*0.01,),
+            Stockmain(size),
+            Stockchart(size),
+            Stockinfolist(size),
+            SizedBox(height : size.height * 0.01),
+            Stocknewslist(size)
+          ],
+        ),
+      )
     );
   }
 }
