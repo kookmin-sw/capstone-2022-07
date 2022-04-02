@@ -81,6 +81,7 @@ def text_clean(inputString, query):
 
 # 크롤링 함수
 def search_crawl(tuple_list,query):
+    # 삭제할 키워드들 
     del_list = ["오늘의", "뉴스", "급락주","마감","주요","급등주"]
 
     page = 1
@@ -126,9 +127,10 @@ def search_crawl(tuple_list,query):
         for atag in atags:
             # title_text.append(atag.text)  # 제목
             # link_text.append(atag["href"])  # 링크주소
-            
-            
-            news_name = text_clean(atag.text,query)
+            news_name = atag.text
+            if any(keyword in news_name for keyword in del_list):
+                continue
+            news_name = text_clean(news_name,query)
             news_url = atag["href"]
             label =0
             tag = ""
