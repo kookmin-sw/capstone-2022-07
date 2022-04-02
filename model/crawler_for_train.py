@@ -45,7 +45,7 @@ def getStockCode(market, url_param):
     """
     market: 상장구분 (11=유가증권, 12=코스닥, 13=K-OTC, 14=코넥스, 50=기타비상장)
     """
-    url_base = f"http://api.seibro.or.kr/openapi/service/{url_param}"
+    url_base = "http://api.seibro.or.kr/openapi/service/{url_param}"
     url_spec = "getShotnByMartN1"
     url = url_base + "/" + url_spec
     api_key_decode = requests.utils.unquote(api_decode_key_stock, encoding="utf-8")
@@ -82,7 +82,8 @@ def text_clean(inputString, query):
 # 크롤링 함수
 def search_crawl(tuple_list,query):
     # 삭제할 키워드들 
-    del_list = ["오늘의", "뉴스", "급락주","마감","주요","급등주"]
+    del_list = ["오늘의", "뉴스", "급락주","마감","주요","급등주", "증시일정", "캘린더", "이번주", "[포토]", "[인사]", "상장사", "주간", "종목", "총정리", 
+                "다음주", "슈퍼주총"]
 
     page = 1
     maxpage = 1
@@ -158,7 +159,7 @@ def search_crawl(tuple_list,query):
                 pov_or_neg = 0              
 
         # tuple_list.append((query, news_name, news_url, news_date, pov_or_neg))
-            tuple_list.append((news_name, pov_or_neg, query, tag))
+            tuple_list.append((news_name, pov_or_neg))
 
         page += 10
 
@@ -1137,8 +1138,8 @@ def run():
     #     pool.join()
 
     tuple_list = list()
-    tuple_list.append(('title','label','company'))
-    for query in cospi[125:942]:
+    tuple_list.append(('title','label'))
+    for query in cospi[0:300]:
         search_crawl(tuple_list, query)
 
 
