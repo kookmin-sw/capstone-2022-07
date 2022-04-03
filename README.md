@@ -16,7 +16,7 @@ This project aims to build a system that notifies users of of stocks that are sh
 
 ## 3. 소개 영상
 
-개발 후 추가 예정
+<iframe width="640" height="360" src="https://youtu.be/EKr2MalbsOY" frameborder="0" gesture="media" allowfullscreen=""></iframe>
 
 ---
 
@@ -29,7 +29,7 @@ This project aims to build a system that notifies users of of stocks that are sh
 ```markdown
 🐯 \*\*\*\*1664
 📧 ijkoo16@kookmin.ac.kr
-📌 UI/UX 디자인, 크롤링 모델 구현
+📌 Front-end, Git 관리, Firebase 데이터베이스 구축
 ```
 
 **이건민**
@@ -39,7 +39,7 @@ This project aims to build a system that notifies users of of stocks that are sh
 ```markdown
 🐮 \*\*\*\*1660
 📧 Email: lkm9709@kookmin.ac.kr
-📌
+📌 Front-end, UI/UX 디자인
 ```
 
 **이승준**
@@ -49,15 +49,17 @@ This project aims to build a system that notifies users of of stocks that are sh
 ```markdown
 🐯 \*\*\*\*1667
 📧 Email: juns519@kookmin.ac.kr
-📌
+📌 모델 학습, 크롤링 모델 구축
 ```
+
+**이원형**
 
 <img src = "https://user-images.githubusercontent.com/28581806/157245315-08383b96-17d7-4d6b-a057-2e75c6ddb1e5.jpeg" width="300px" height="300px">
 
 ```markdown
 🐭 \*\*\*\*1672
 📧 Email: hyeong3642@kookmin.ac.kr
-📌
+📌 모델 학습, 데이터셋 구축
 ```
 
 ---
@@ -141,14 +143,7 @@ https://code.visualstudio.com/
 Xcode를 설치하세요:
 
 ```markdown
-앱스토어에서 xcode 설치 or
-
-1. http://developer.apple.com/download/more (Apple ID 로그인)
-2. 다운받을 Xcode 버전 검색
-3. Xcode xip 압축파일 다운로드
-4. 다운받은 xip 파일 실행
-5. 압축이 해제된 Xcode 파일 응용프로그램 폴더로 복사
-6. Xcode 실행
+앱스토어에서 xcode 설치
 ```
 
 ##### step 3:
@@ -195,24 +190,6 @@ https://flutter-ko.dev/docs/get-started/install/macos
 1. terminal open
 2. flutter --doctor
    (flutter —doctor 실행시 본인의 환경에서 플러터 코드 실행을 할수 있는지 확인가능)
-```
-
-##### step 7-1:
-
-flutter doctor 실행후 나오는 아래와 같은 에러는 ios앱 빌드시에는 무시
-이외에 에러 발생시에 flutter doctor가 어떤 것을 해야하는지 상세히 보여주니 따라서 진행할 것.
-
-```markdown
-Android toolchain - develop for Android devices
-✗ Unable to locate Android SDK.
-Install Android Studio from:
-https://developer.android.com/studio/index.html
-On first launch it will assist you in installing the Android SDK
-components.
-(or visit https://flutter.dev/docs/get-started/install/macos#android-setup
-for detailed instructions).
-If the Android SDK has been installed to a custom location, please use
-`flutter config --android-sdk` to update to that location.
 ```
 
 ##### step 8:
