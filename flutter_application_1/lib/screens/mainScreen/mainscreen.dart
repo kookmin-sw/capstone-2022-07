@@ -9,7 +9,6 @@ import 'package:flutter_application_1/Color/Color.dart';
 import 'package:flutter_application_1/Components/main_app_bar.dart';
 import 'package:flutter_application_1/Components/setting_button.dart';
 
-
 class Mainscreen extends StatefulWidget {
   Mainscreen({Key? key}) : super(key: key);
 
@@ -25,7 +24,7 @@ class _MainscreenState extends State<Mainscreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '4월 1일, 목요일 (GMT+9) 09:00 기준',
+                '4월 1일, 목요일 (GMT+9) 09:00 기준', //Firebase 적용 사항
                 style: TextStyle(
                   color: Color.fromRGBO(0, 0, 0, 0.7),
                   fontFamily : 'Content',
@@ -55,14 +54,14 @@ class _MainscreenState extends State<Mainscreen> {
                   ),
                   child : Column(
                     children: [ // Firebase 적용 사항
-                      Topstock(size),
-                      Topstock(size),
-                      Topstock(size),
-                      Topstock(size),
-                      Topstock(size),
-                      Topstock(size),
-                      Topstock(size),
-                      Topstock(size),
+                      Topstock(size, '삼성전자', '+3.1%', 70000, 1213),
+                      Topstock(size, '피엔케이피부임상연구센타', '+11.4%', 12230,802 ),
+                      Topstock(size, '이승중견기업', '+30%', 9999990, 786),
+                      Topstock(size, '동국제약', '-12%', 52000,530 ),
+                      Topstock(size, '셀트리온', '+1.2%', 13000, 432),
+                      Topstock(size, 'LG에너지솔루션', '-15.5%', 72300,422 ),
+                      Topstock(size, '현대엘리베이터', '+9.78%', 34500, 320),
+                      Topstock(size, 'SK하이닉스', '+7.78%', 12200,258 ),
 
 
                     ],
@@ -72,7 +71,14 @@ class _MainscreenState extends State<Mainscreen> {
     );
   }
 
-  Widget Topstock(Size size){
+  Widget Topstock(Size size, String stockname, var stockperc, var stockprice, var newscount ){
+    var color;
+    if (stockperc[0] == '+') {
+      color = CHART_PLUS;
+    } else {
+      color = CHART_MINUS;
+    }
+
     return Container(
         width: size.width *  0.9,
         height: size.height * 0.37 * 0.1,
@@ -82,7 +88,7 @@ class _MainscreenState extends State<Mainscreen> {
             Container(
 
                 child: Text(
-                  '삼성 전자',  //Firebase 적용사항
+                  '${stockname}',  //Firebase 적용사항
                   style: TextStyle(
                       color: Color.fromRGBO(0, 0, 0, 1),
                       fontFamily: 'ABeeZee',
@@ -92,47 +98,55 @@ class _MainscreenState extends State<Mainscreen> {
                 )
 
             ),
-            Container(
-                margin: EdgeInsets.only(left: size.width * 0.9 * 0.08),
-                alignment: Alignment.center,
-                child : Column(
-                  children: [
-                    Text(
-                      '+2.79%', //Firebase 적용사항
-                      style: TextStyle(
-                          color: CHART_PLUS,
-                          fontFamily: 'Content',
-                          fontSize: size.width * 0.03,
-                          fontWeight: FontWeight.normal,
-                          height: 1.2),),
-                    Text(
-                      '77,000', //Firebase 적용사항
-                      style: TextStyle(
-                          color: Color.fromRGBO(0, 0, 0, 1),
-                          fontFamily: 'Content',
-                          fontSize: size.width * 0.02,
-                          fontWeight: FontWeight.normal,
-                          height: 1.2),
-                    )
-                  ],
-
-
-                )
-            ),
             Expanded(
 
-                child: Text(
-                  '1,500개', //Firebase 적용사항
-                  textAlign: TextAlign.right,
-                  style: TextStyle(
-                      color: Color.fromRGBO(0, 0, 0, 1),
-                      fontFamily: 'ABeeZee',
-                      fontSize: size.width * 0.035,
-                      fontWeight: FontWeight.normal,
-                      height: 1.2),
-                )
+              child : Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Container(
+                      child : Column(
+                        children: [
+                          Text(
 
-            ),
+                            '${stockperc}', //Firebase 적용사항
+                            style: TextStyle(
+                                color: color,
+                                fontFamily: 'Content',
+                                fontSize: size.width * 0.03,
+                                fontWeight: FontWeight.normal,
+                                height: 1.2),),
+                          Text(
+                            '${stockprice}', //Firebase 적용사항
+                            style: TextStyle(
+                                color: Color.fromRGBO(0, 0, 0, 1),
+                                fontFamily: 'Content',
+                                fontSize: size.width * 0.02,
+                                fontWeight: FontWeight.normal,
+                                height: 1.2),
+                          )
+                        ],
+
+
+                      )
+                  ),
+                  Container(
+                      width : size.width * 0.15,
+                      child: Text(
+                        '${newscount}개', //Firebase 적용사항
+                        textAlign: TextAlign.right,
+                        style: TextStyle(
+                            color: Color.fromRGBO(0, 0, 0, 1),
+                            fontFamily: 'ABeeZee',
+                            fontSize: size.width * 0.035,
+                            fontWeight: FontWeight.normal,
+                            height: 1.2),
+                      )
+
+                  ),
+
+                ],
+              )
+            )
 
           ],
         )
@@ -205,7 +219,7 @@ class _MainscreenState extends State<Mainscreen> {
                   ),
                 ),
                 Text(
-                  '-3.72', // Firebase 적용 사항
+                  '+3.72', // Firebase 적용 사항
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: Color.fromRGBO(0, 57, 164, 0.9),
