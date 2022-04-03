@@ -46,7 +46,7 @@ class _SearchscreenState extends State<Searchscreen> {
           ),
           boxShadow: [
             BoxShadow(
-                color: SEARCH,
+                color: GREY,
                 offset: Offset(0,-2.5),
                 blurRadius: 2,
                 blurStyle: BlurStyle.inner
@@ -63,12 +63,13 @@ class _SearchscreenState extends State<Searchscreen> {
                     semanticsLabel: 'search'
                 )
             ),
+            // Firebase 적용 사항
             Expanded(
               child: Text(
                 '찾으시는 종목을 입력하세요', textAlign: TextAlign.left, style: TextStyle(
                   color: Color.fromRGBO(91, 99, 106, 1),
                   fontFamily: 'ABeeZee',
-                  fontSize: 14,
+                  fontSize: size.width * 0.035,
                   letterSpacing: 0,
                   fontWeight: FontWeight.normal,
                   height: 1

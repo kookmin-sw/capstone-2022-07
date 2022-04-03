@@ -39,7 +39,7 @@ class _StartScreenState extends State<StartScreen> {
     Colors.purple,
     Colors.pink,
     Colors.amber[600]!,
-    Colors.teal
+    Colors.teal,
   ];
 
   @override
@@ -131,7 +131,7 @@ class _StartScreenState extends State<StartScreen> {
                   //   // ),
                   // ),
                   text: 'User',
-                )
+                ),
               ],
               selectedIndex: selectedIndex,
               onTabChange: (index) {
