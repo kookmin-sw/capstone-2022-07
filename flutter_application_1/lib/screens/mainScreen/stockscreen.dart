@@ -2,13 +2,17 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, prefer_const_constructors_in_immutables, non_constant_identifier_names, prefer_const_literals_to_create_immutables, prefer_typing_uninitialized_variables
 
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/Components/stock_list.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_application_1/Color/Color.dart';
 import 'package:flutter_application_1/Components/main_app_bar.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:yahoofin/yahoofin.dart';
+import 'dart:math';
 
 //Firebase 적용 사항
 List<String> stockIcon = <String>['price', 'perc', 'eps', 'marketcap', 'dividend'];
@@ -24,30 +28,41 @@ class Stockscreen extends StatefulWidget {
   State<Stockscreen> createState() => _StockscreenState();
 }
 
-
-
 class _StockscreenState extends State<Stockscreen> {
-  // 종목 이름,가격,대비,긍/부정, 관심
-  Widget Stockmain(Size size){
+  List<num>? volume = [];
+  List<num>? time = [];
+  var volume_max;
+  var volume_min;
+  var maximum;
+  var minimum;
+  getData() async {
+    var yfin = YahooFin();
+    StockHistory hist = yfin.initStockHistory(ticker: "^KS11");
+    StockChart chart = await yfin.getChartQuotes(
+        stockHistory: hist,
+        interval: StockInterval.oneDay,
+        period: StockRange.oneMonth);
+    volume = chart.chartQuotes!.close;
+    time = chart.chartQuotes!.timestamp;
+    volume_max = volume!.cast<num>().reduce(max);
+    minimum = volume!.cast<num>().reduce(min) - 10;
+    maximum = volume_max + volume_max / 10;
+    initState();
+  }
 
+  // 종목 이름,가격,대비,긍/부정, 관심
+  Widget Stockmain(Size size) {
     return Container(
-        margin: EdgeInsets.symmetric(vertical: size.height*0.02 ,horizontal: size.width*0.05 ),
-        width: size.width*0.9,
-        height: size.height * 0.2,
-        decoration: BoxDecoration(
-          borderRadius : BorderRadius.only(
-            topLeft: Radius.circular(8),
-            topRight: Radius.circular(8),
-            bottomLeft: Radius.circular(8),
-            bottomRight: Radius.circular(8),
-          ),
-          color : Colors.white,
-          boxShadow : [
-            BoxShadow(
-                color: Color.fromRGBO(0, 0, 0, 0.25),
-                offset: Offset(0,4),
-                blurRadius: 2
-            )],
+      margin: EdgeInsets.symmetric(
+          vertical: size.height * 0.02, horizontal: size.width * 0.05),
+      width: size.width * 0.9,
+      height: size.height * 0.2,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(8),
+          topRight: Radius.circular(8),
+          bottomLeft: Radius.circular(8),
+          bottomRight: Radius.circular(8),
         ),
         child : Row(
           mainAxisSize: MainAxisSize.min,
@@ -115,8 +130,14 @@ class _StockscreenState extends State<Stockscreen> {
                     'assets/icons/nice.svg',
                     semanticsLabel: 'nice'
                 )
+              ],
             ),
-
+          ),
+          // 긍/부정
+          Expanded(
+            child: SvgPicture.asset('assets/icons/nice.svg',
+                semanticsLabel: 'nice'),
+          ),
             //관심
             // Firebase 적용 사항
             Stack(
@@ -128,17 +149,27 @@ class _StockscreenState extends State<Stockscreen> {
                         height : size.height*0.2 * 0.3,
                         width : size.height* 0.2 * 0.3,
 
-                        child : SvgPicture.asset(
-                            'assets/icons/countingstar.svg',
-                            semanticsLabel: 'countingstar'
-                        )
-                    )
-                )
-              ],
-            )
-          ],
-        )
+  List<_ChartData> data = [];
+  late TooltipBehavior _tooltip;
+  late ZoomPanBehavior _zoompan;
+
+  void initState() {
+    print(volume);
+    print(time);
+    data = [];
+    for (int i = 0; i < volume!.length; i++) {
+      if (time!.isNotEmpty) {
+        var date = DateTime.fromMillisecondsSinceEpoch(time![i].toInt() * 1000);
+        data.add(_ChartData(date, volume![i].toDouble()));
+      }
+    }
+    print(data);
+    _tooltip = TooltipBehavior(enable: true);
+    _zoompan = ZoomPanBehavior(
+      enableDoubleTapZooming: true,
+      enableMouseWheelZooming: true,
     );
+    // super.initState();
   }
 
 // 종목 차트
@@ -167,31 +198,46 @@ class _StockscreenState extends State<Stockscreen> {
                         blurRadius: 2
                     )],
                 ),
-                child : Container(
-                    width: size.width*0.9*0.9,
-                    height: size.height*0.25*0.9,
-                    child :Image.asset('assets/charts/chart.png', fit: BoxFit.fill,)
-                )
+              ],
             ),
-
-            Container(
-                margin: EdgeInsets.symmetric(horizontal: size.width*0.05, vertical: size.height*0.01 ),
-                width: size.width*0.9,
+          ),
+        ),
+        Container(
+          margin: EdgeInsets.symmetric(
+              horizontal: size.width * 0.05, vertical: size.height * 0.01),
+          width: size.width * 0.9,
+          height: size.height * 0.05,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(8),
+              topRight: Radius.circular(8),
+              bottomLeft: Radius.circular(8),
+              bottomRight: Radius.circular(8),
+            ),
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                  color: Color.fromRGBO(0, 0, 0, 0.25),
+                  offset: Offset(0, 4),
+                  blurRadius: 1)
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Container(
+                width: size.height * 0.05,
                 height: size.height * 0.05,
+                alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  borderRadius : BorderRadius.only(
+                  borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(8),
                     topRight: Radius.circular(8),
                     bottomLeft: Radius.circular(8),
                     bottomRight: Radius.circular(8),
                   ),
-                  color : Colors.white,
-                  boxShadow : [
-                    BoxShadow(
-                        color: Color.fromRGBO(0, 0, 0, 0.25),
-                        offset: Offset(0,4),
-                        blurRadius: 1
-                    )],
+                  color: CHART_MINUS,
                 ),
                 child : Row(
                   mainAxisSize: MainAxisSize.max,
@@ -292,6 +338,7 @@ class _StockscreenState extends State<Stockscreen> {
             )
           ],
         )
+      ],
     );
   }
 
@@ -462,22 +509,31 @@ class _StockscreenState extends State<Stockscreen> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+
     return Scaffold(
       appBar: mainAppBar(context, "종목 정보"),
-      body: SingleChildScrollView(
-        child : Column(
-          children: [
-            SizedBox(height: size.height*0.01,),
-            Stockmain(size),
-            Stockchart(size),
-            Stockinfolist(size),
-            SizedBox(height : size.height * 0.01),
-            Stocknewslist(size)
-          ],
-        ),
-      )
+      body: FutureBuilder(
+        future: getData(),
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          return Column(
+            children: [
+              SizedBox(
+                height: size.height * 0.01,
+              ),
+              Stockmain(size),
+              Stockchart(size),
+              Stockinfo(size),
+            ],
+          );
+        },
+      ),
     );
   }
 }
 
+class _ChartData {
+  _ChartData(this.x, this.y);
 
+  final DateTime x;
+  final double y;
+}

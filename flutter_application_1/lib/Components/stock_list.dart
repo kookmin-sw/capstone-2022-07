@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_literals_to_create_immutables, unnecessary_const, non_constant_identifier_names, prefer_typing_uninitialized_variables
 
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/screens/mainScreen/stockscreen.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_application_1/Color/Color.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -23,9 +24,9 @@ final List<String> Perc = <String>[
 ];
 final List<int> Volume = <int>[265232, 52802, 1232, 25232, 1557];
 
-
 //종목을 카드로 나타냄
-Widget Stockcard(Size size, var name, var price, var perc, var volume) {
+Widget Stockcard(BuildContext context, Size size, var name, var price, var perc,
+    var volume) {
   var color;
   if (perc[0] == '+') {
     color = CHART_PLUS;
@@ -205,7 +206,16 @@ Widget Stockcard(Size size, var name, var price, var perc, var volume) {
                     child: SizedBox(),
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return Stockscreen();
+                          },
+                        ),
+                      );
+                    },
                     child: Container(
                       padding: EdgeInsets.symmetric(
                           horizontal: size.width * 0.03,
@@ -267,10 +277,9 @@ Widget Cardlist(Size size) {
       padding: EdgeInsets.symmetric(horizontal: size.width * 0.05),
       itemCount: Name.length,
       itemBuilder: (BuildContext context, int index) {
-        return Stockcard(size, Name[index], Price[index], Perc[index],
+        return Stockcard(context, size, Name[index], Price[index], Perc[index],
             Volume[index]);
       },
     ),
   );
 }
-
