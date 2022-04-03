@@ -54,7 +54,7 @@ This project aims to build a system that notifies users of of stocks that are sh
 
 **이원형**
 
-```
+
 <img src = "https://user-images.githubusercontent.com/28581806/157245315-08383b96-17d7-4d6b-a057-2e75c6ddb1e5.jpeg" width="300px" height="300px">
 
 ```markdown
