@@ -134,8 +134,6 @@ def search_crawl(tuple_list,query):
             news_url = atag["href"]
             label =0
             tag = ""
-            if any(keyword in news_name for keyword in del_list):
-                continue
 
             for i in range(len(positive)):
                 if news_name.find(positive[i]) != -1:
