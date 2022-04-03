@@ -83,7 +83,7 @@ def text_clean(inputString, query):
 def search_crawl(tuple_list,query):
     # 삭제할 키워드들 
     del_list = ["오늘의", "뉴스", "급락주","마감","주요","급등주", "증시일정", "캘린더", "이번주", "[포토]", "[인사]", "상장사", "주간", "종목", "총정리", 
-                "다음주", "슈퍼주총", "공모주", "돋보기", "週間"]
+                "다음주", "슈퍼주총", "공모주", "돋보기", "週間", "증권주"]
 
     page = 1
     maxpage = 1
@@ -1139,7 +1139,7 @@ def run():
 
     tuple_list = list()
     tuple_list.append(('title','label'))
-    for query in cospi[69:136]:
+    for query in cospi[137:942]:
         search_crawl(tuple_list, query)
 
 
@@ -1149,7 +1149,7 @@ def run():
 
 if __name__ == "__main__":
     tuple = run()
-    with open('./testforwh.csv', 'w') as f:
+    with open('./train.csv', 'w') as f:
         writer = csv.writer(f , lineterminator='\n')
         for tup in tuple:
             writer.writerow(tup)
