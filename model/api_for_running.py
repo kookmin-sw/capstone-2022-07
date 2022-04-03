@@ -37,7 +37,7 @@ def getStockCode(market, url_param):
     """
     market: 상장구분 (11=유가증권, 12=코스닥, 13=K-OTC, 14=코넥스, 50=기타비상장)
     """
-    url_base = f"http://api.seibro.or.kr/openapi/service/{url_param}"
+    url_base = "http://api.seibro.or.kr/openapi/service/{url_param}"
     url_spec = "getShotnByMartN1"
     url = url_base + "/" + url_spec
     stock_code = 0
