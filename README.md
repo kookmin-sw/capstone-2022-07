@@ -16,7 +16,7 @@ This project aims to build a system that notifies users of of stocks that are sh
 
 ## 3. 소개 영상
 
-<iframe width="640" height="360" src="https://youtu.be/EKr2MalbsOY" frameborder="0" gesture="media" allowfullscreen=""></iframe>
+[![Watch the video](https://user-images.githubusercontent.com/28581806/161442821-7dbd3694-b471-443b-8118-818b9d9d9c47.png)](https://user-images.githubusercontent.com/28581806/161442682-b33a7657-eee8-4b15-8b76-6c33b7724f0d.mp4)
 
 ---
 
