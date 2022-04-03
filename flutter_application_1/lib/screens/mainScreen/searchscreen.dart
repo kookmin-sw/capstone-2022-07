@@ -69,7 +69,7 @@ class _SearchscreenState extends State<Searchscreen> {
                 '찾으시는 종목을 입력하세요', textAlign: TextAlign.left, style: TextStyle(
                   color: Color.fromRGBO(91, 99, 106, 1),
                   fontFamily: 'ABeeZee',
-                  fontSize: 14,
+                  fontSize: size.width * 0.035,
                   letterSpacing: 0,
                   fontWeight: FontWeight.normal,
                   height: 1

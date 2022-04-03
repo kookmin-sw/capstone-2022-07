@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_application_1/Color/Color.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_application_1/Components/widget_box.dart';
 
 //view용 임시 리스트
 final List<String> Name = <String>[
@@ -41,7 +40,21 @@ Widget Stockcard(Size size, var name, var price, var perc, var volume) {
   return Container(
     height: size.height * 0.185,
     width: size.width * 0.9,
-    decoration: widgetBoxDecoration(8,255,4,255),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(8),
+        topRight: Radius.circular(8),
+        bottomLeft: Radius.circular(8),
+        bottomRight: Radius.circular(8),
+      ),
+      boxShadow: [
+        BoxShadow(
+            color: Color.fromRGBO(255,255,255, 0.25),
+            offset: Offset(0, 4),
+            blurRadius: 4)
+      ],
+      color: Color.fromRGBO(255, 255, 255, 1),
+    ),
     padding: EdgeInsets.symmetric(
         horizontal: size.width * 0.03, vertical: size.height * 0.005),
     margin: EdgeInsets.only(bottom: size.height * 0.03),
@@ -61,10 +74,10 @@ Widget Stockcard(Size size, var name, var price, var perc, var volume) {
                 child: Text(
                   name,
                   textAlign: TextAlign.left,
-                  style: const TextStyle(
+                  style:  TextStyle(
                     color: Color.fromRGBO(0, 0, 0, 1),
                     fontFamily: 'Content',
-                    fontSize: 18,
+                    fontSize: size.width * 0.035,
                     letterSpacing: 0,
                     fontWeight: FontWeight.normal,
                     height: 1,
@@ -84,7 +97,21 @@ Widget Stockcard(Size size, var name, var price, var perc, var volume) {
               child: Row(
                 children: [
                   Container(
-                    decoration: widgetBoxDecoration(4, 255, 4, 249),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(4),
+                        topRight: Radius.circular(4),
+                        bottomLeft: Radius.circular(4),
+                        bottomRight: Radius.circular(4),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                            color: Color.fromRGBO(255,255,255, 0.25),
+                            offset: Offset(0, 4),
+                            blurRadius: 4)
+                      ],
+                      color: Color.fromRGBO(249, 249, 249, 1),
+                    ),
                     padding: EdgeInsets.symmetric(
                         horizontal: size.width * 0.03,
                         vertical: size.height * 0.01),
@@ -94,7 +121,7 @@ Widget Stockcard(Size size, var name, var price, var perc, var volume) {
                       style: TextStyle(
                         color: color,
                         fontFamily: 'Content',
-                        fontSize: 12,
+                        fontSize: size.width * 0.03,
                         letterSpacing: 0,
                         fontWeight: FontWeight.normal,
                         height: 1,
@@ -103,7 +130,21 @@ Widget Stockcard(Size size, var name, var price, var perc, var volume) {
                   ),
                   SizedBox(width: size.width * 0.03),
                   Container(
-                    decoration: widgetBoxDecoration(4, 255, 4, 249),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(4),
+                        topRight: Radius.circular(4),
+                        bottomLeft: Radius.circular(4),
+                        bottomRight: Radius.circular(4),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                            color: Color.fromRGBO(255,255,255, 0.25),
+                            offset: Offset(0, 4),
+                            blurRadius: 4)
+                      ],
+                      color: Color.fromRGBO(249,249, 249, 1),
+                    ),
                     padding: EdgeInsets.symmetric(
                         horizontal: size.width * 0.03,
                         vertical: size.height * 0.01),
@@ -113,7 +154,7 @@ Widget Stockcard(Size size, var name, var price, var perc, var volume) {
                       style: TextStyle(
                         color: color,
                         fontFamily: 'Content',
-                        fontSize: 12,
+                        fontSize: size.width * 0.03,
                         letterSpacing: 0,
                         fontWeight: FontWeight.normal,
                         height: 1,
@@ -129,7 +170,21 @@ Widget Stockcard(Size size, var name, var price, var perc, var volume) {
               child: Row(
                 children: [
                   Container(
-                    decoration: widgetBoxDecoration(4, 255, 4, 249),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(4),
+                        topRight: Radius.circular(4),
+                        bottomLeft: Radius.circular(4),
+                        bottomRight: Radius.circular(4),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                            color: Color.fromRGBO(255,255,255, 0.25),
+                            offset: Offset(0, 4),
+                            blurRadius: 4)
+                      ],
+                      color: Color.fromRGBO(249,249, 249, 1),
+                    ),
                     padding: EdgeInsets.symmetric(
                         horizontal: size.width * 0.03,
                         vertical: size.height * 0.01),
@@ -139,7 +194,7 @@ Widget Stockcard(Size size, var name, var price, var perc, var volume) {
                       style: TextStyle(
                         color: color,
                         fontFamily: 'Content',
-                        fontSize: 12,
+                        fontSize: size.width * 0.03,
                         letterSpacing: 0,
                         fontWeight: FontWeight.normal,
                         height: 1,
@@ -177,12 +232,12 @@ Widget Stockcard(Size size, var name, var price, var perc, var volume) {
                       child: Row(
                         children: [
                           // Firebase 적용 사항
-                          const Text(
+                          Text(
                             '자세히',
                             style: TextStyle(
                                 color: Color.fromRGBO(0, 0, 0, 1),
                                 fontFamily: 'ABeeZee',
-                                fontSize: 14,
+                                fontSize: size.width * 0.036,
                                 fontWeight: FontWeight.normal,
                                 height: 1.2),
                           ),

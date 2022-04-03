@@ -67,7 +67,7 @@ class _StockscreenState extends State<Stockscreen> {
                             style: TextStyle(
                               color: Color.fromRGBO(0, 0, 0, 1),
                               fontFamily: 'Content',
-                              fontSize: 36,
+                              fontSize: size.width * 0.09,
 
                               fontWeight: FontWeight.bold,
                               height:1,
@@ -82,7 +82,7 @@ class _StockscreenState extends State<Stockscreen> {
                             style: TextStyle(
                               color: CHART_MINUS,
                               fontFamily: 'Content',
-                              fontSize: 22,
+                              fontSize: size.width * 0.055,
                               letterSpacing: 0,
                               fontWeight: FontWeight.normal,
                               height:1,
@@ -98,7 +98,7 @@ class _StockscreenState extends State<Stockscreen> {
                             style: TextStyle(
                               color: CHART_MINUS,
                               fontFamily: 'Content',
-                              fontSize: 14,
+                              fontSize: size.width * 0.035,
                               letterSpacing: 0,
                               fontWeight: FontWeight.normal,
                               height:1,
@@ -217,7 +217,7 @@ class _StockscreenState extends State<Stockscreen> {
                             style: TextStyle(
                               color: Colors.white,
                               fontFamily: 'Content',
-                              fontSize: 20,
+                              fontSize: size.width * 0.045,
                               fontWeight: FontWeight.normal,
                               height:1,
                             )
@@ -233,7 +233,7 @@ class _StockscreenState extends State<Stockscreen> {
                             style: TextStyle(
                               color: Color.fromRGBO(158, 158, 158, 1),
                               fontFamily: 'Content',
-                              fontSize: 20,
+                              fontSize: size.width * 0.045,
                               fontWeight: FontWeight.normal,
                               height:1,
                             )
@@ -249,7 +249,7 @@ class _StockscreenState extends State<Stockscreen> {
                             style: TextStyle(
                               color: Color.fromRGBO(158, 158, 158, 1),
                               fontFamily: 'Content',
-                              fontSize: 20,
+                              fontSize: size.width * 0.045,
                               fontWeight: FontWeight.normal,
                               height:1,
                             )
@@ -265,7 +265,7 @@ class _StockscreenState extends State<Stockscreen> {
                             style: TextStyle(
                               color: Color.fromRGBO(158, 158, 158, 1),
                               fontFamily: 'Content',
-                              fontSize: 20,
+                              fontSize: size.width * 0.045,
                               fontWeight: FontWeight.normal,
                               height:1,
                             )
@@ -281,7 +281,7 @@ class _StockscreenState extends State<Stockscreen> {
                             style: TextStyle(
                               color: Color.fromRGBO(158, 158, 158, 1),
                               fontFamily: 'Content',
-                              fontSize: 20,
+                              fontSize: size.width * 0.045,
                               fontWeight: FontWeight.normal,
                               height:1,
                             )
@@ -354,7 +354,7 @@ class _StockscreenState extends State<Stockscreen> {
             '${Infodetail}', textAlign: TextAlign.left, style: TextStyle(
               color: Color.fromRGBO(91, 99, 106, 1),
               fontFamily: 'ABeeZee',
-              fontSize: 16,
+              fontSize: size.width * 0.04,
               letterSpacing: 0,
               fontWeight: FontWeight.bold,
               height: 1
@@ -368,7 +368,7 @@ class _StockscreenState extends State<Stockscreen> {
                 color: Color.fromRGBO(91, 99, 106, 1),
 
                 fontFamily: 'ABeeZee',
-                fontSize: 14,
+                fontSize: size.width * 0.036,
                 letterSpacing: 0,
                 fontWeight: FontWeight.normal,
                 height: 1
@@ -432,10 +432,10 @@ class _StockscreenState extends State<Stockscreen> {
           Text(
             Name,
             textAlign: TextAlign.right,
-            style: const TextStyle(
+            style: TextStyle(
               color: Color.fromRGBO(0, 0, 0, 1),
               fontFamily: 'Content',
-              fontSize: 14,
+              fontSize: size.width * 0.04,
               letterSpacing: 0,
               fontWeight: FontWeight.bold,
               height: 1,
@@ -445,10 +445,10 @@ class _StockscreenState extends State<Stockscreen> {
           Text(
             Title,
             textAlign: TextAlign.left,
-            style: const TextStyle(
+            style: TextStyle(
               color: Color.fromRGBO(0, 0, 0, 0.8),
               fontFamily: 'Content',
-              fontSize: 10,
+              fontSize: size.width * 0.036,
               letterSpacing: 0,
               fontWeight: FontWeight.normal,
               height: 1,
