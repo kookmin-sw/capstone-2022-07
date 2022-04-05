@@ -52,7 +52,6 @@ dev_dependencies:
   flutter_svg: ^1.0.3
   intl: ^0.17.0
 
-
   # Firebase dependencies
   firebase_core: ^1.13.1
   firebase_auth: ^3.3.11
