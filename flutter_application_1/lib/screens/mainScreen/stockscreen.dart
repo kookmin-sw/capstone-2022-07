@@ -13,6 +13,7 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:yahoofin/yahoofin.dart';
 import 'dart:math';
+import 'package:contained_tab_bar_view/contained_tab_bar_view.dart';
 
 class Stockscreen extends StatefulWidget {
   Stockscreen({Key? key}) : super(key: key);
@@ -22,34 +23,153 @@ class Stockscreen extends StatefulWidget {
 }
 
 class _StockscreenState extends State<Stockscreen> {
-  List<num>? volume = [];
-  List<num>? time = [];
-  var volume_max;
-  var volume_min;
-  var maximum;
-  var minimum;
-  getData() async {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    // animationController.dispose() instead of your controller.dispose
+  }
+
+  List<num>? dayVolume = [];
+  List<num>? dayTime = [];
+  List<num>? monthVolume = [];
+  List<num>? monthTime = [];
+  List<num>? yearVolume = [];
+  List<num>? yearTime = [];
+  List<num>? tenYearVolume = [];
+  List<num>? tenYearTime = [];
+  var dayMinimum;
+  var monthMinimum;
+  var yearMinimum;
+  var tenYearMinimum;
+
+  Future getDayData() async {
     var yfin = YahooFin();
-    StockHistory hist = yfin.initStockHistory(ticker: "^KS11");
+    StockHistory hist = yfin.initStockHistory(ticker: "000660.KS");
+    StockChart chart = await yfin.getChartQuotes(
+        stockHistory: hist,
+        interval: StockInterval.thirtyMinute,
+        period: StockRange.oneDay);
+
+    dayVolume = chart.chartQuotes!.close;
+    dayTime = chart.chartQuotes!.timestamp;
+
+    for (int i = 0; i < dayVolume!.length; i++) {
+      if (dayTime!.isNotEmpty) {
+        var date =
+            DateTime.fromMillisecondsSinceEpoch(dayTime![i].toInt() * 1000);
+        dayData.add(_ChartData(date, dayVolume![i].toDouble()));
+      }
+    }
+    if (mounted) {
+      setState(() {
+        dayMinimum = dayVolume!.cast<num>().reduce(min);
+      });
+    }
+
+    return "";
+  }
+
+  Future getMonthData() async {
+    var yfin = YahooFin();
+    StockHistory hist = yfin.initStockHistory(ticker: "000660.KS");
     StockChart chart = await yfin.getChartQuotes(
         stockHistory: hist,
         interval: StockInterval.oneDay,
         period: StockRange.oneMonth);
-    volume = chart.chartQuotes!.close;
-    time = chart.chartQuotes!.timestamp;
-    volume_max = volume!.cast<num>().reduce(max);
-    minimum = volume!.cast<num>().reduce(min) - 10;
-    maximum = volume_max + volume_max / 10;
-    initState();
+
+    monthVolume = chart.chartQuotes!.close;
+    monthTime = chart.chartQuotes!.timestamp;
+    for (int i = 0; i < monthVolume!.length; i++) {
+      if (monthTime!.isNotEmpty) {
+        var date =
+            DateTime.fromMillisecondsSinceEpoch(monthTime![i].toInt() * 1000);
+        monthData.add(_ChartData(date, monthVolume![i].toDouble()));
+      }
+    }
+    monthMinimum = monthVolume!.cast<num>().reduce(min);
+
+    return "";
   }
 
+  Future getYearData() async {
+    var yfin = YahooFin();
+    StockHistory hist = yfin.initStockHistory(ticker: "000660.KS");
+    StockChart chart = await yfin.getChartQuotes(
+        stockHistory: hist,
+        interval: StockInterval.oneMonth,
+        period: StockRange.oneYear);
+
+    yearVolume = chart.chartQuotes!.close;
+    yearTime = chart.chartQuotes!.timestamp;
+    for (int i = 0; i < yearVolume!.length; i++) {
+      if (yearTime!.isNotEmpty) {
+        var date =
+            DateTime.fromMillisecondsSinceEpoch(yearTime![i].toInt() * 1000);
+        yearData.add(_ChartData(date, yearVolume![i].toDouble()));
+      }
+    }
+    yearMinimum = yearVolume!.cast<num>().reduce(min);
+
+    return "";
+  }
+
+  Future getTenYearData() async {
+    var yfin = YahooFin();
+    StockHistory hist = yfin.initStockHistory(ticker: "000660.KS");
+    StockChart chart = await yfin.getChartQuotes(
+        stockHistory: hist,
+        interval: StockInterval.oneMonth,
+        period: StockRange.tenYear);
+
+    tenYearVolume = chart.chartQuotes!.close;
+    tenYearTime = chart.chartQuotes!.timestamp;
+
+    for (int i = 0; i < tenYearVolume!.length; i++) {
+      if (tenYearTime!.isNotEmpty) {
+        var date =
+            DateTime.fromMillisecondsSinceEpoch(tenYearTime![i].toInt() * 1000);
+        tenYearData.add(_ChartData(date, tenYearVolume![i].toDouble()));
+      }
+    }
+    tenYearMinimum = tenYearVolume!.cast<num>().reduce(min);
+
+    return "";
+  }
+
+  chart() {
+    getMonthData();
+    getYearData();
+    getTenYearData();
+    getDayData();
+  }
   // 종목 이름,가격,대비,긍/부정, 관심
+
+  List<_ChartData> dayData = [];
+  List<_ChartData> monthData = [];
+  List<_ChartData> yearData = [];
+  List<_ChartData> tenYearData = [];
+
+  late TooltipBehavior _tooltip;
+  late ZoomPanBehavior _zoompan;
+
+  void ChartInit(List<_ChartData> data) async {
+    data = [];
+
+    // _tooltip = TooltipBehavior(enable: true);
+  }
+
   Widget Stockmain(Size size) {
     return Container(
       margin: EdgeInsets.symmetric(
           vertical: size.height * 0.02, horizontal: size.width * 0.05),
+      // padding: EdgeInsets.all(size.width * 0.05),
       width: size.width * 0.9,
-      height: size.height * 0.2,
+      // height: size.height * 0.4,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(8),
@@ -58,125 +178,101 @@ class _StockscreenState extends State<Stockscreen> {
           bottomRight: Radius.circular(8),
         ),
         color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-              color: Color.fromRGBO(0, 0, 0, 0.25),
-              offset: Offset(0, 4),
-              blurRadius: 2)
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Stockinfo(size),
+          tab(size),
+          // ChartData(size),
         ],
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // 이름,가격,대비
-          Container(
-            margin: EdgeInsets.only(left: size.width * 0.05),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  '삼성전자',
-                  textAlign: TextAlign.justify,
-                  style: TextStyle(
-                    color: Color.fromRGBO(0, 0, 0, 1),
-                    fontFamily: 'Content',
-                    fontSize: 36,
-                    fontWeight: FontWeight.bold,
-                    height: 1,
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.only(top: size.height * 0.01),
-                  child: Text(
-                    '69,900',
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                      color: CHART_MINUS,
-                      fontFamily: 'Content',
-                      fontSize: 22,
-                      letterSpacing: 0,
-                      fontWeight: FontWeight.normal,
-                      height: 1,
-                    ),
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.only(top: size.height * 0.005),
-                  child: Text(
-                    '-203(-2.49%)',
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                      color: CHART_MINUS,
-                      fontFamily: 'Content',
-                      fontSize: 14,
-                      letterSpacing: 0,
-                      fontWeight: FontWeight.normal,
-                      height: 1,
-                    ),
-                  ),
-                )
-              ],
+    );
+  }
+
+  Widget tab(Size size) {
+    return Center(
+      child: SizedBox(
+        width: size.width * 0.9,
+        height: size.height * 0.375,
+        child: ContainedTabBarView(
+          tabs: [
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(50),
+              ),
+              child: Align(
+                alignment: Alignment.center,
+                child: Text("1D"),
+              ),
+            ),
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(50),
+              ),
+              child: Align(
+                alignment: Alignment.center,
+                child: Text("1M"),
+              ),
+            ),
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(50),
+              ),
+              child: Align(
+                alignment: Alignment.center,
+                child: Text("1Y"),
+              ),
+            ),
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(50),
+              ),
+              child: Align(
+                alignment: Alignment.center,
+                child: Text("10Y"),
+              ),
+            ),
+          ],
+          initialIndex: 1,
+          tabBarProperties: TabBarProperties(
+            padding: EdgeInsets.all(8),
+            indicatorPadding: EdgeInsets.only(
+                left: size.width * 0.03, right: size.width * 0.03),
+            unselectedLabelColor: Colors.grey[400],
+            indicatorSize: TabBarIndicatorSize.label,
+            indicator: BoxDecoration(
+                borderRadius: BorderRadius.circular(50),
+                color: Color(0xff0039A4)),
+            margin: EdgeInsets.only(bottom: 8.0),
+            position: TabBarPosition.bottom,
+            background: Container(
+              decoration: BoxDecoration(
+                color: Colors.transparent,
+                borderRadius: BorderRadius.all(Radius.circular(8.0)),
+              ),
             ),
           ),
-          // 긍/부정
-          Expanded(
-            child: SvgPicture.asset('assets/icons/nice.svg',
-                semanticsLabel: 'nice'),
-          ),
-
-          //관심
-          Stack(
-            children: [
-              Align(
-                alignment: Alignment.topCenter,
-                child: Container(
-                  margin: EdgeInsets.only(
-                      top: size.height * 0.2 * 0.1,
-                      right: size.width * 0.9 * 0.05),
-                  height: size.height * 0.2 * 0.3,
-                  width: size.height * 0.2 * 0.3,
-                  child: SvgPicture.asset('assets/icons/countingstar.svg',
-                      semanticsLabel: 'countingstar'),
-                ),
-              )
-            ],
-          )
-        ],
+          views: [
+            DayChart(size, dayData),
+            MonthChart(size, monthData),
+            YearChart(size, yearData),
+            TenYearChart(size, tenYearData),
+          ],
+          onChange: (index) {},
+        ),
       ),
     );
   }
 
-  List<_ChartData> data = [];
-  late TooltipBehavior _tooltip;
-  late ZoomPanBehavior _zoompan;
-
-  void initState() {
-    print(volume);
-    print(time);
-    data = [];
-    for (int i = 0; i < volume!.length; i++) {
-      if (time!.isNotEmpty) {
-        var date = DateTime.fromMillisecondsSinceEpoch(time![i].toInt() * 1000);
-        data.add(_ChartData(date, volume![i].toDouble()));
-      }
-    }
-    print(data);
-    _tooltip = TooltipBehavior(enable: true);
-    _zoompan = ZoomPanBehavior(
-      enableDoubleTapZooming: true,
-      enableMouseWheelZooming: true,
-    );
-    // super.initState();
-  }
-
-// 종목 차트
-  Widget Stockchart(Size size) {
+  Widget Chart(Size size, List<_ChartData> data, var minimum) {
     return Column(
       children: [
         Container(
-          margin: EdgeInsets.symmetric(horizontal: size.width * 0.05),
+          // margin: EdgeInsets.symmetric(horizontal: size.width * 0.05),
           width: size.width * 0.9,
-          height: size.height * 0.4,
+          height: size.height * 0.3,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(8),
@@ -185,20 +281,14 @@ class _StockscreenState extends State<Stockscreen> {
               bottomRight: Radius.circular(8),
             ),
             color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                  color: Color.fromRGBO(0, 0, 0, 0.25),
-                  offset: Offset(0, 4),
-                  blurRadius: 2)
-            ],
           ),
           child: SizedBox(
             width: size.width * 0.9 * 0.9,
             height: size.height * 0.4,
             child: SfCartesianChart(
               primaryXAxis: DateTimeAxis(),
-              primaryYAxis: NumericAxis(minimum: volume_min, interval: 10),
-              tooltipBehavior: _tooltip,
+              primaryYAxis: NumericAxis(minimum: minimum),
+              // tooltipBehavior: _tooltip,
               // zoomPanBehavior: _zoompan,
               series: <ChartSeries<_ChartData, DateTime>>[
                 AreaSeries<_ChartData, DateTime>(
@@ -216,123 +306,87 @@ class _StockscreenState extends State<Stockscreen> {
             ),
           ),
         ),
-        Container(
-          margin: EdgeInsets.symmetric(
-              horizontal: size.width * 0.05, vertical: size.height * 0.01),
-          width: size.width * 0.9,
-          height: size.height * 0.05,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(8),
-              topRight: Radius.circular(8),
-              bottomLeft: Radius.circular(8),
-              bottomRight: Radius.circular(8),
-            ),
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                  color: Color.fromRGBO(0, 0, 0, 0.25),
-                  offset: Offset(0, 4),
-                  blurRadius: 1)
-            ],
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Container(
-                width: size.height * 0.05,
-                height: size.height * 0.05,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(8),
-                    topRight: Radius.circular(8),
-                    bottomLeft: Radius.circular(8),
-                    bottomRight: Radius.circular(8),
-                  ),
-                  color: CHART_MINUS,
-                ),
-                child: TextButton(
-                  child: Text('1D'),
-                  onPressed: () {
-                    getData();
-                  },
-                ),
-              ),
-              Container(
-                width: size.height * 0.05,
-                height: size.height * 0.05,
-                alignment: Alignment.center,
-                child: Text(
-                  '1W',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Color.fromRGBO(158, 158, 158, 1),
-                    fontFamily: 'Content',
-                    fontSize: 20,
-                    fontWeight: FontWeight.normal,
-                    height: 1,
-                  ),
-                ),
-              ),
-              Container(
-                width: size.height * 0.05,
-                height: size.height * 0.05,
-                alignment: Alignment.center,
-                child: Text(
-                  '1M',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Color.fromRGBO(158, 158, 158, 1),
-                    fontFamily: 'Content',
-                    fontSize: 20,
-                    fontWeight: FontWeight.normal,
-                    height: 1,
-                  ),
-                ),
-              ),
-              Container(
-                width: size.height * 0.05,
-                height: size.height * 0.05,
-                alignment: Alignment.center,
-                child: Text(
-                  '1Y',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Color.fromRGBO(158, 158, 158, 1),
-                    fontFamily: 'Content',
-                    fontSize: 20,
-                    fontWeight: FontWeight.normal,
-                    height: 1,
-                  ),
-                ),
-              ),
-              Container(
-                width: size.height * 0.05,
-                height: size.height * 0.05,
-                alignment: Alignment.center,
-                child: Text(
-                  'All',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Color.fromRGBO(158, 158, 158, 1),
-                    fontFamily: 'Content',
-                    fontSize: 20,
-                    fontWeight: FontWeight.normal,
-                    height: 1,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        )
       ],
     );
   }
 
-//종목 정보
+  Widget DayChart(Size size, List<_ChartData> data) {
+    return Chart(size, data, dayMinimum);
+  }
+
+  Widget MonthChart(Size size, List<_ChartData> data) {
+    return Chart(size, data, monthMinimum);
+  }
+
+  Widget YearChart(Size size, List<_ChartData> data) {
+    return Chart(size, data, yearMinimum);
+  }
+
+  Widget TenYearChart(Size size, List<_ChartData> data) {
+    return Chart(size, data, tenYearMinimum);
+  }
+
   Widget Stockinfo(Size size) {
+    return Container(
+      padding: EdgeInsets.all(size.width * 0.05),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                '삼성전자',
+                textAlign: TextAlign.justify,
+                style: TextStyle(
+                  color: Color.fromRGBO(0, 0, 0, 1),
+                  fontFamily: 'Content',
+                  fontSize: size.width * 0.06,
+                  fontWeight: FontWeight.bold,
+                  height: 1,
+                ),
+              ),
+              SizedBox(width: size.width * 0.01),
+              Text(
+                "005930",
+                style: TextStyle(
+                    color: Colors.grey[700], fontSize: size.width * 0.04),
+              )
+            ],
+          ),
+          SizedBox(height: size.height * 0.01),
+          Text(
+            '69,900',
+            style: TextStyle(
+              color: CHART_MINUS,
+              fontFamily: 'Content',
+              fontSize: size.width * 0.06,
+              letterSpacing: 0,
+              fontWeight: FontWeight.bold,
+              height: 1,
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.only(top: size.height * 0.005),
+            child: Text(
+              '-203(-2.49%)',
+              textAlign: TextAlign.left,
+              style: TextStyle(
+                color: CHART_MINUS,
+                fontFamily: 'Content',
+                fontSize: size.width * 0.04,
+                letterSpacing: 0,
+                fontWeight: FontWeight.normal,
+                height: 1,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+//종목 정보
+  Widget newsInfo(Size size) {
     return Container(
       width: size.width * 0.9,
       height: size.height * 0.08,
@@ -377,27 +431,54 @@ class _StockscreenState extends State<Stockscreen> {
     );
   }
 
+  Widget devide(Size size) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Container(
+          margin: EdgeInsets.only(right: size.width * 0.05),
+          width: size.height * 0.12,
+          child: Divider(
+            color: Colors.grey[400],
+            thickness: 0.8,
+          ),
+        ),
+        Text(
+          "간편 로그인",
+          style: TextStyle(color: Colors.grey[400]),
+        ),
+        Container(
+          margin: EdgeInsets.only(left: size.width * 0.05),
+          width: size.height * 0.12,
+          child: Divider(
+            color: Colors.grey[400],
+            thickness: 0.8,
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
 
-    return Scaffold(
-      appBar: mainAppBar(context, "종목 정보"),
-      body: FutureBuilder(
-        future: getData(),
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          return Column(
-            children: [
-              SizedBox(
-                height: size.height * 0.01,
+    return FutureBuilder(
+      future: chart(),
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        if (dayData.isNotEmpty) {
+          return Scaffold(
+            appBar: mainAppBar(context, "종목 정보"),
+            body: SafeArea(
+              child: SingleChildScrollView(
+                child: Stockmain(size),
               ),
-              Stockmain(size),
-              Stockchart(size),
-              Stockinfo(size),
-            ],
+            ),
           );
-        },
-      ),
+        } else {
+          return Center(child: CircularProgressIndicator());
+        }
+      },
     );
   }
 }
