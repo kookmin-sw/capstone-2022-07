@@ -4,6 +4,8 @@
 
 // ignore_for_file: prefer_const_constructors, prefer_const_constructors_in_immutables, non_constant_identifier_names, prefer_const_literals_to_create_immutables, prefer_typing_uninitialized_variables
 
+import 'dart:html';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Components/stock_list.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -34,6 +36,11 @@ class _StockscreenState extends State<Stockscreen> {
     // animationController.dispose() instead of your controller.dispose
   }
 
+  List<_ChartData> dayData = [];
+  List<_ChartData> monthData = [];
+  List<_ChartData> yearData = [];
+  List<_ChartData> tenYearData = [];
+
   List<num>? dayVolume = [];
   List<num>? dayTime = [];
   List<num>? monthVolume = [];
@@ -42,14 +49,34 @@ class _StockscreenState extends State<Stockscreen> {
   List<num>? yearTime = [];
   List<num>? tenYearVolume = [];
   List<num>? tenYearTime = [];
+
   var dayMinimum;
   var monthMinimum;
   var yearMinimum;
   var tenYearMinimum;
 
-  Future getDayData() async {
+  var news = [
+    {
+      "title": "삼성전자, 유상증자 결정",
+      "text": "이재용 삼성전자 부회장이 지난달 이찬희 삼성준법감시위워회 위원장과 만나"
+    },
+    {
+      "title": "삼성전자, 2022년형 사운드바 국내 출시",
+      "text": "는 2022년형 사운드바 2종을 국내 시장에 출시했다고 3일 밝혔다. 이번에 출시한 제품...",
+    },
+    {
+      "title": "삼성·SK하이닉스, 1분기 기준 역대 최대...",
+      "text": "삼성전자, SK하이닉스는 1분기를 기준으로 역대 최대 매출을 새로 쓸 것으로 전망된다. 반면 배터리 업계는 ..."
+    },
+    {
+      "title": "삼성 네오 QLED, 해외 유명 매체 호평 받아",
+      "text": "위크는 네오 QLED에 대해 “게임과 스트리밍, 스포츠 영상 감상을 중요하게 생각하는 소비자..."
+    }
+  ];
+
+  Future getDayData(String ticker) async {
     var yfin = YahooFin();
-    StockHistory hist = yfin.initStockHistory(ticker: "000660.KS");
+    StockHistory hist = yfin.initStockHistory(ticker: ticker);
     StockChart chart = await yfin.getChartQuotes(
         stockHistory: hist,
         interval: StockInterval.thirtyMinute,
@@ -74,9 +101,9 @@ class _StockscreenState extends State<Stockscreen> {
     return "";
   }
 
-  Future getMonthData() async {
+  Future getMonthData(String ticker) async {
     var yfin = YahooFin();
-    StockHistory hist = yfin.initStockHistory(ticker: "000660.KS");
+    StockHistory hist = yfin.initStockHistory(ticker: ticker);
     StockChart chart = await yfin.getChartQuotes(
         stockHistory: hist,
         interval: StockInterval.oneDay,
@@ -96,9 +123,9 @@ class _StockscreenState extends State<Stockscreen> {
     return "";
   }
 
-  Future getYearData() async {
+  Future getYearData(String ticker) async {
     var yfin = YahooFin();
-    StockHistory hist = yfin.initStockHistory(ticker: "000660.KS");
+    StockHistory hist = yfin.initStockHistory(ticker: ticker);
     StockChart chart = await yfin.getChartQuotes(
         stockHistory: hist,
         interval: StockInterval.oneMonth,
@@ -118,9 +145,9 @@ class _StockscreenState extends State<Stockscreen> {
     return "";
   }
 
-  Future getTenYearData() async {
+  Future getTenYearData(String ticker) async {
     var yfin = YahooFin();
-    StockHistory hist = yfin.initStockHistory(ticker: "000660.KS");
+    StockHistory hist = yfin.initStockHistory(ticker: ticker);
     StockChart chart = await yfin.getChartQuotes(
         stockHistory: hist,
         interval: StockInterval.oneMonth,
@@ -141,33 +168,46 @@ class _StockscreenState extends State<Stockscreen> {
     return "";
   }
 
-  chart() {
-    getMonthData();
-    getYearData();
-    getTenYearData();
-    getDayData();
+  chartInit(String ticker) {
+    getMonthData(ticker);
+    getYearData(ticker);
+    getTenYearData(ticker);
+    getDayData(ticker);
   }
   // 종목 이름,가격,대비,긍/부정, 관심
 
-  List<_ChartData> dayData = [];
-  List<_ChartData> monthData = [];
-  List<_ChartData> yearData = [];
-  List<_ChartData> tenYearData = [];
+  Widget TabContainer(String text) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(50),
+      ),
+      child: Align(
+        alignment: Alignment.center,
+        child: Text(text),
+      ),
+    );
+  }
 
-  late TooltipBehavior _tooltip;
-  late ZoomPanBehavior _zoompan;
-
-  void ChartInit(List<_ChartData> data) async {
-    data = [];
-
-    // _tooltip = TooltipBehavior(enable: true);
+  Widget InfoTabContainer(Size size, String text) {
+    return Container(
+      margin:
+          EdgeInsets.only(left: size.width * 0.03, right: size.width * 0.03),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(50),
+        // border: Border.all(color: (Colors.grey[400])!, width: ),
+      ),
+      child: Align(
+        alignment: Alignment.center,
+        child: Text(text),
+      ),
+    );
   }
 
   Widget Stockmain(Size size) {
     return Container(
       margin: EdgeInsets.symmetric(
           vertical: size.height * 0.02, horizontal: size.width * 0.05),
-      // padding: EdgeInsets.all(size.width * 0.05),
+      padding: EdgeInsets.all(size.width * 0.01),
       width: size.width * 0.9,
       // height: size.height * 0.4,
       decoration: BoxDecoration(
@@ -184,56 +224,23 @@ class _StockscreenState extends State<Stockscreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Stockinfo(size),
-          tab(size),
-          // ChartData(size),
+          chartTab(size),
         ],
       ),
     );
   }
 
-  Widget tab(Size size) {
+  Widget chartTab(Size size) {
     return Center(
       child: SizedBox(
         width: size.width * 0.9,
-        height: size.height * 0.375,
+        height: size.height * 0.39,
         child: ContainedTabBarView(
           tabs: [
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(50),
-              ),
-              child: Align(
-                alignment: Alignment.center,
-                child: Text("1D"),
-              ),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(50),
-              ),
-              child: Align(
-                alignment: Alignment.center,
-                child: Text("1M"),
-              ),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(50),
-              ),
-              child: Align(
-                alignment: Alignment.center,
-                child: Text("1Y"),
-              ),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(50),
-              ),
-              child: Align(
-                alignment: Alignment.center,
-                child: Text("10Y"),
-              ),
-            ),
+            TabContainer("1D"),
+            TabContainer("1M"),
+            TabContainer("1Y"),
+            TabContainer("10Y"),
           ],
           initialIndex: 1,
           tabBarProperties: TabBarProperties(
@@ -259,6 +266,47 @@ class _StockscreenState extends State<Stockscreen> {
             MonthChart(size, monthData),
             YearChart(size, yearData),
             TenYearChart(size, tenYearData),
+          ],
+          onChange: (index) {},
+        ),
+      ),
+    );
+  }
+
+  Widget infoTab(Size size) {
+    return Center(
+      child: SizedBox(
+        width: size.width * 0.9,
+        height: size.height * 0.6,
+        child: ContainedTabBarView(
+          tabs: [
+            InfoTabContainer(size, "종목 뉴스"),
+            InfoTabContainer(size, "종목 정보"),
+          ],
+          initialIndex: 0,
+          tabBarProperties: TabBarProperties(
+            padding: EdgeInsets.all(8),
+            indicatorPadding: EdgeInsets.only(
+                left: size.width * 0.03, right: size.width * 0.03),
+            labelStyle: TextStyle(color: Color(0xff0039A4)),
+            labelColor: Color(0xff0039A4),
+            unselectedLabelColor: Colors.grey[400],
+            indicatorSize: TabBarIndicatorSize.label,
+            indicator: BoxDecoration(
+                borderRadius: BorderRadius.circular(50),
+                // border: Border.all(color: (Colors.grey[400])!),
+                border: Border.all(color: Color(0xff0039A4), width: 1),
+                color: Color(0xffEFF1F6)),
+            margin: EdgeInsets.only(bottom: 8.0),
+            background: Container(
+              decoration: BoxDecoration(
+                color: Colors.transparent,
+              ),
+            ),
+          ),
+          views: [
+            newsInfo(size),
+            newsInfo(size),
           ],
           onChange: (index) {},
         ),
@@ -298,7 +346,7 @@ class _StockscreenState extends State<Stockscreen> {
                   name: 'Gold',
                   color: Color(0xff0039A4),
                   gradient: LinearGradient(colors: [
-                    Color(0xff0039A4).withOpacity(0.5),
+                    Color(0xff0039A4).withOpacity(0.1),
                     Color(0xff0039A4),
                   ], begin: Alignment.bottomCenter, end: Alignment.topCenter),
                 ),
@@ -385,77 +433,69 @@ class _StockscreenState extends State<Stockscreen> {
     );
   }
 
-//종목 정보
+  //종목 정보
   Widget newsInfo(Size size) {
     return Container(
+      margin: EdgeInsets.symmetric(
+          vertical: size.height * 0.02, horizontal: size.width * 0.05),
+      // padding: EdgeInsets.all(size.width * 0.05),
       width: size.width * 0.9,
-      height: size.height * 0.08,
-      color: Colors.white,
-      child: ExpansionTile(
-        title: Text(
-          '종목정보',
-          textAlign: TextAlign.left,
-          style: TextStyle(
-            color: Color.fromRGBO(0, 0, 0, 1),
-            fontFamily: 'Content',
-            fontSize: size.width * 0.05,
-            fontWeight: FontWeight.normal,
-            height: 1,
-          ),
+      // height: size.height * 0.4,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(8),
+          topRight: Radius.circular(8),
+          bottomLeft: Radius.circular(8),
+          bottomRight: Radius.circular(8),
         ),
-        initiallyExpanded: false,
+        color: Colors.white,
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(8),
-                topRight: Radius.circular(8),
-                bottomLeft: Radius.circular(8),
-                bottomRight: Radius.circular(8),
+          Center(
+            child: Container(
+              padding: EdgeInsets.all(size.height * 0.02),
+              child: Text(
+                "뉴스 정보",
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              border: Border.all(width: 3, color: Colors.black),
-              color: Color.fromRGBO(142, 142, 142, 1),
-              boxShadow: [
-                BoxShadow(
-                    color: Color.fromRGBO(0, 0, 0, 0.25),
-                    offset: Offset(0, 4),
-                    blurRadius: 2)
-              ],
             ),
-            child: Column(
-              children: [Text('123')],
-            ),
-          )
+          ),
+          // news.map((title, text) => newsList(title, text), )
         ],
       ),
     );
   }
 
-  Widget devide(Size size) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Container(
-          margin: EdgeInsets.only(right: size.width * 0.05),
-          width: size.height * 0.12,
-          child: Divider(
-            color: Colors.grey[400],
-            thickness: 0.8,
+  Widget newsList(String title, String text) {
+    return Container(
+      child: Column(
+        children: [
+          Divider(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                title,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              goodNews(),
+            ],
           ),
-        ),
-        Text(
-          "간편 로그인",
-          style: TextStyle(color: Colors.grey[400]),
-        ),
-        Container(
-          margin: EdgeInsets.only(left: size.width * 0.05),
-          width: size.height * 0.12,
-          child: Divider(
-            color: Colors.grey[400],
-            thickness: 0.8,
-          ),
-        ),
-      ],
+        ],
+      ),
+    );
+  }
+
+  Widget goodNews() {
+    return Container(
+      child: Text(
+        "호재",
+        style: TextStyle(color: Color(0xff0EBD8D)),
+      ),
+      color: Color(0xffE7F9F4),
     );
   }
 
@@ -464,14 +504,20 @@ class _StockscreenState extends State<Stockscreen> {
     Size size = MediaQuery.of(context).size;
 
     return FutureBuilder(
-      future: chart(),
+      // 종목명
+      future: chartInit("000660.KS"),
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (dayData.isNotEmpty) {
           return Scaffold(
             appBar: mainAppBar(context, "종목 정보"),
             body: SafeArea(
               child: SingleChildScrollView(
-                child: Stockmain(size),
+                child: Column(
+                  children: [
+                    Stockmain(size),
+                    infoTab(size),
+                  ],
+                ),
               ),
             ),
           );
