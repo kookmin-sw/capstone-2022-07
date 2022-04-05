@@ -11,7 +11,7 @@ import csv
 from datetime import datetime, timedelta
 import codecs
 import re
-
+#########https://haries.tistory.com/4
 url = "http://api.seibro.or.kr/openapi/service/StockSvc/getKDRSecnInfo"  # 공공데이터포털 api 주소(Without param)
 api_service_key_stock = "RXhGWArdgsytKaKf0g%2FWxNuo27wXxg4iChLUs9ePc39VvneddFbQ9v9ZXCDWJkdFbhqCvbw9kdMGy%2F%2Bv3it50A%3D%3D"  # service api key
 api_decode_key_stock = requests.utils.unquote(
@@ -82,6 +82,7 @@ def text_clean(inputString, query):
 # 크롤링 함수
 def search_crawl(tuple_list,query):
     # 삭제할 키워드들 
+
     del_list = ["오늘의", "뉴스", "급락주","마감","주요","급등주", "증시일정", "캘린더", "이번주", "[포토]", "[인사]", "상장사", "주간", "종목", "총정리", 
                 "다음주", "슈퍼주총", "공모주", "돋보기", "週間", "증권주"]
 
@@ -135,8 +136,10 @@ def search_crawl(tuple_list,query):
             news_url = atag["href"]
             label =0
             tag = ""
+
             if any(keyword in news_name for keyword in del_list):
                 continue
+
 
             for i in range(len(positive)):
                 if news_name.find(positive[i]) != -1:
@@ -159,7 +162,9 @@ def search_crawl(tuple_list,query):
                 pov_or_neg = 0              
 
         # tuple_list.append((query, news_name, news_url, news_date, pov_or_neg))
+
             tuple_list.append((news_name, pov_or_neg))
+
 
         page += 10
 
@@ -1138,8 +1143,11 @@ def run():
     #     pool.join()
 
     tuple_list = list()
+
+
     tuple_list.append(('title','label'))
     for query in cospi[137:942]:
+
         search_crawl(tuple_list, query)
 
 
