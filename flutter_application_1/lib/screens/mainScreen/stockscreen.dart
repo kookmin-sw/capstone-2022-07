@@ -4,7 +4,7 @@
 
 // ignore_for_file: prefer_const_constructors, prefer_const_constructors_in_immutables, non_constant_identifier_names, prefer_const_literals_to_create_immutables, prefer_typing_uninitialized_variables
 
-import 'dart:html';
+
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Components/stock_list.dart';
@@ -74,6 +74,9 @@ class _StockscreenState extends State<Stockscreen> {
     }
   ];
 
+  List<String> stockIcon = <String>['price', 'perc', 'eps', 'marketcap', 'dividend'];
+  List<String> stockInfodetail = <String>['주가', '주가수익률', '주당순이익', '시가총액', '배당'];
+  List<String> stockValue = <String>['99,900원(+2.49%)', '45.79%', '32.54', '240.73', '1.50%(FY:2077'];
   Future getDayData(String ticker) async {
     var yfin = YahooFin();
     StockHistory hist = yfin.initStockHistory(ticker: ticker);
@@ -305,8 +308,8 @@ class _StockscreenState extends State<Stockscreen> {
             ),
           ),
           views: [
-            newsInfo(size),
-            newsInfo(size),
+            Info(size, '종목 뉴스', news),
+            Info(size, '종목 정보', news),
           ],
           onChange: (index) {},
         ),
@@ -433,43 +436,98 @@ class _StockscreenState extends State<Stockscreen> {
     );
   }
 
-  //종목 정보
-  Widget newsInfo(Size size) {
+
+  // 하단 위젯 구성
+  Widget Info(Size size, String msg, List news) {
     return Container(
-      margin: EdgeInsets.symmetric(
-          vertical: size.height * 0.02, horizontal: size.width * 0.05),
-      // padding: EdgeInsets.all(size.width * 0.05),
-      width: size.width * 0.9,
-      // height: size.height * 0.4,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(8),
-          topRight: Radius.circular(8),
-          bottomLeft: Radius.circular(8),
-          bottomRight: Radius.circular(8),
+
+        borderRadius : BorderRadius.only(
+          topLeft: Radius.circular(16),
+          topRight: Radius.circular(16),
+          bottomLeft: Radius.circular(16),
+          bottomRight: Radius.circular(16),
         ),
-        color: Colors.white,
+        color : Colors.white,
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
+      width : size.width*0.9,
+
+      child :Column(
         children: [
-          Center(
-            child: Container(
-              padding: EdgeInsets.all(size.height * 0.02),
-              child: Text(
-                "뉴스 정보",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
+          Container(
+            padding: EdgeInsets.all(size.height * 0.02),
+            child: Text(
+              '${msg}',
+              style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
-          // news.map((title, text) => newsList(title, text), )
+          ListView.separated(
+            scrollDirection: Axis.vertical,
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            padding: EdgeInsets.symmetric(horizontal: size.width * 0.04 ),
+            itemCount: (msg== '종목 정보') ?
+            stockIcon.length : news.length,
+            itemBuilder: (BuildContext context, int index) {
+              return (msg == '종목 정보' ?
+              stockdetail(size, stockIcon[index], stockInfodetail[index], stockValue[index] ) :
+              stockNews(news[index]));
+            },
+            separatorBuilder: (BuildContext context, int index) => const Divider(color: GREY),
+          )
         ],
-      ),
+      )
+
+
+
     );
   }
+  Widget stockdetail(Size size, String Icon, String Infodetail, String Value) {
+    return Container(
+        margin : EdgeInsets.only(bottom: size.height * 0.03, top: size.height * 0.03),
+        child : Row(
+          children: [
+            Container(
 
-  Widget newsList(String title, String text) {
+                width: size.width * 0.04,
+                height: size.width * 0.04 ,
+                child : (SvgPicture.asset('assets/icons/stock${Icon}.svg',
+                    semanticsLabel: '${stockIcon}',
+                    color : CHART_MINUS))
+
+            ),
+            SizedBox(width : size.width * 0.02),
+            Text(
+              '${Infodetail}', textAlign: TextAlign.left, style: TextStyle(
+                color: Color.fromRGBO(91, 99, 106, 1),
+                fontFamily: 'ABeeZee',
+                fontSize: size.width * 0.04,
+                letterSpacing: 0,
+                fontWeight: FontWeight.bold,
+                height: 1
+            ),
+            ),
+            Expanded(
+                child : Text(
+                  '${Value}',
+                  textAlign: TextAlign.right,
+                  style: TextStyle(
+                      color: Color.fromRGBO(91, 99, 106, 1),
+
+                      fontFamily: 'ABeeZee',
+                      fontSize: size.width * 0.036,
+                      letterSpacing: 0,
+                      fontWeight: FontWeight.normal,
+                      height: 1
+                  ),
+                )
+            )
+
+          ],
+        )
+    );
+  }
+  Widget stockNews(news) {
     return Container(
       child: Column(
         children: [
@@ -478,7 +536,7 @@ class _StockscreenState extends State<Stockscreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                title,
+                news.title,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               goodNews(),
@@ -488,7 +546,6 @@ class _StockscreenState extends State<Stockscreen> {
       ),
     );
   }
-
   Widget goodNews() {
     return Container(
       child: Text(
@@ -503,28 +560,31 @@ class _StockscreenState extends State<Stockscreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
 
-    return FutureBuilder(
-      // 종목명
-      future: chartInit("000660.KS"),
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        if (dayData.isNotEmpty) {
-          return Scaffold(
-            appBar: mainAppBar(context, "종목 정보"),
-            body: SafeArea(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Stockmain(size),
-                    infoTab(size),
-                  ],
+    return SingleChildScrollView(
+      scrollDirection: Axis.vertical,
+      child : FutureBuilder(
+        // 종목명
+        future: chartInit("000660.KS"),
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (dayData.isNotEmpty) {
+            return Scaffold(
+              appBar: mainAppBar(context, "종목 정보"),
+              body: SafeArea(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Stockmain(size),
+                      infoTab(size),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          );
-        } else {
-          return Center(child: CircularProgressIndicator());
-        }
-      },
+            );
+          } else {
+            return Center(child: CircularProgressIndicator());
+          }
+        },
+      )
     );
   }
 }
