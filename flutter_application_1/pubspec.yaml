@@ -52,7 +52,6 @@ dev_dependencies:
   flutter_svg: ^1.0.3
   intl: ^0.17.0
 
-
   # Firebase dependencies
   firebase_core: ^1.13.1
   firebase_auth: ^3.3.11
@@ -65,6 +64,7 @@ dev_dependencies:
   yahoofin: ^0.0.8
   syncfusion_flutter_charts: ^19.4.56
   fl_chart: ^0.50.0
+  contained_tab_bar_view: ^0.8.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
