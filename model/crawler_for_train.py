@@ -1139,7 +1139,7 @@ def run():
 
     tuple_list = list()
     tuple_list.append(('title','label'))
-    for query in cospi[137:942]:
+    for query in cospi[266:942]:
         search_crawl(tuple_list, query)
 
 
