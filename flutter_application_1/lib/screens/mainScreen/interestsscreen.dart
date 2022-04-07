@@ -6,8 +6,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Components/main_app_bar.dart';
+import 'package:flutter_application_1/Components/setting_button.dart';
 import 'package:flutter_application_1/Components/stock_list.dart';
-
 
 class InterestScreen extends StatefulWidget {
   InterestScreen({Key? key}) : super(key: key);
@@ -21,7 +21,11 @@ class _InterestScreenState extends State<InterestScreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: mainAppBar(context, "관심 종목"),
+      appBar: mainAppBar(
+        context,
+        "관심 종목",
+        SettingButton(context),
+      ),
       body: Column(
         children: [
           Cardlist(size),

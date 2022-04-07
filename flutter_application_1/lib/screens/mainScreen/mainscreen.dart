@@ -233,7 +233,11 @@ class _MainscreenState extends State<Mainscreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: mainAppBar(context, "홈"),
+      appBar: mainAppBar(
+        context,
+        "홈",
+        SettingButton(context),
+      ),
       body: SafeArea(
         child: Column(
           children: [
