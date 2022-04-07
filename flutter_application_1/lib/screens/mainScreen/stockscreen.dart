@@ -58,19 +58,28 @@ class _StockscreenState extends State<Stockscreen> {
   var news = [
     {
       "title": "삼성전자, 유상증자 결정",
-      "text": "이재용 삼성전자 부회장이 지난달 이찬희 삼성준법감시위워회 위원장과 만나"
+      "text": "이재용 삼성전자 부회장이 지난달 이찬희 삼성준법감시위워회 위원장과 만나",
+      "result" : "악재"
     },
     {
       "title": "삼성전자, 2022년형 사운드바 국내 출시",
-      "text": "는 2022년형 사운드바 2종을 국내 시장에 출시했다고 3일 밝혔다. 이번에 출시한 제품...",
+      "text": "2022년형 사운드바 2종을 국내 시장에 출시했다고 3일 밝혔다. 이번에 출시한 제품...",
+        "result" : "호재"
     },
     {
       "title": "삼성·SK하이닉스, 1분기 기준 역대 최대...",
-      "text": "삼성전자, SK하이닉스는 1분기를 기준으로 역대 최대 매출을 새로 쓸 것으로 전망된다. 반면 배터리 업계는 ..."
+      "text": "삼성전자, SK하이닉스는 1분기를 기준으로 역대 최대 매출을 새로 쓸 것으로 전망된다. 반면 배터리 업계는 ...",
+        "result" : "호재"
     },
     {
       "title": "삼성 네오 QLED, 해외 유명 매체 호평 받아",
-      "text": "위크는 네오 QLED에 대해 “게임과 스트리밍, 스포츠 영상 감상을 중요하게 생각하는 소비자..."
+      "text": "위크는 네오 QLED에 대해 “게임과 스트리밍, 스포츠 영상 감상을 중요하게 생각하는 소비자...",
+        "result" : "호재"
+    },
+    {
+      "title": "삼성 네오 QLED, 해외 유명 매체 호평 받아",
+      "text": "위크는 네오 QLED에 대해 “게임과 스트리밍, 스포츠 영상 감상을 중요하게 생각하는 소비자...",
+      "result" : "호재"
     }
   ];
 
@@ -452,31 +461,37 @@ class _StockscreenState extends State<Stockscreen> {
       ),
       width : size.width*0.9,
 
-      child :Column(
-        children: [
-          Container(
-            padding: EdgeInsets.all(size.height * 0.02),
-            child: Text(
-              '${msg}',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-          ListView.separated(
+      child : Container(
+        child : SingleChildScrollView(
             scrollDirection: Axis.vertical,
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            padding: EdgeInsets.symmetric(horizontal: size.width * 0.04 ),
-            itemCount: (msg== '종목 정보') ?
-            stockIcon.length : news.length,
-            itemBuilder: (BuildContext context, int index) {
-              return (msg == '종목 정보' ?
-              stockdetail(size, stockIcon[index], stockInfodetail[index], stockValue[index] ) :
-              stockNews(news[index]));
-            },
-            separatorBuilder: (BuildContext context, int index) => const Divider(color: GREY),
-          )
-        ],
-      )
+          child :Column(
+          children: [
+            Container(
+              padding: EdgeInsets.all(size.height * 0.02),
+              child: Text(
+                '${msg}',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            ListView.separated(
+              scrollDirection: Axis.vertical,
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              padding: EdgeInsets.symmetric(horizontal: size.width * 0.04 ),
+              itemCount: (msg== '종목 정보') ?
+              stockIcon.length : news.length,
+              itemBuilder: (BuildContext context, int index) {
+                return (msg == '종목 정보' ?
+                stockdetail(size, stockIcon[index], stockInfodetail[index], stockValue[index] ) :
+                stockNews(news[index]));
+              },
+              separatorBuilder: (BuildContext context, int index) => const Divider(color: GREY),
+            )
+          ],
+        )),
+
+      ),
+
 
 
 
@@ -527,32 +542,75 @@ class _StockscreenState extends State<Stockscreen> {
         )
     );
   }
-  Widget stockNews(news) {
+  Widget stockNews(Map<String, String> news) {
+    var Title = news['title'];
+    var newsText = news['text'];
+    // String? 에러
+    if(Title == null){
+      return SizedBox();
+    }
+    if(newsText == null){
+      return SizedBox();
+    }
+
+
     return Container(
       child: Column(
         children: [
-          Divider(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                news.title,
+                Title,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              goodNews(),
+              newsResult(news),
             ],
           ),
+          SizedBox(height: 2,),
+          Container(
+            child : Text(
+              '- ${newsText}',
+              style: TextStyle(fontWeight: FontWeight.normal,
+                  color: Color(0xff888888)),
+            )
+          )
         ],
+
       ),
     );
   }
-  Widget goodNews() {
+  Widget newsResult(Map<String, String> news) {
+    var res = news['result'];
+    var resultColor;
+    var resultBackgrouncolor;
+    if(res == null){
+      return Container();
+    }
+    if(res == "호재"){
+      resultColor = Color(0xff0EBD8D);
+      resultBackgrouncolor = Color(0xffE7F9F4);
+    }else if(res == "악재"){
+      resultColor = Color(0xffEF3641);
+      resultBackgrouncolor = Color(0xffF9E7E7);
+    }
     return Container(
-      child: Text(
-        "호재",
-        style: TextStyle(color: Color(0xff0EBD8D)),
+      padding: EdgeInsets.symmetric(vertical: 2, horizontal: 5),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(8),
+          topRight: Radius.circular(8),
+          bottomLeft: Radius.circular(8),
+          bottomRight: Radius.circular(8),
+        ),
+        color: resultBackgrouncolor,
       ),
-      color: Color(0xffE7F9F4),
+      child: Text(
+        res,
+        style: TextStyle(color: resultColor,
+        ),
+      ),
+
     );
   }
 
@@ -560,9 +618,8 @@ class _StockscreenState extends State<Stockscreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.vertical,
-      child : FutureBuilder(
+    return
+        FutureBuilder(
         // 종목명
         future: chartInit("000660.KS"),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
@@ -584,8 +641,8 @@ class _StockscreenState extends State<Stockscreen> {
             return Center(child: CircularProgressIndicator());
           }
         },
-      )
-    );
+      );
+
   }
 }
 
