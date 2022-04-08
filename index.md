@@ -11,9 +11,9 @@
 
 
 ## 활용 예시 
-<img src="https://user-images.githubusercontent.com/28239856/161903122-dcb0b951-e502-4863-ab29-c4247343fbfb.png" width="280
-" height="520"><img src="https://user-images.githubusercontent.com/28239856/161903209-4a8340d5-57a6-4cf6-83cf-a822acc67a9c.png" width="280
-" height="520">
+<img src="https://user-images.githubusercontent.com/28239856/161903122-dcb0b951-e502-4863-ab29-c4247343fbfb.png" width="250
+" height="470"><img src="https://user-images.githubusercontent.com/28239856/161903209-4a8340d5-57a6-4cf6-83cf-a822acc67a9c.png" width="250
+" height="470">
 
 1. 종목별 정보 제공
    + 종목별 호/악재 기사 판별 및  뉴스 정보 제공 
