@@ -117,6 +117,7 @@ class _SigninScreenState extends State<SigninScreen> {
           height: size.height * 0.1,
           width: size.width * 0.8,
           child: TextFormField(
+            obscureText: true,
             decoration: InputDecoration(
                 contentPadding: EdgeInsets.all(size.height * 0.02),
                 prefixIcon: Icon(Icons.lock),
@@ -176,7 +177,15 @@ class _SigninScreenState extends State<SigninScreen> {
           borderRadius: BorderRadius.circular(10),
         ),
         child: TextButton(
-          onPressed: () {},
+          onPressed: () {
+            if (_emailKey.currentState!.validate() &&
+                _passwordKey.currentState!.validate()) {
+              signInWithEmail(_email, _password, context);
+            } else {
+              _emailKey.currentState!.validate();
+              _passwordKey.currentState!.validate();
+            }
+          },
           child: Text(
             "로그인",
             style: TextStyle(

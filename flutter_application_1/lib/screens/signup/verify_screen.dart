@@ -1,10 +1,14 @@
 // ignore_for_file: prefer_const_constructors_in_immutables, prefer_const_constructors, prefer_final_fields, unused_field
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application_1/Animation/fade_animation.dart';
+import 'package:flutter_application_1/Signin/function.dart';
 import 'package:flutter_application_1/screens/signup/register_screen.dart';
 import 'package:flutter_application_1/tool/validator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class VerifyScreen extends StatefulWidget {
   VerifyScreen({Key? key}) : super(key: key);
@@ -17,6 +21,8 @@ class _VerifyScreenState extends State<VerifyScreen> {
   FocusNode _focus = FocusNode();
   final _verifyKey = GlobalKey<FormState>();
   var _verify = "";
+  late Timer _timer;
+  bool _isUserEmailVerified = false;
 
   Widget informaion(Size size) {
     return Container(
@@ -45,7 +51,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
                 ),
               ),
               Text(
-                "인증번호",
+                "인증 링크",
                 style: TextStyle(
                   color: Color(0xff0039A4),
                 ),
@@ -57,6 +63,12 @@ class _VerifyScreenState extends State<VerifyScreen> {
                 ),
               ),
             ],
+          ),
+          Text(
+            "링크를 클릭해주세요!",
+            style: TextStyle(
+              color: Color(0xff0039A4),
+            ),
           ),
         ],
       ),
@@ -136,6 +148,31 @@ class _VerifyScreenState extends State<VerifyScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    Future(
+      () async {
+        _timer = Timer.periodic(
+          Duration(seconds: 1),
+          (timer) async {
+            await FirebaseAuth.instance.currentUser!.reload();
+            var user = FirebaseAuth.instance.currentUser!;
+            if (user.emailVerified) {
+              setState(
+                () {
+                  _isUserEmailVerified = user.emailVerified;
+                },
+              );
+              authStateChanges(context);
+              timer.cancel();
+            }
+          },
+        );
+      },
     );
   }
 

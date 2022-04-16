@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application_1/Animation/fade_animation.dart';
+import 'package:flutter_application_1/Signin/function.dart';
 import 'package:flutter_application_1/screens/signup/verify_screen.dart';
 import 'package:flutter_application_1/tool/validator.dart';
 
@@ -150,6 +151,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           height: size.height * 0.1,
           width: size.width * 0.8,
           child: TextFormField(
+            obscureText: true,
             decoration: InputDecoration(
                 contentPadding: EdgeInsets.all(size.height * 0.02),
                 prefixIcon: Icon(Icons.lock),
@@ -186,15 +188,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
           borderRadius: BorderRadius.circular(10),
         ),
         child: TextButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) {
-                  return VerifyScreen();
-                },
-              ),
-            );
+          onPressed: () async {
+            if (_emailKey.currentState!.validate() &&
+                _passwordKey.currentState!.validate()) {
+              await signUpWithEmail(_email, _password, context);
+            } else {
+              _emailKey.currentState!.validate();
+              _passwordKey.currentState!.validate();
+            }
           },
           child: Text(
             "회원가입",
@@ -234,8 +235,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   informaion(size),
                   decoText(size, "이메일"),
                   emailInput(size),
-                  decoText(size, "이름"),
-                  nickNameInput(size),
                   decoText(size, "비밀번호"),
                   passwordInput(size),
                   registerButton(size),

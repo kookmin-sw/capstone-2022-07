@@ -113,17 +113,6 @@ class _LoginScreenState extends State<LoginScreen> {
         child: TextButton(
           onPressed: () async {
             await signInWithGoogle();
-            if (FirebaseAuth.instance.currentUser != null) {
-              authStateChanges(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return InputNicknameScreen();
-                  },
-                ),
-              );
-            }
           },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
