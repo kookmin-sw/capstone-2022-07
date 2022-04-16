@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Components/setting_button.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_application_1/Components/main_app_bar.dart';
-import 'package:flutter_application_1/Color/Color.dart';
+import 'package:flutter_application_1/Color/color.dart';
 
 class Searchscreen extends StatefulWidget {
   Searchscreen({Key? key}) : super(key: key);

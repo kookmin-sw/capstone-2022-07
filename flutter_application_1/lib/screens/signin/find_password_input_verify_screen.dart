@@ -1,10 +1,9 @@
-// ignore_for_file: prefer_const_constructors_in_immutables, prefer_const_constructors, prefer_final_fields
+// ignore_for_file: prefer_const_constructors_in_immutables, prefer_const_constructors, prefer_final_fields, unused_field
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application_1/Animation/fade_animation.dart';
 import 'package:flutter_application_1/screens/signin/find_password_input_new_password_screen.dart';
-import 'package:flutter_application_1/screens/signup/register_screen.dart';
 import 'package:flutter_application_1/tool/validator.dart';
 
 class FindPasswordInputVerifyScreen extends StatefulWidget {

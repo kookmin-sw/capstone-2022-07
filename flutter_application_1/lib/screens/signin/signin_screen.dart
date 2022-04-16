@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, prefer_final_fields, prefer_const_constructors_in_immutables, unused_field
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -237,7 +237,7 @@ class _SigninScreenState extends State<SigninScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SvgPicture.asset(
-                'lib/assets/google_logo.svg',
+                'assets/logos/google_logo.svg',
                 width: size.width * 0.1,
                 height: size.height * 0.03,
               ),

@@ -7,7 +7,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Components/star_button.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_application_1/Color/Color.dart';
+import 'package:flutter_application_1/Color/color.dart';
 import 'package:flutter_application_1/Components/main_app_bar.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:yahoofin/yahoofin.dart';
@@ -193,10 +193,10 @@ class _StockscreenState extends State<Stockscreen> {
   }
 
   chartInit(String ticker) {
-    // getMonthData(ticker);
-    // getYearData(ticker);
-    // getTenYearData(ticker);
-    // getDayData(ticker);
+    getMonthData(ticker);
+    getYearData(ticker);
+    getTenYearData(ticker);
+    getDayData(ticker);
   }
   // 종목 이름,가격,대비,긍/부정, 관심
 
@@ -628,7 +628,7 @@ class _StockscreenState extends State<Stockscreen> {
       // 종목명
       future: chartInit("000660.KS"),
       builder: (BuildContext context, AsyncSnapshot snapshot) {
-        if (dayData.isEmpty) {
+        if (dayData.isNotEmpty) {
           return Scaffold(
             appBar: mainAppBar(
               context,

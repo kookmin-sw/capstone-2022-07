@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_application_1/Components/setting_button.dart';
 
 AppBar mainAppBar(BuildContext context, String title, IconButton button) {
   return AppBar(

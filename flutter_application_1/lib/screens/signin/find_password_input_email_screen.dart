@@ -18,6 +18,7 @@ class _FindPasswordInputEmailScreenState
     extends State<FindPasswordInputEmailScreen> {
   FocusNode _focus = FocusNode();
   final _findEmailKey = GlobalKey<FormState>();
+  // ignore: unused_field
   var _email = "";
 
   Widget informaion(Size size) {

@@ -5,7 +5,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, sized_box_for_whitespace, avoid_unnecessary_containers, non_constant_identifier_names, prefer_const_constructors_in_immutables, avoid_print
 
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/Color/Color.dart';
+import 'package:flutter_application_1/Color/color.dart';
 import 'package:flutter_application_1/Components/main_app_bar.dart';
 import 'package:flutter_application_1/Components/setting_button.dart';
 import 'package:yahoofin/yahoofin.dart';
@@ -71,7 +71,7 @@ class _MainscreenState extends State<Mainscreen> {
 
   Widget Topstock(Size size, String stockname, var stockperc, var stockprice,
       var newscount) {
-    var color;
+    Color color;
     if (stockperc[0] == '+') {
       color = CHART_PLUS;
     } else {
@@ -89,7 +89,7 @@ class _MainscreenState extends State<Mainscreen> {
           children: [
             Container(
                 child: Text(
-              '${stockname}', //Firebase 적용사항
+              stockname, //Firebase 적용사항
               style: TextStyle(
                   color: Color.fromRGBO(0, 0, 0, 1),
                   fontFamily: 'ABeeZee',
@@ -105,7 +105,7 @@ class _MainscreenState extends State<Mainscreen> {
                     child: Column(
                   children: [
                     Text(
-                      '${stockperc}', //Firebase 적용사항
+                      '$stockperc', //Firebase 적용사항
                       style: TextStyle(
                           color: color,
                           fontFamily: 'Content',
@@ -114,7 +114,7 @@ class _MainscreenState extends State<Mainscreen> {
                           height: 1.2),
                     ),
                     Text(
-                      '${stockprice}', //Firebase 적용사항
+                      '$stockprice', //Firebase 적용사항
                       style: TextStyle(
                           color: Color.fromRGBO(0, 0, 0, 1),
                           fontFamily: 'Content',
@@ -127,7 +127,7 @@ class _MainscreenState extends State<Mainscreen> {
                 Container(
                     width: size.width * 0.15,
                     child: Text(
-                      '${newscount}개', //Firebase 적용사항
+                      '$newscount개', //Firebase 적용사항
                       textAlign: TextAlign.right,
                       style: TextStyle(
                           color: Color.fromRGBO(0, 0, 0, 1),
