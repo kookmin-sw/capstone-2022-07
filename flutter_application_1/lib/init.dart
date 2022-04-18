@@ -16,7 +16,7 @@ class Init extends StatelessWidget {
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
         if (!snapshot.hasData) {
-          return InterestScreen();
+          return Stockscreen();
         }
         return LoginScreen();
       },
