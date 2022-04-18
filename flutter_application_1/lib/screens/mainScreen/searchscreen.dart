@@ -60,7 +60,9 @@ Widget Searchbar(Size size) {
               margin: EdgeInsets.only(left: size.width * 0.9 * 0.02),
               child: SvgPicture.asset('assets/icons/search.svg',
                   semanticsLabel: 'search')),
+          
           // Firebase 적용 사항
+          // 입력 시 입력한 string이 포함되는 종목이 노출되도록해야함 
           Expanded(
             child: Text(
               '찾으시는 종목을 입력하세요',
