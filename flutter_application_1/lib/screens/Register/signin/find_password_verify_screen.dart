@@ -1,28 +1,23 @@
 // ignore_for_file: prefer_const_constructors_in_immutables, prefer_const_constructors, prefer_final_fields, unused_field
 
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application_1/Animation/fade_animation.dart';
-import 'package:flutter_application_1/Signin/function.dart';
-import 'package:flutter_application_1/screens/signup/register_screen.dart';
+import 'package:flutter_application_1/screens/Register/signin/signin_screen.dart';
 import 'package:flutter_application_1/tool/validator.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
-class VerifyScreen extends StatefulWidget {
-  VerifyScreen({Key? key}) : super(key: key);
+class FindPasswordVerifyScreen extends StatefulWidget {
+  FindPasswordVerifyScreen({Key? key}) : super(key: key);
 
   @override
-  State<VerifyScreen> createState() => _VerifyScreenState();
+  State<FindPasswordVerifyScreen> createState() =>
+      _FindPasswordVerifyScreenState();
 }
 
-class _VerifyScreenState extends State<VerifyScreen> {
+class _FindPasswordVerifyScreenState extends State<FindPasswordVerifyScreen> {
   FocusNode _focus = FocusNode();
-  final _verifyKey = GlobalKey<FormState>();
-  var _verify = "";
-  late Timer _timer;
-  bool _isUserEmailVerified = false;
+  final _findVerifyKey = GlobalKey<FormState>();
+  var _findVerify = "";
 
   Widget informaion(Size size) {
     return Container(
@@ -34,7 +29,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
           Container(
             padding: EdgeInsets.only(bottom: size.height * 0.02),
             child: Text(
-              "회원가입",
+              "비밀번호를 잊으셨나요?",
               style: TextStyle(
                 color: Color(0xff0039A4),
                 fontSize: size.width * 0.07,
@@ -51,43 +46,27 @@ class _VerifyScreenState extends State<VerifyScreen> {
                 ),
               ),
               Text(
-                "인증 링크",
+                "비밀번호 변경 메일",
                 style: TextStyle(
                   color: Color(0xff0039A4),
                 ),
               ),
               Text(
-                "를 보냈습니다!",
+                "을 보냈습니다!",
                 style: TextStyle(
                   color: Colors.grey.shade600,
                 ),
               ),
             ],
           ),
-          Text(
-            "링크를 클릭해주세요!",
-            style: TextStyle(
-              color: Color(0xff0039A4),
-            ),
-          ),
         ],
       ),
     );
   }
 
-  Widget decoText(Size size, String text) {
-    return Container(
-      padding: EdgeInsets.only(
-          top: size.height * 0.01,
-          left: size.width * 0.1,
-          bottom: size.height * 0.01),
-      child: Text(text),
-    );
-  }
-
-  Widget verifyInput(Size size) {
+  Widget findVerifyInput(Size size) {
     return Form(
-      key: _verifyKey,
+      key: _findVerifyKey,
       child: Center(
         child: SizedBox(
           height: size.height * 0.1,
@@ -107,9 +86,9 @@ class _VerifyScreenState extends State<VerifyScreen> {
             validator: (value) =>
                 CheckValidate().validateVerification(_focus, value!),
             onChanged: (value) {
-              _verify = value;
-              if (_verifyKey.currentState != null) {
-                _verifyKey.currentState!.validate();
+              _findVerify = value;
+              if (_findVerifyKey.currentState != null) {
+                _findVerifyKey.currentState!.validate();
               }
             },
           ),
@@ -118,7 +97,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
     );
   }
 
-  Widget registerButton(Size size) {
+  Widget submitButton(Size size) {
     return Center(
       child: Container(
         height: size.height * 0.06,
@@ -134,13 +113,13 @@ class _VerifyScreenState extends State<VerifyScreen> {
               context,
               MaterialPageRoute(
                 builder: (context) {
-                  return RegisterScreen();
+                  return SigninScreen();
                 },
               ),
             );
           },
           child: Text(
-            "회원가입",
+            "새 비밀번호로 다시 로그인하기",
             style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: size.width * 0.035,
@@ -148,31 +127,6 @@ class _VerifyScreenState extends State<VerifyScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    Future(
-      () async {
-        _timer = Timer.periodic(
-          Duration(seconds: 1),
-          (timer) async {
-            await FirebaseAuth.instance.currentUser!.reload();
-            var user = FirebaseAuth.instance.currentUser!;
-            if (user.emailVerified) {
-              setState(
-                () {
-                  _isUserEmailVerified = user.emailVerified;
-                },
-              );
-              authStateChanges(context);
-              timer.cancel();
-            }
-          },
-        );
-      },
     );
   }
 
@@ -200,9 +154,9 @@ class _VerifyScreenState extends State<VerifyScreen> {
               children: [
                 informaion(size),
                 SizedBox(height: size.height * 0.05),
-                decoText(size, "인증번호"),
-                verifyInput(size),
-                registerButton(size),
+                // decoText(size, "인증번호"),
+                // findVerifyInput(size),
+                submitButton(size),
               ],
             ),
           ),

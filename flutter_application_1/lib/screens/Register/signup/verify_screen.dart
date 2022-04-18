@@ -1,25 +1,29 @@
-// ignore_for_file: prefer_const_constructors_in_immutables, prefer_const_constructors, prefer_final_fields
+// ignore_for_file: prefer_const_constructors_in_immutables, prefer_const_constructors, prefer_final_fields, unused_field
+
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application_1/Animation/fade_animation.dart';
-import 'package:flutter_application_1/screens/signin/find_password_input_verify_screen.dart';
+import 'package:flutter_application_1/screens/Register/function.dart';
+import 'package:flutter_application_1/screens/Register/registerComponents.dart';
+import 'package:flutter_application_1/screens/Register/signup/register_screen.dart';
 import 'package:flutter_application_1/tool/validator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class FindPasswordInputEmailScreen extends StatefulWidget {
-  FindPasswordInputEmailScreen({Key? key}) : super(key: key);
+class VerifyScreen extends StatefulWidget {
+  VerifyScreen({Key? key}) : super(key: key);
 
   @override
-  State<FindPasswordInputEmailScreen> createState() =>
-      _FindPasswordInputEmailScreenState();
+  State<VerifyScreen> createState() => _VerifyScreenState();
 }
 
-class _FindPasswordInputEmailScreenState
-    extends State<FindPasswordInputEmailScreen> {
+class _VerifyScreenState extends State<VerifyScreen> {
   FocusNode _focus = FocusNode();
-  final _findEmailKey = GlobalKey<FormState>();
-  // ignore: unused_field
-  var _email = "";
+  final _verifyKey = GlobalKey<FormState>();
+  var _verify = "";
+  late Timer _timer;
+  bool _isUserEmailVerified = false;
 
   Widget informaion(Size size) {
     return Container(
@@ -31,7 +35,7 @@ class _FindPasswordInputEmailScreenState
           Container(
             padding: EdgeInsets.only(bottom: size.height * 0.02),
             child: Text(
-              "비밀번호를 잊으셨나요?",
+              "회원가입",
               style: TextStyle(
                 color: Color(0xff0039A4),
                 fontSize: size.width * 0.07,
@@ -42,64 +46,61 @@ class _FindPasswordInputEmailScreenState
           Row(
             children: [
               Text(
-                "인증을 통해 ",
+                "입력하신 이메일 계정으로 ",
                 style: TextStyle(
                   color: Colors.grey.shade600,
                 ),
               ),
               Text(
-                "비밀번호",
+                "인증 링크",
                 style: TextStyle(
                   color: Color(0xff0039A4),
                 ),
               ),
               Text(
-                "를 복구해 드리겠습니다.",
+                "를 보냈습니다!",
                 style: TextStyle(
                   color: Colors.grey.shade600,
                 ),
               ),
             ],
           ),
+          Text(
+            "링크를 클릭해주세요!",
+            style: TextStyle(
+              color: Color(0xff0039A4),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget decoText(Size size, String text) {
-    return Container(
-      padding: EdgeInsets.only(
-          top: size.height * 0.01,
-          left: size.width * 0.1,
-          bottom: size.height * 0.01),
-      child: Text(text),
-    );
-  }
-
-  Widget emailInput(Size size) {
+  Widget verifyInput(Size size) {
     return Form(
-      key: _findEmailKey,
+      key: _verifyKey,
       child: Center(
         child: SizedBox(
           height: size.height * 0.1,
           width: size.width * 0.8,
           child: TextFormField(
+            textAlign: TextAlign.center,
             decoration: InputDecoration(
                 contentPadding: EdgeInsets.all(size.height * 0.02),
-                prefixIcon: Icon(Icons.email),
                 border: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey[600]!),
                     borderRadius: BorderRadius.circular(10)),
                 focusedBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Color(0xff0039A4)),
                     borderRadius: BorderRadius.circular(10)),
-                hintText: "abc@example.com",
+                hintText: "123456",
                 hintStyle: TextStyle(color: Colors.grey[400])),
-            validator: (value) => CheckValidate().validateEmail(_focus, value!),
+            validator: (value) =>
+                CheckValidate().validateVerification(_focus, value!),
             onChanged: (value) {
-              _email = value;
-              if (_findEmailKey.currentState != null) {
-                _findEmailKey.currentState!.validate();
+              _verify = value;
+              if (_verifyKey.currentState != null) {
+                _verifyKey.currentState!.validate();
               }
             },
           ),
@@ -108,7 +109,7 @@ class _FindPasswordInputEmailScreenState
     );
   }
 
-  Widget confirmButton(Size size) {
+  Widget registerButton(Size size) {
     return Center(
       child: Container(
         height: size.height * 0.06,
@@ -124,13 +125,13 @@ class _FindPasswordInputEmailScreenState
               context,
               MaterialPageRoute(
                 builder: (context) {
-                  return FindPasswordInputVerifyScreen();
+                  return RegisterScreen();
                 },
               ),
             );
           },
           child: Text(
-            "확인",
+            "회원가입",
             style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: size.width * 0.035,
@@ -138,6 +139,31 @@ class _FindPasswordInputEmailScreenState
           ),
         ),
       ),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    Future(
+      () async {
+        _timer = Timer.periodic(
+          Duration(seconds: 1),
+          (timer) async {
+            await FirebaseAuth.instance.currentUser!.reload();
+            var user = FirebaseAuth.instance.currentUser!;
+            if (user.emailVerified) {
+              setState(
+                () {
+                  _isUserEmailVerified = user.emailVerified;
+                },
+              );
+              authStateChanges(context);
+              timer.cancel();
+            }
+          },
+        );
+      },
     );
   }
 
@@ -165,9 +191,9 @@ class _FindPasswordInputEmailScreenState
               children: [
                 informaion(size),
                 SizedBox(height: size.height * 0.05),
-                decoText(size, "이메일"),
-                emailInput(size),
-                confirmButton(size),
+                decoText(size, "인증번호"),
+                verifyInput(size),
+                registerButton(size),
               ],
             ),
           ),

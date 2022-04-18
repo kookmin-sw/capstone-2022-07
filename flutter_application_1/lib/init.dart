@@ -2,10 +2,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_application_1/Signin/function.dart';
-import 'package:flutter_application_1/screens/login_screen.dart';
-import 'package:flutter_application_1/screens/signup/input_nickname_screen.dart';
-import 'package:flutter_application_1/screens/start_screen.dart';
+import 'package:flutter_application_1/screens/Register/function.dart';
+import 'package:flutter_application_1/screens/Register/signup/input_nickname_screen.dart';
+import 'package:flutter_application_1/screens/Register/login_screen.dart';
+import 'package:flutter_application_1/screens/mainScreen/start_screen.dart';
 
 class Init extends StatelessWidget {
   const Init({Key? key}) : super(key: key);

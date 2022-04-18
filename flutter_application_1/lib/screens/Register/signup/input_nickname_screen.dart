@@ -3,22 +3,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application_1/Animation/fade_animation.dart';
-import 'package:flutter_application_1/screens/signin/find_password_input_new_password_screen.dart';
+import 'package:flutter_application_1/screens/Register/function.dart';
+import 'package:flutter_application_1/screens/Register/registerComponents.dart';
+import 'package:flutter_application_1/screens/mainScreen/start_screen.dart';
 import 'package:flutter_application_1/tool/validator.dart';
 
-class FindPasswordInputVerifyScreen extends StatefulWidget {
-  FindPasswordInputVerifyScreen({Key? key}) : super(key: key);
+class InputNicknameScreen extends StatefulWidget {
+  InputNicknameScreen({Key? key}) : super(key: key);
 
   @override
-  State<FindPasswordInputVerifyScreen> createState() =>
-      _FindPasswordInputVerifyScreenState();
+  State<InputNicknameScreen> createState() => _InputNicknameScreenState();
 }
 
-class _FindPasswordInputVerifyScreenState
-    extends State<FindPasswordInputVerifyScreen> {
+class _InputNicknameScreenState extends State<InputNicknameScreen> {
   FocusNode _focus = FocusNode();
-  final _findVerifyKey = GlobalKey<FormState>();
-  var _findVerify = "";
+  final _nickNameKey = GlobalKey<FormState>();
+  var _nickName = "";
 
   Widget informaion(Size size) {
     return Container(
@@ -30,7 +30,7 @@ class _FindPasswordInputVerifyScreenState
           Container(
             padding: EdgeInsets.only(bottom: size.height * 0.02),
             child: Text(
-              "비밀번호를 잊으셨나요?",
+              "회원가입",
               style: TextStyle(
                 color: Color(0xff0039A4),
                 fontSize: size.width * 0.07,
@@ -41,19 +41,19 @@ class _FindPasswordInputVerifyScreenState
           Row(
             children: [
               Text(
-                "입력하신 이메일 계정으로 ",
+                "사용하실 ",
                 style: TextStyle(
                   color: Colors.grey.shade600,
                 ),
               ),
               Text(
-                "인증번호",
+                "닉네임",
                 style: TextStyle(
                   color: Color(0xff0039A4),
                 ),
               ),
               Text(
-                "를 보냈습니다!",
+                "을 입력해주세요!",
                 style: TextStyle(
                   color: Colors.grey.shade600,
                 ),
@@ -65,41 +65,31 @@ class _FindPasswordInputVerifyScreenState
     );
   }
 
-  Widget decoText(Size size, String text) {
-    return Container(
-      padding: EdgeInsets.only(
-          top: size.height * 0.01,
-          left: size.width * 0.1,
-          bottom: size.height * 0.01),
-      child: Text(text),
-    );
-  }
-
-  Widget findVerifyInput(Size size) {
+  Widget nickNameInput(Size size) {
     return Form(
-      key: _findVerifyKey,
+      key: _nickNameKey,
       child: Center(
         child: SizedBox(
           height: size.height * 0.1,
           width: size.width * 0.8,
           child: TextFormField(
-            textAlign: TextAlign.center,
             decoration: InputDecoration(
                 contentPadding: EdgeInsets.all(size.height * 0.02),
+                prefixIcon: Icon(Icons.people),
                 border: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey[600]!),
                     borderRadius: BorderRadius.circular(10)),
                 focusedBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Color(0xff0039A4)),
                     borderRadius: BorderRadius.circular(10)),
-                hintText: "123456",
+                hintText: "이름",
                 hintStyle: TextStyle(color: Colors.grey[400])),
             validator: (value) =>
-                CheckValidate().validateVerification(_focus, value!),
+                CheckValidate().validateNickname(_focus, value!),
             onChanged: (value) {
-              _findVerify = value;
-              if (_findVerifyKey.currentState != null) {
-                _findVerifyKey.currentState!.validate();
+              _nickName = value;
+              if (_nickNameKey.currentState != null) {
+                _nickNameKey.currentState!.validate();
               }
             },
           ),
@@ -108,7 +98,7 @@ class _FindPasswordInputVerifyScreenState
     );
   }
 
-  Widget submitButton(Size size) {
+  Widget registerButton(Size size) {
     return Center(
       child: Container(
         height: size.height * 0.06,
@@ -120,17 +110,20 @@ class _FindPasswordInputVerifyScreenState
         ),
         child: TextButton(
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) {
-                  return FindPasswordInputNewPassword();
-                },
-              ),
-            );
+            if (_nickNameKey.currentState!.validate()) {
+              updateNickname(_nickName);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return StartScreen();
+                  },
+                ),
+              );
+            }
           },
           child: Text(
-            "제출",
+            "회원가입",
             style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: size.width * 0.035,
@@ -165,9 +158,9 @@ class _FindPasswordInputVerifyScreenState
               children: [
                 informaion(size),
                 SizedBox(height: size.height * 0.05),
-                decoText(size, "인증번호"),
-                findVerifyInput(size),
-                submitButton(size),
+                decoText(size, "닉네임"),
+                nickNameInput(size),
+                registerButton(size),
               ],
             ),
           ),

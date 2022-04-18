@@ -3,10 +3,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application_1/Animation/fade_animation.dart';
-import 'package:flutter_application_1/screens/signin/find_password_input_email_screen.dart';
+import 'package:flutter_application_1/screens/Register/registerComponents.dart';
+import 'package:flutter_application_1/screens/Register/signin/find_password_input_email_screen.dart';
 import 'package:flutter_application_1/tool/validator.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_application_1/Signin/function.dart';
+import 'package:flutter_application_1/screens/Register/function.dart';
 
 class SigninScreen extends StatefulWidget {
   SigninScreen({Key? key}) : super(key: key);
@@ -64,16 +65,6 @@ class _SigninScreenState extends State<SigninScreen> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget decoText(Size size, String text) {
-    return Container(
-      padding: EdgeInsets.only(
-          top: size.height * 0.01,
-          left: size.width * 0.1,
-          bottom: size.height * 0.01),
-      child: Text(text),
     );
   }
 

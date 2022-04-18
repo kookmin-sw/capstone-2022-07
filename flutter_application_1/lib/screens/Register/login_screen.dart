@@ -3,10 +3,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_application_1/Animation/fade_animation.dart';
-import 'package:flutter_application_1/Signin/function.dart';
-import 'package:flutter_application_1/screens/signin/signin_screen.dart';
-import 'package:flutter_application_1/screens/signup/input_nickname_screen.dart';
-import 'package:flutter_application_1/screens/signup/register_screen.dart';
+import 'package:flutter_application_1/screens/Register/function.dart';
+import 'package:flutter_application_1/screens/Register/registerComponents.dart';
+import 'package:flutter_application_1/screens/Register/signin/signin_screen.dart';
+import 'package:flutter_application_1/screens/Register/signup/register_screen.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -176,39 +176,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget alreadyLoginButton(Size size) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
-          "이미 계정이 있으신가요?",
-          style:
-              TextStyle(fontSize: size.width * 0.03, color: Colors.grey[600]),
-        ),
-        TextButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) {
-                  return SigninScreen();
-                },
-              ),
-            );
-          },
-          child: Text(
-            "로그인",
-            style: TextStyle(
-                fontSize: size.width * 0.03,
-                decoration: TextDecoration.underline,
-                color: Color(0xff0039A4),
-                fontWeight: FontWeight.bold),
-          ),
-        )
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -231,7 +198,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   emailLoginButton(context, size)
                 ],
               ),
-              alreadyLoginButton(size)
+              alreadyLoginButton(context, size)
             ],
           ),
         ),

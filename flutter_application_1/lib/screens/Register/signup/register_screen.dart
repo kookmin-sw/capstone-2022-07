@@ -3,8 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application_1/Animation/fade_animation.dart';
-import 'package:flutter_application_1/Signin/function.dart';
-import 'package:flutter_application_1/screens/signup/verify_screen.dart';
+import 'package:flutter_application_1/screens/Register/function.dart';
+import 'package:flutter_application_1/screens/Register/registerComponents.dart';
 import 'package:flutter_application_1/tool/validator.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -65,16 +65,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget decoText(Size size, String text) {
-    return Container(
-      padding: EdgeInsets.only(
-          top: size.height * 0.01,
-          left: size.width * 0.1,
-          bottom: size.height * 0.01),
-      child: Text(text),
     );
   }
 
@@ -238,7 +228,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   decoText(size, "비밀번호"),
                   passwordInput(size),
                   registerButton(size),
-                  SizedBox(height: size.height * 0.1)
+                  SizedBox(height: size.height * 0.05),
+                  alreadyLoginButton(context, size),
                 ],
               ),
             ),

@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_application_1/Signin/function.dart';
+import 'package:flutter_application_1/screens/Register/function.dart';
 
 IconButton SettingButton(BuildContext context) {
   return IconButton(

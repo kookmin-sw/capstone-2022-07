@@ -2,11 +2,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/init.dart';
-import 'package:flutter_application_1/screens/login_screen.dart';
-import 'package:flutter_application_1/screens/signup/input_nickname_screen.dart';
-import 'package:flutter_application_1/screens/signup/register_screen.dart';
-import 'package:flutter_application_1/screens/signup/verify_screen.dart';
-import 'package:flutter_application_1/screens/start_screen.dart';
+import 'package:flutter_application_1/screens/Register/signup/input_nickname_screen.dart';
+import 'package:flutter_application_1/screens/Register/signup/register_screen.dart';
+import 'package:flutter_application_1/screens/Register/signup/verify_screen.dart';
+import 'package:flutter_application_1/screens/Register/login_screen.dart';
+import 'package:flutter_application_1/screens/mainScreen/start_screen.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -118,6 +118,10 @@ Future<dynamic> signInWithEmail(
         }
     }
   }
+}
+
+Future<void> resetPassword(String email) async {
+  await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
 }
 
 Future findUserByUid(String uid) async {

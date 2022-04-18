@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application_1/Animation/fade_animation.dart';
+import 'package:flutter_application_1/screens/Register/registerComponents.dart';
 import 'package:flutter_application_1/tool/validator.dart';
 
 class FindPasswordInputNewPassword extends StatefulWidget {
@@ -65,16 +66,6 @@ class _FindPasswordInputNewPasswordState
           ),
         ],
       ),
-    );
-  }
-
-  Widget decoText(Size size, String text) {
-    return Container(
-      padding: EdgeInsets.only(
-          top: size.height * 0.01,
-          left: size.width * 0.1,
-          bottom: size.height * 0.01),
-      child: Text(text),
     );
   }
 
