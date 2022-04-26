@@ -1,22 +1,29 @@
-// ignore_for_file: prefer_const_constructors_in_immutables, prefer_const_constructors, prefer_final_fields
+// ignore_for_file: prefer_const_constructors_in_immutables, prefer_const_constructors, prefer_final_fields, unused_field
+
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application_1/Animation/fade_animation.dart';
-import 'package:flutter_application_1/screens/signup/register_screen.dart';
+import 'package:flutter_application_1/screens/Register/function.dart';
+import 'package:flutter_application_1/screens/Register/registerComponents.dart';
+import 'package:flutter_application_1/screens/Register/signup/register_screen.dart';
 import 'package:flutter_application_1/tool/validator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class InputNicknameScreen extends StatefulWidget {
-  InputNicknameScreen({Key? key}) : super(key: key);
+class VerifyScreen extends StatefulWidget {
+  VerifyScreen({Key? key}) : super(key: key);
 
   @override
-  State<InputNicknameScreen> createState() => _InputNicknameScreenState();
+  State<VerifyScreen> createState() => _VerifyScreenState();
 }
 
-class _InputNicknameScreenState extends State<InputNicknameScreen> {
+class _VerifyScreenState extends State<VerifyScreen> {
   FocusNode _focus = FocusNode();
-  final _nickNameKey = GlobalKey<FormState>();
-  var _nickName = "";
+  final _verifyKey = GlobalKey<FormState>();
+  var _verify = "";
+  late Timer _timer;
+  bool _isUserEmailVerified = false;
 
   Widget informaion(Size size) {
     return Container(
@@ -39,65 +46,61 @@ class _InputNicknameScreenState extends State<InputNicknameScreen> {
           Row(
             children: [
               Text(
-                "사용하실 ",
+                "입력하신 이메일 계정으로 ",
                 style: TextStyle(
                   color: Colors.grey.shade600,
                 ),
               ),
               Text(
-                "닉네임",
+                "인증 링크",
                 style: TextStyle(
                   color: Color(0xff0039A4),
                 ),
               ),
               Text(
-                "을 입력해주세요!",
+                "를 보냈습니다!",
                 style: TextStyle(
                   color: Colors.grey.shade600,
                 ),
               ),
             ],
           ),
+          Text(
+            "링크를 클릭해주세요!",
+            style: TextStyle(
+              color: Color(0xff0039A4),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget decoText(Size size, String text) {
-    return Container(
-      padding: EdgeInsets.only(
-          top: size.height * 0.01,
-          left: size.width * 0.1,
-          bottom: size.height * 0.01),
-      child: Text(text),
-    );
-  }
-
-  Widget nickNameInput(Size size) {
+  Widget verifyInput(Size size) {
     return Form(
-      key: _nickNameKey,
+      key: _verifyKey,
       child: Center(
         child: SizedBox(
           height: size.height * 0.1,
           width: size.width * 0.8,
           child: TextFormField(
+            textAlign: TextAlign.center,
             decoration: InputDecoration(
                 contentPadding: EdgeInsets.all(size.height * 0.02),
-                prefixIcon: Icon(Icons.people),
                 border: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey[600]!),
                     borderRadius: BorderRadius.circular(10)),
                 focusedBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Color(0xff0039A4)),
                     borderRadius: BorderRadius.circular(10)),
-                hintText: "이름",
+                hintText: "123456",
                 hintStyle: TextStyle(color: Colors.grey[400])),
             validator: (value) =>
-                CheckValidate().validateNickname(_focus, value!),
+                CheckValidate().validateVerification(_focus, value!),
             onChanged: (value) {
-              _nickName = value;
-              if (_nickNameKey.currentState != null) {
-                _nickNameKey.currentState!.validate();
+              _verify = value;
+              if (_verifyKey.currentState != null) {
+                _verifyKey.currentState!.validate();
               }
             },
           ),
@@ -140,6 +143,31 @@ class _InputNicknameScreenState extends State<InputNicknameScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    Future(
+      () async {
+        _timer = Timer.periodic(
+          Duration(seconds: 1),
+          (timer) async {
+            await FirebaseAuth.instance.currentUser!.reload();
+            var user = FirebaseAuth.instance.currentUser!;
+            if (user.emailVerified) {
+              setState(
+                () {
+                  _isUserEmailVerified = user.emailVerified;
+                },
+              );
+              authStateChanges(context);
+              timer.cancel();
+            }
+          },
+        );
+      },
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
@@ -163,8 +191,8 @@ class _InputNicknameScreenState extends State<InputNicknameScreen> {
               children: [
                 informaion(size),
                 SizedBox(height: size.height * 0.05),
-                decoText(size, "닉네임"),
-                nickNameInput(size),
+                decoText(size, "인증번호"),
+                verifyInput(size),
                 registerButton(size),
               ],
             ),
