@@ -6,7 +6,8 @@ import time
 import itertools
 import csv
 import datetime
-
+import schedule
+import datetime
 # 시간 측정 함수
 def logging_time(original_fn):
     def wrapper_fn(*args, **kwargs):
@@ -37,7 +38,7 @@ def getStockCode(market, url_param):
     """
     market: 상장구분 (11=유가증권, 12=코스닥, 13=K-OTC, 14=코넥스, 50=기타비상장)
     """
-    url_base = "http://api.seibro.or.kr/openapi/service/{url_param}"
+    url_base = f"http://api.seibro.or.kr/openapi/service/{url_param}"
     url_spec = "getShotnByMartN1"
     url = url_base + "/" + url_spec
     stock_code = 0
@@ -96,7 +97,7 @@ client_secret = "mZP8JBDOBK"
 def api_search(tuple_list, stock):
     url = 'https://openapi.naver.com/v1/search/news.json' 
     header = {'X-Naver-Client-Id':client_id, 'X-Naver-Client-Secret':client_secret} 
-    param = {'query':stock, 'display':10, 'start':1, 'sort':'date'} 
+    param = {'query':stock, 'display':1, 'start':1, 'sort':'date'} 
     # query     : 검색할 단어
     # display   : 검색 출력 건수 (기본 10 / 최대 100)
     # start     : 검색 시작 위치 (기본 1  / 최대 1000)
@@ -124,29 +125,76 @@ def api_search(tuple_list, stock):
             date = formatting_date(dict['pubDate'])
 
             tuple_list.append((stock ,title ,dict['originallink'] ,date ,pov_or_neg))
-
+            # print(stock ,title ,dict['originallink'] ,date ,pov_or_neg)
     else:
         print("Error Code:" + str(res.status_code)+" Stock name is "+ str(stock))
 
-@logging_time
-def run():
+
+
+company=[]
+def get_companylist():
     temp = list()
     temp.append(getStockCode(11, "StockSvc"))
     temp.append(getStockCode(12, "StockSvc"))
+    global company
     company = list(itertools.chain.from_iterable(temp))
 
-    tuple_list=[]
-    tuple_list.append(("stock" ,"title" ,"url" ,"date" ,"pov_or_neg"))
-    for query in company:
+@logging_time
+def run():
+    try:
+        # 8시 30분부터 7시간 동안 15분 주기로 
+        print("run")
+        reset = 7*4 # 15분씩 4번 7시간
+        while reset:
+            print("남은횟수: ", reset)
+            start = time.time()
+            tuple_list=[]
+            tuple_list.append(("stock" ,"title" ,"url" ,"date" ,"pov_or_neg"))
+            num = len(company)
+            count=0
+            for i in range(num):
+                api_search(tuple_list, company[i])
+                count+=1    #api는 초당 10개라서 10개당 0.5초씩 딜레이 
+                if count==10:
+                    count=0
+                    time.sleep(0.5)
 
-        api_search(tuple_list, query) 
+            print("tupple", len(tuple_list))
+            end = time.time()
+            rest_time = 900 - (end-start)
+            time.sleep(rest_time) # 15분 휴식
 
-    #tuple to csv 저장
-    with open('news.csv', 'w') as f:
-        writer = csv.writer(f , lineterminator='\n')
-        for tup in tuple_list:
-            writer.writerow(tup)
+            reset -= 1
+
+    except ValueError:
+        print("valueERR")
+        print(time.time()-start)
+
+
+
+    # #tuple to csv 저장
+    # with open('news.csv', 'w') as f:
+    #     writer = csv.writer(f , lineterminator='\n')
+    #     for tup in tuple_list:
+    #         writer.writerow(tup)
+
+
+# 8시 20분에 주식가져옴
+schedule.every().day.at("08:20").do(get_companylist)
+# 8시 30분에 코드 실행
+schedule.every().day.at("08:30").do(run)
 
 
 if __name__ == "__main__":
-    run()
+    get_companylist()
+ 
+    now = datetime.datetime.now()
+    time_now = datetime.timedelta(hours= now.hour , minutes=now.minute)
+    time_start = datetime.timedelta(hours= 8, minutes=30)
+    time_end = datetime.timedelta(hours= 17, minutes=30)
+    #만약 장 중 이라면
+    if (time_now > time_start) and (time_end > time_now):
+        run()
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
