@@ -50,6 +50,7 @@ Widget Searchbar(Size size) {
         bottomLeft: Radius.circular(10),
         bottomRight: Radius.circular(10),
       ),
+    ),
       child: Row(
         children: [
           Container(
@@ -72,6 +73,8 @@ Widget Searchbar(Size size) {
                   height: 1),
             ),
           )
-        ],
-      ));
+        ]
+      )
+
+  );
 }
