@@ -1,25 +1,26 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, prefer_const_constructors_in_immutables, prefer_final_fields, unused_field
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application_1/Animation/fade_animation.dart';
-import 'package:flutter_application_1/screens/signin/find_password_input_email_screen.dart';
+import 'package:flutter_application_1/screens/Register/function.dart';
+import 'package:flutter_application_1/screens/Register/registerComponents.dart';
 import 'package:flutter_application_1/tool/validator.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_application_1/Signin/function.dart';
 
-class SigninScreen extends StatefulWidget {
-  SigninScreen({Key? key}) : super(key: key);
+class RegisterScreen extends StatefulWidget {
+  RegisterScreen({Key? key}) : super(key: key);
 
   @override
-  State<SigninScreen> createState() => _SigninScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _SigninScreenState extends State<SigninScreen> {
+class _RegisterScreenState extends State<RegisterScreen> {
   FocusNode _focus = FocusNode();
   final _emailKey = GlobalKey<FormState>();
+  final _nameKey = GlobalKey<FormState>();
   final _passwordKey = GlobalKey<FormState>();
   var _email = "";
+  var _nickname = "";
   var _password = "";
 
   Widget informaion(Size size) {
@@ -32,7 +33,7 @@ class _SigninScreenState extends State<SigninScreen> {
           Container(
             padding: EdgeInsets.only(bottom: size.height * 0.02),
             child: Text(
-              "로그인",
+              "회원가입",
               style: TextStyle(
                 color: Color(0xff0039A4),
                 fontSize: size.width * 0.07,
@@ -43,19 +44,19 @@ class _SigninScreenState extends State<SigninScreen> {
           Row(
             children: [
               Text(
-                "지금 ",
+                "단타충 ",
                 style: TextStyle(
                   color: Colors.grey.shade600,
                 ),
               ),
               Text(
-                "로그인",
+                "계정",
                 style: TextStyle(
                   color: Color(0xff0039A4),
                 ),
               ),
               Text(
-                "하여 주식 뉴스를 쉽게 확인하세요!",
+                "을 만들고 주식 뉴스를 쉽게 확인하세요!",
                 style: TextStyle(
                   color: Colors.grey.shade600,
                 ),
@@ -64,16 +65,6 @@ class _SigninScreenState extends State<SigninScreen> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget decoText(Size size, String text) {
-    return Container(
-      padding: EdgeInsets.only(
-          top: size.height * 0.01,
-          left: size.width * 0.1,
-          bottom: size.height * 0.01),
-      child: Text(text),
     );
   }
 
@@ -109,6 +100,39 @@ class _SigninScreenState extends State<SigninScreen> {
     );
   }
 
+  Widget nickNameInput(Size size) {
+    return Form(
+      key: _nameKey,
+      child: Center(
+        child: SizedBox(
+          height: size.height * 0.1,
+          width: size.width * 0.8,
+          child: TextFormField(
+            decoration: InputDecoration(
+                contentPadding: EdgeInsets.all(size.height * 0.02),
+                prefixIcon: Icon(Icons.people),
+                border: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey[600]!),
+                    borderRadius: BorderRadius.circular(10)),
+                focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xff0039A4)),
+                    borderRadius: BorderRadius.circular(10)),
+                hintText: "이름",
+                hintStyle: TextStyle(color: Colors.grey[400])),
+            validator: (value) =>
+                CheckValidate().validateNickname(_focus, value!),
+            onChanged: (value) {
+              _nickname = value;
+              if (_nameKey.currentState != null) {
+                _nameKey.currentState!.validate();
+              }
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget passwordInput(Size size) {
     return Form(
       key: _passwordKey,
@@ -117,6 +141,7 @@ class _SigninScreenState extends State<SigninScreen> {
           height: size.height * 0.1,
           width: size.width * 0.8,
           child: TextFormField(
+            obscureText: true,
             decoration: InputDecoration(
                 contentPadding: EdgeInsets.all(size.height * 0.02),
                 prefixIcon: Icon(Icons.lock),
@@ -142,112 +167,32 @@ class _SigninScreenState extends State<SigninScreen> {
     );
   }
 
-  Widget forgetPasswordButton(Size size) {
-    return TextButton(
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) {
-              return FindPasswordInputEmailScreen();
-            },
-          ),
-        );
-      },
-      child: Text(
-        "비밀번호를 잊으셨나요?",
-        style: TextStyle(
-          fontSize: size.width * 0.03,
-          color: Color(0xff0039A4),
-        ),
-      ),
-    );
-  }
-
-  Widget loginButton(Size size) {
+  Widget registerButton(Size size) {
     return Center(
       child: Container(
         height: size.height * 0.06,
         width: size.width * 0.8,
-        margin: EdgeInsets.only(
-            top: size.height * 0.02, bottom: size.height * 0.05),
+        margin: EdgeInsets.only(top: size.height * 0.02),
         decoration: BoxDecoration(
           color: Color(0xff0039A4),
           borderRadius: BorderRadius.circular(10),
         ),
         child: TextButton(
-          onPressed: () {},
+          onPressed: () async {
+            if (_emailKey.currentState!.validate() &&
+                _passwordKey.currentState!.validate()) {
+              await signUpWithEmail(_email, _password, context);
+            } else {
+              _emailKey.currentState!.validate();
+              _passwordKey.currentState!.validate();
+            }
+          },
           child: Text(
-            "로그인",
+            "회원가입",
             style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: size.width * 0.035,
                 color: Colors.white),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget devide(Size size) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Container(
-          margin: EdgeInsets.only(right: size.width * 0.05),
-          width: size.height * 0.12,
-          child: Divider(
-            color: Colors.grey[400],
-            thickness: 0.8,
-          ),
-        ),
-        Text(
-          "간편 로그인",
-          style: TextStyle(color: Colors.grey[400]),
-        ),
-        Container(
-          margin: EdgeInsets.only(left: size.width * 0.05),
-          width: size.height * 0.12,
-          child: Divider(
-            color: Colors.grey[400],
-            thickness: 0.8,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget googleLoginButton(Size size) {
-    return Center(
-      child: Container(
-        height: size.height * 0.06,
-        width: size.width * 0.8,
-        margin: EdgeInsets.only(
-            top: size.height * 0.05, bottom: size.height * 0.01),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Colors.black),
-        ),
-        child: TextButton(
-          onPressed: () async {
-            await signInWithGoogle();
-          },
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SvgPicture.asset(
-                'lib/assets/google_logo.svg',
-                width: size.width * 0.1,
-                height: size.height * 0.03,
-              ),
-              SizedBox(
-                width: size.width * 0.02,
-              ),
-              Text("구글 계정으로 로그인",
-                  style: TextStyle(
-                      fontSize: size.width * 0.035, color: Colors.black)),
-            ],
           ),
         ),
       ),
@@ -280,19 +225,11 @@ class _SigninScreenState extends State<SigninScreen> {
                   informaion(size),
                   decoText(size, "이메일"),
                   emailInput(size),
-                  Row(
-                    children: [
-                      decoText(size, "비밀번호"),
-                      forgetPasswordButton(size),
-                    ],
-                  ),
+                  decoText(size, "비밀번호"),
                   passwordInput(size),
-                  loginButton(size),
-                  devide(size),
-                  googleLoginButton(size),
-                  SizedBox(
-                    height: size.height * 0.05,
-                  )
+                  registerButton(size),
+                  SizedBox(height: size.height * 0.05),
+                  alreadyLoginButton(context, size),
                 ],
               ),
             ),
