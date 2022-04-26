@@ -5,9 +5,10 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, prefer_const_constructors_in_immutables, non_constant_identifier_names
 
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/Components/setting_button.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_application_1/Components/main_app_bar.dart';
-import 'package:flutter_application_1/Color/Color.dart';
+import 'package:flutter_application_1/Color/color.dart';
 
 class Searchscreen extends StatefulWidget {
   Searchscreen({Key? key}) : super(key: key);
@@ -20,7 +21,11 @@ class _SearchscreenState extends State<Searchscreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: mainAppBar(context, "검색"),
+      appBar: mainAppBar(
+        context,
+        "검색",
+        SettingButton(context),
+      ),
       body: Column(
         children: [
           SizedBox(
@@ -35,24 +40,15 @@ class _SearchscreenState extends State<Searchscreen> {
 
 Widget Searchbar(Size size) {
   return Container(
-      width: size.width * 0.9,
-      height: size.height * 0.04,
-      margin: EdgeInsets.symmetric(horizontal: size.width * 0.1),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(10),
-          topRight: Radius.circular(10),
-          bottomLeft: Radius.circular(10),
-          bottomRight: Radius.circular(10),
-        ),
-        boxShadow: [
-          BoxShadow(
-              color: GREY,
-              offset: Offset(0, -2.5),
-              blurRadius: 2,
-              blurStyle: BlurStyle.inner)
-        ],
-        color: Color.fromRGBO(224, 228, 233, 1),
+    width: size.width * 0.9,
+    height: size.height * 0.04,
+    margin: EdgeInsets.symmetric(horizontal: size.width * 0.1),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(10),
+        topRight: Radius.circular(10),
+        bottomLeft: Radius.circular(10),
+        bottomRight: Radius.circular(10),
       ),
       child: Row(
         children: [

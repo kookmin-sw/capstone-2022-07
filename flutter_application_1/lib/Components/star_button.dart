@@ -1,16 +1,15 @@
 // ignore_for_file: prefer_const_constructors, non_constant_identifier_names
 
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_application_1/screens/Register/function.dart';
 
-IconButton SettingButton(BuildContext context) {
+IconButton StarButton(BuildContext context) {
+  bool isLike = false;
+
   return IconButton(
     onPressed: () {
       // Navigator.pop(context);
-      signOut(context);
     },
-    icon: Icon(Icons.settings),
+    icon: Icon(isLike == false ? Icons.star_border : Icons.star),
     color: Colors.black,
   );
 }

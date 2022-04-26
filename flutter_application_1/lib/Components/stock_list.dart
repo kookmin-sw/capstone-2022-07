@@ -1,9 +1,9 @@
-// ignore_for_file: prefer_const_literals_to_create_immutables, unnecessary_const, non_constant_identifier_names, prefer_typing_uninitialized_variables
+// ignore_for_file: prefer_const_literals_to_create_immutables, unnecessary_const, non_constant_identifier_names, prefer_typing_uninitialized_variables, prefer_const_constructors
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/screens/mainScreen/stockscreen.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter_application_1/Color/Color.dart';
+import 'package:flutter_application_1/Color/color.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 //view용 임시 리스트
@@ -47,7 +47,7 @@ Widget Stockcard(BuildContext context, Size size, var name, var price, var perc,
       ),
       boxShadow: [
         BoxShadow(
-            color: Color.fromRGBO(255,255,255, 0.25),
+            color: Color.fromRGBO(255, 255, 255, 0.25),
             offset: Offset(0, 4),
             blurRadius: 4)
       ],
@@ -74,6 +74,7 @@ Widget Stockcard(BuildContext context, Size size, var name, var price, var perc,
                   textAlign: TextAlign.left,
                   style:  TextStyle(
                     color: const Color.fromRGBO(0, 0, 0, 1),
+
                     fontFamily: 'Content',
                     fontSize: size.width * 0.035,
                     letterSpacing: 0,
@@ -104,7 +105,7 @@ Widget Stockcard(BuildContext context, Size size, var name, var price, var perc,
                       ),
                       boxShadow: [
                         BoxShadow(
-                            color: Color.fromRGBO(255,255,255, 0.25),
+                            color: Color.fromRGBO(255, 255, 255, 0.25),
                             offset: Offset(0, 4),
                             blurRadius: 4)
                       ],
@@ -137,11 +138,11 @@ Widget Stockcard(BuildContext context, Size size, var name, var price, var perc,
                       ),
                       boxShadow: [
                         BoxShadow(
-                            color: Color.fromRGBO(255,255,255, 0.25),
+                            color: Color.fromRGBO(255, 255, 255, 0.25),
                             offset: Offset(0, 4),
                             blurRadius: 4)
                       ],
-                      color: Color.fromRGBO(249,249, 249, 1),
+                      color: Color.fromRGBO(249, 249, 249, 1),
                     ),
                     padding: EdgeInsets.symmetric(
                         horizontal: size.width * 0.03,
@@ -177,11 +178,11 @@ Widget Stockcard(BuildContext context, Size size, var name, var price, var perc,
                       ),
                       boxShadow: [
                         BoxShadow(
-                            color: Color.fromRGBO(255,255,255, 0.25),
+                            color: Color.fromRGBO(255, 255, 255, 0.25),
                             offset: Offset(0, 4),
                             blurRadius: 4)
                       ],
-                      color: Color.fromRGBO(249,249, 249, 1),
+                      color: Color.fromRGBO(249, 249, 249, 1),
                     ),
                     padding: EdgeInsets.symmetric(
                         horizontal: size.width * 0.03,
