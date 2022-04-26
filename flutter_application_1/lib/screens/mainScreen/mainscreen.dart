@@ -25,7 +25,7 @@ class _MainscreenState extends State<Mainscreen> {
     return Container(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(
-        '4월 1일, 목요일 (GMT+9) 09:00 기준', //Firebase 적용 사항
+        '', //Firebase 적용 사항
         style: TextStyle(
           color: Color.fromRGBO(0, 0, 0, 0.7),
           fontFamily: 'Content',
@@ -37,6 +37,7 @@ class _MainscreenState extends State<Mainscreen> {
       ,
       Container(
           width: size.width * 0.9,
+          height: size.height * 0.47,
           padding: EdgeInsets.symmetric(vertical: size.height * 0.01),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.only(
@@ -56,14 +57,14 @@ class _MainscreenState extends State<Mainscreen> {
           child: Column(
             children: [
               // Firebase 적용 사항
-              Topstock(size, '삼성전자', '+3.1%', 70000, 1213),
-              Topstock(size, '피엔케이피부임상연구센타', '+11.4%', 12230, 802),
-              Topstock(size, '이승중견기업', '+30%', 9999990, 786),
-              Topstock(size, '동국제약', '-12%', 52000, 530),
-              Topstock(size, '셀트리온', '+1.2%', 13000, 432),
-              Topstock(size, 'LG에너지솔루션', '-15.5%', 72300, 422),
-              Topstock(size, '현대엘리베이터', '+9.78%', 34500, 320),
-              Topstock(size, 'SK하이닉스', '+7.78%', 12200, 258),
+              //  list.forEach((element)
+              // {
+              //  Topstock(size, element['stockname'], element['stockperc'], element['stockprice'])
+              // }
+
+
+
+
             ],
           ))
     ]));
@@ -198,7 +199,7 @@ class _MainscreenState extends State<Mainscreen> {
                 Container(
                   height: size.height * 0.4 * 0.15 * 0.5,
                   child: Text(
-                    '2,686.3', // Firebase 적용 사항
+                    '', // Firebase 적용 사항
                     textAlign: TextAlign.center,
                     style: TextStyle(
                         color: Color.fromRGBO(0, 57, 164, 0.9),
@@ -208,7 +209,7 @@ class _MainscreenState extends State<Mainscreen> {
                   ),
                 ),
                 Text(
-                  '+3.72', // Firebase 적용 사항
+                  '', // Firebase 적용 사항
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: Color.fromRGBO(0, 57, 164, 0.9),
@@ -216,10 +217,7 @@ class _MainscreenState extends State<Mainscreen> {
                       height: 1),
                 ),
                 Container(
-                  child: Image.asset('assets/charts/chart.png',
-                      width: size.width * 0.9 * 0.5,
-                      height: size.height * 0.4 * 0.4,
-                      fit: BoxFit.fitHeight),
+                  // Firebase 적용사항 차트로 변경
                 ),
               ],
             ),

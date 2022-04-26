@@ -52,31 +52,33 @@ class _StockscreenState extends State<Stockscreen> {
   var yearMinimum;
   var tenYearMinimum;
 
+
+  //Firebase 적용사항
   var news = [
     {
-      "title": "삼성전자, 유상증자 결정",
-      "text": "이재용 삼성전자 부회장이 지난달 이찬희 삼성준법감시위워회 위원장과 만나",
-      "result": "악재"
+      "title": "",
+      "text": "",
+      "result" : ""
     },
     {
-      "title": "삼성전자, 2022년형 사운드바 국내 출시",
-      "text": "2022년형 사운드바 2종을 국내 시장에 출시했다고 3일 밝혔다. 이번에 출시한 제품...",
-      "result": "호재"
+      "title": "",
+      "text": "",
+        "result" : ""
     },
     {
-      "title": "삼성·SK하이닉스, 1분기 기준 역대 최대...",
-      "text": "삼성전자, SK하이닉스는 1분기를 기준으로 역대 최대 매출을 새로 쓸 것으로 전망된다. 반면 배터리 업계는 ...",
-      "result": "호재"
+      "title": "",
+      "text": "",
+        "result" : ""
     },
     {
-      "title": "삼성 네오 QLED, 해외 유명 매체 호평 받아",
-      "text": "위크는 네오 QLED에 대해 “게임과 스트리밍, 스포츠 영상 감상을 중요하게 생각하는 소비자...",
-      "result": "호재"
+      "title": "",
+      "text": "",
+        "result" : ""
     },
     {
-      "title": "삼성 네오 QLED, 해외 유명 매체 호평 받아",
-      "text": "위크는 네오 QLED에 대해 “게임과 스트리밍, 스포츠 영상 감상을 중요하게 생각하는 소비자...",
-      "result": "호재"
+      "title": "",
+      "text": "",
+      "result" : ""
     }
   ];
 
@@ -88,14 +90,9 @@ class _StockscreenState extends State<Stockscreen> {
     'dividend'
   ];
   List<String> stockInfodetail = <String>['주가', '주가수익률', '주당순이익', '시가총액', '배당'];
-  List<String> stockValue = <String>[
-    '99,900원(+2.49%)',
-    '45.79%',
-    '32.54',
-    '240.73',
-    '1.50%(FY:2077'
-  ];
 
+  //Firebase 적용사항
+  List<String> stockValue = <String>['','','','',''];
   Future getDayData(String ticker) async {
     var yfin = YahooFin();
     StockHistory hist = yfin.initStockHistory(ticker: ticker);
@@ -408,7 +405,8 @@ class _StockscreenState extends State<Stockscreen> {
           Row(
             children: [
               Text(
-                '삼성전자',
+                //Firebase 적용사항
+                '',
                 textAlign: TextAlign.justify,
                 style: TextStyle(
                   color: Color.fromRGBO(0, 0, 0, 1),
@@ -420,7 +418,9 @@ class _StockscreenState extends State<Stockscreen> {
               ),
               SizedBox(width: size.width * 0.01),
               Text(
-                "005930",
+                //Firebase 적용사항
+
+              "",
                 style: TextStyle(
                     color: Colors.grey[700], fontSize: size.width * 0.04),
               )
@@ -428,7 +428,9 @@ class _StockscreenState extends State<Stockscreen> {
           ),
           SizedBox(height: size.height * 0.01),
           Text(
-            '69,900',
+            //Firebase 적용사항
+
+          '',
             style: TextStyle(
               color: CHART_MINUS,
               fontFamily: 'Content',
@@ -441,7 +443,9 @@ class _StockscreenState extends State<Stockscreen> {
           Container(
             margin: EdgeInsets.only(top: size.height * 0.005),
             child: Text(
-              '-203(-2.49%)',
+              //Firebase 적용사항
+
+            '',
               textAlign: TextAlign.left,
               style: TextStyle(
                 color: CHART_MINUS,

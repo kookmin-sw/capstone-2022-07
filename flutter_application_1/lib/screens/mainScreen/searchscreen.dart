@@ -50,36 +50,28 @@ Widget Searchbar(Size size) {
         bottomLeft: Radius.circular(10),
         bottomRight: Radius.circular(10),
       ),
-      boxShadow: [
-        BoxShadow(
-            color: GREY,
-            offset: Offset(0, -2.5),
-            blurRadius: 2,
-            blurStyle: BlurStyle.inner)
-      ],
-      color: Color.fromRGBO(224, 228, 233, 1),
-    ),
-    child: Row(
-      children: [
-        Container(
-            margin: EdgeInsets.only(left: size.width * 0.9 * 0.02),
-            child: SvgPicture.asset('assets/icons/search.svg',
-                semanticsLabel: 'search')),
-        // Firebase 적용 사항
-        Expanded(
-          child: Text(
-            '찾으시는 종목을 입력하세요',
-            textAlign: TextAlign.left,
-            style: TextStyle(
-                color: Color.fromRGBO(91, 99, 106, 1),
-                fontFamily: 'ABeeZee',
-                fontSize: size.width * 0.035,
-                letterSpacing: 0,
-                fontWeight: FontWeight.normal,
-                height: 1),
-          ),
-        )
-      ],
-    ),
-  );
+      child: Row(
+        children: [
+          Container(
+              margin: EdgeInsets.only(left: size.width * 0.9 * 0.02),
+              child: SvgPicture.asset('assets/icons/search.svg',
+                  semanticsLabel: 'search')),
+          
+          // Firebase 적용 사항
+          // 입력 시 입력한 string이 포함되는 종목이 노출되도록해야함 
+          Expanded(
+            child: Text(
+              '찾으시는 종목을 입력하세요',
+              textAlign: TextAlign.left,
+              style: TextStyle(
+                  color: Color.fromRGBO(91, 99, 106, 1),
+                  fontFamily: 'ABeeZee',
+                  fontSize: size.width * 0.035,
+                  letterSpacing: 0,
+                  fontWeight: FontWeight.normal,
+                  height: 1),
+            ),
+          )
+        ],
+      ));
 }
