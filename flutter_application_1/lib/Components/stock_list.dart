@@ -1,29 +1,26 @@
-// ignore_for_file: prefer_const_literals_to_create_immutables, unnecessary_const, non_constant_identifier_names, prefer_typing_uninitialized_variables
+// ignore_for_file: prefer_const_literals_to_create_immutables, unnecessary_const, non_constant_identifier_names, prefer_typing_uninitialized_variables, prefer_const_constructors
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/screens/mainScreen/stockscreen.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter_application_1/Color/Color.dart';
+import 'package:flutter_application_1/Color/color.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 //view용 임시 리스트
-final List<String> Name = <String>[
-  '삼성전자',
-  '이승중견기업',
-  '동국산업',
-  'LG에너지솔루션',
-  '빵꾸똥꾸'
-];
-final List<int> Price = <int>[79900, 999999900, 12350, 379900, 12321];
-final List<String> Perc = <String>[
-  '-2.49%',
-  '+1.49%',
-  '+3.49%',
-  '-5.12%',
-  '+30%'
-];
-final List<int> Volume = <int>[265232, 52802, 1232, 25232, 1557];
+final List<String> Name = <String>[];
+final List<int> Price = <int>[];
+final List<String> Perc = <String>[];
+final List<int> Volume = <int>[];
 
+// ===============================
+// Firebase 적용사항
+// Firebase의 users컬렉션에서 관심종목을 찾고
+// name, price, perc, volume를 가져와야함.
+// Name.add(stock.name)
+// Price.add(stock.price)
+// Perc.add(stock.perc)
+// Volume.add(stock.volume)
+//================================
 //종목을 카드로 나타냄
 Widget Stockcard(BuildContext context, Size size, var name, var price, var perc,
     var volume) {
@@ -41,16 +38,16 @@ Widget Stockcard(BuildContext context, Size size, var name, var price, var perc,
   return Container(
     height: size.height * 0.185,
     width: size.width * 0.9,
-    decoration: BoxDecoration(
+    decoration: const BoxDecoration(
       borderRadius: BorderRadius.only(
         topLeft: Radius.circular(8),
-        topRight: Radius.circular(8),
+        topRight: const Radius.circular(8),
         bottomLeft: Radius.circular(8),
         bottomRight: Radius.circular(8),
       ),
       boxShadow: [
         BoxShadow(
-            color: Color.fromRGBO(255,255,255, 0.25),
+            color: Color.fromRGBO(255, 255, 255, 0.25),
             offset: Offset(0, 4),
             blurRadius: 4)
       ],
@@ -76,7 +73,8 @@ Widget Stockcard(BuildContext context, Size size, var name, var price, var perc,
                   name,
                   textAlign: TextAlign.left,
                   style:  TextStyle(
-                    color: Color.fromRGBO(0, 0, 0, 1),
+                    color: const Color.fromRGBO(0, 0, 0, 1),
+
                     fontFamily: 'Content',
                     fontSize: size.width * 0.035,
                     letterSpacing: 0,
@@ -98,7 +96,7 @@ Widget Stockcard(BuildContext context, Size size, var name, var price, var perc,
               child: Row(
                 children: [
                   Container(
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(4),
                         topRight: Radius.circular(4),
@@ -107,7 +105,7 @@ Widget Stockcard(BuildContext context, Size size, var name, var price, var perc,
                       ),
                       boxShadow: [
                         BoxShadow(
-                            color: Color.fromRGBO(255,255,255, 0.25),
+                            color: Color.fromRGBO(255, 255, 255, 0.25),
                             offset: Offset(0, 4),
                             blurRadius: 4)
                       ],
@@ -131,7 +129,7 @@ Widget Stockcard(BuildContext context, Size size, var name, var price, var perc,
                   ),
                   SizedBox(width: size.width * 0.03),
                   Container(
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(4),
                         topRight: Radius.circular(4),
@@ -140,11 +138,11 @@ Widget Stockcard(BuildContext context, Size size, var name, var price, var perc,
                       ),
                       boxShadow: [
                         BoxShadow(
-                            color: Color.fromRGBO(255,255,255, 0.25),
+                            color: Color.fromRGBO(255, 255, 255, 0.25),
                             offset: Offset(0, 4),
                             blurRadius: 4)
                       ],
-                      color: Color.fromRGBO(249,249, 249, 1),
+                      color: Color.fromRGBO(249, 249, 249, 1),
                     ),
                     padding: EdgeInsets.symmetric(
                         horizontal: size.width * 0.03,
@@ -171,7 +169,7 @@ Widget Stockcard(BuildContext context, Size size, var name, var price, var perc,
               child: Row(
                 children: [
                   Container(
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(4),
                         topRight: Radius.circular(4),
@@ -180,11 +178,11 @@ Widget Stockcard(BuildContext context, Size size, var name, var price, var perc,
                       ),
                       boxShadow: [
                         BoxShadow(
-                            color: Color.fromRGBO(255,255,255, 0.25),
+                            color: Color.fromRGBO(255, 255, 255, 0.25),
                             offset: Offset(0, 4),
                             blurRadius: 4)
                       ],
-                      color: Color.fromRGBO(249,249, 249, 1),
+                      color: Color.fromRGBO(249, 249, 249, 1),
                     ),
                     padding: EdgeInsets.symmetric(
                         horizontal: size.width * 0.03,
@@ -245,7 +243,7 @@ Widget Stockcard(BuildContext context, Size size, var name, var price, var perc,
                           Text(
                             '자세히',
                             style: TextStyle(
-                                color: Color.fromRGBO(0, 0, 0, 1),
+                                color: const Color.fromRGBO(0, 0, 0, 1),
                                 fontFamily: 'ABeeZee',
                                 fontSize: size.width * 0.036,
                                 fontWeight: FontWeight.normal,

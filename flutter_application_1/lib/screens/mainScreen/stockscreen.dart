@@ -4,15 +4,12 @@
 
 // ignore_for_file: prefer_const_constructors, prefer_const_constructors_in_immutables, non_constant_identifier_names, prefer_const_literals_to_create_immutables, prefer_typing_uninitialized_variables
 
-
-
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/Components/stock_list.dart';
+import 'package:flutter_application_1/Components/star_button.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_application_1/Color/Color.dart';
+import 'package:flutter_application_1/Color/color.dart';
 import 'package:flutter_application_1/Components/main_app_bar.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:yahoofin/yahoofin.dart';
 import 'dart:math';
 import 'package:contained_tab_bar_view/contained_tab_bar_view.dart';
@@ -55,37 +52,47 @@ class _StockscreenState extends State<Stockscreen> {
   var yearMinimum;
   var tenYearMinimum;
 
+
+  //Firebase 적용사항
   var news = [
     {
-      "title": "삼성전자, 유상증자 결정",
-      "text": "이재용 삼성전자 부회장이 지난달 이찬희 삼성준법감시위워회 위원장과 만나",
-      "result" : "악재"
+      "title": "",
+      "text": "",
+      "result" : ""
     },
     {
-      "title": "삼성전자, 2022년형 사운드바 국내 출시",
-      "text": "2022년형 사운드바 2종을 국내 시장에 출시했다고 3일 밝혔다. 이번에 출시한 제품...",
-        "result" : "호재"
+      "title": "",
+      "text": "",
+        "result" : ""
     },
     {
-      "title": "삼성·SK하이닉스, 1분기 기준 역대 최대...",
-      "text": "삼성전자, SK하이닉스는 1분기를 기준으로 역대 최대 매출을 새로 쓸 것으로 전망된다. 반면 배터리 업계는 ...",
-        "result" : "호재"
+      "title": "",
+      "text": "",
+        "result" : ""
     },
     {
-      "title": "삼성 네오 QLED, 해외 유명 매체 호평 받아",
-      "text": "위크는 네오 QLED에 대해 “게임과 스트리밍, 스포츠 영상 감상을 중요하게 생각하는 소비자...",
-        "result" : "호재"
+      "title": "",
+      "text": "",
+        "result" : ""
     },
     {
-      "title": "삼성 네오 QLED, 해외 유명 매체 호평 받아",
-      "text": "위크는 네오 QLED에 대해 “게임과 스트리밍, 스포츠 영상 감상을 중요하게 생각하는 소비자...",
-      "result" : "호재"
+      "title": "",
+      "text": "",
+      "result" : ""
     }
   ];
 
-  List<String> stockIcon = <String>['price', 'perc', 'eps', 'marketcap', 'dividend'];
+  List<String> stockIcon = <String>[
+    'price',
+    'perc',
+    'eps',
+    'marketcap',
+    'dividend'
+  ];
   List<String> stockInfodetail = <String>['주가', '주가수익률', '주당순이익', '시가총액', '배당'];
-  List<String> stockValue = <String>['99,900원(+2.49%)', '45.79%', '32.54', '240.73', '1.50%(FY:2077'];
+
+  //Firebase 적용사항
+  List<String> stockValue = <String>['','','','',''];
   Future getDayData(String ticker) async {
     var yfin = YahooFin();
     StockHistory hist = yfin.initStockHistory(ticker: ticker);
@@ -105,9 +112,11 @@ class _StockscreenState extends State<Stockscreen> {
       }
     }
     if (mounted) {
-      setState(() {
-        dayMinimum = dayVolume!.cast<num>().reduce(min);
-      });
+      setState(
+        () {
+          dayMinimum = dayVolume!.cast<num>().reduce(min);
+        },
+      );
     }
 
     return "";
@@ -287,9 +296,10 @@ class _StockscreenState extends State<Stockscreen> {
 
   Widget infoTab(Size size) {
     return Center(
-      child: SizedBox(
+      child: Container(
         width: size.width * 0.9,
         height: size.height * 0.6,
+        margin: EdgeInsets.only(bottom: size.height * 0.05),
         child: ContainedTabBarView(
           tabs: [
             InfoTabContainer(size, "종목 뉴스"),
@@ -395,7 +405,8 @@ class _StockscreenState extends State<Stockscreen> {
           Row(
             children: [
               Text(
-                '삼성전자',
+                //Firebase 적용사항
+                '',
                 textAlign: TextAlign.justify,
                 style: TextStyle(
                   color: Color.fromRGBO(0, 0, 0, 1),
@@ -407,7 +418,9 @@ class _StockscreenState extends State<Stockscreen> {
               ),
               SizedBox(width: size.width * 0.01),
               Text(
-                "005930",
+                //Firebase 적용사항
+
+              "",
                 style: TextStyle(
                     color: Colors.grey[700], fontSize: size.width * 0.04),
               )
@@ -415,7 +428,9 @@ class _StockscreenState extends State<Stockscreen> {
           ),
           SizedBox(height: size.height * 0.01),
           Text(
-            '69,900',
+            //Firebase 적용사항
+
+          '',
             style: TextStyle(
               color: CHART_MINUS,
               fontFamily: 'Content',
@@ -428,7 +443,9 @@ class _StockscreenState extends State<Stockscreen> {
           Container(
             margin: EdgeInsets.only(top: size.height * 0.005),
             child: Text(
-              '-203(-2.49%)',
+              //Firebase 적용사항
+
+            '',
               textAlign: TextAlign.left,
               style: TextStyle(
                 color: CHART_MINUS,
@@ -445,152 +462,145 @@ class _StockscreenState extends State<Stockscreen> {
     );
   }
 
-
   // 하단 위젯 구성
   Widget Info(Size size, String msg, List news) {
     return Container(
       decoration: BoxDecoration(
-
-        borderRadius : BorderRadius.only(
+        borderRadius: BorderRadius.only(
           topLeft: Radius.circular(16),
           topRight: Radius.circular(16),
           bottomLeft: Radius.circular(16),
           bottomRight: Radius.circular(16),
         ),
-        color : Colors.white,
+        color: Colors.white,
       ),
-      width : size.width*0.9,
-
-      child : Container(
-        child : SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-          child :Column(
+      width: size.width * 0.9,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Column(
           children: [
-            Container(
-              padding: EdgeInsets.all(size.height * 0.02),
-              child: Text(
-                '${msg}',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
+            // Container(
+            //   padding: EdgeInsets.all(size.height * 0.02),
+            //   child: Text(
+            //     msg,
+            //     style: TextStyle(fontWeight: FontWeight.bold),
+            //   ),
+            // ),
+            // Divider(),
+            SizedBox(
+              height: size.height * 0.02,
             ),
             ListView.separated(
               scrollDirection: Axis.vertical,
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
-              padding: EdgeInsets.symmetric(horizontal: size.width * 0.04 ),
-              itemCount: (msg== '종목 정보') ?
-              stockIcon.length : news.length,
+              padding: EdgeInsets.symmetric(horizontal: size.width * 0.04),
+              itemCount: (msg == '종목 정보') ? stockIcon.length : news.length,
               itemBuilder: (BuildContext context, int index) {
-                return (msg == '종목 정보' ?
-                stockdetail(size, stockIcon[index], stockInfodetail[index], stockValue[index] ) :
-                stockNews(news[index]));
+                return (msg == '종목 정보'
+                    ? stockdetail(size, stockIcon[index],
+                        stockInfodetail[index], stockValue[index])
+                    : stockNews(news[index]));
               },
-              separatorBuilder: (BuildContext context, int index) => const Divider(color: GREY),
+              separatorBuilder: (BuildContext context, int index) =>
+                  const Divider(color: GREY),
+            ),
+            SizedBox(
+              height: size.height * 0.02,
             )
           ],
-        )),
-
+        ),
       ),
-
-
-
-
     );
   }
+
   Widget stockdetail(Size size, String Icon, String Infodetail, String Value) {
     return Container(
-        margin : EdgeInsets.only(bottom: size.height * 0.03, top: size.height * 0.03),
-        child : Row(
-          children: [
-            Container(
-
-                width: size.width * 0.04,
-                height: size.width * 0.04 ,
-                child : (SvgPicture.asset('assets/icons/stock${Icon}.svg',
-                    semanticsLabel: '${stockIcon}',
-                    color : CHART_MINUS))
-
-            ),
-            SizedBox(width : size.width * 0.02),
-            Text(
-              '${Infodetail}', textAlign: TextAlign.left, style: TextStyle(
+      margin:
+          EdgeInsets.only(bottom: size.height * 0.03, top: size.height * 0.03),
+      child: Row(
+        children: [
+          SizedBox(
+              width: size.width * 0.04,
+              height: size.width * 0.04,
+              child: (SvgPicture.asset('assets/icons/stock$Icon.svg',
+                  semanticsLabel: '$stockIcon', color: CHART_MINUS))),
+          SizedBox(width: size.width * 0.02),
+          Text(
+            Infodetail,
+            textAlign: TextAlign.left,
+            style: TextStyle(
                 color: Color.fromRGBO(91, 99, 106, 1),
                 fontFamily: 'ABeeZee',
                 fontSize: size.width * 0.04,
                 letterSpacing: 0,
                 fontWeight: FontWeight.bold,
-                height: 1
+                height: 1),
+          ),
+          Expanded(
+            child: Text(
+              Value,
+              textAlign: TextAlign.right,
+              style: TextStyle(
+                  color: Color.fromRGBO(91, 99, 106, 1),
+                  fontFamily: 'ABeeZee',
+                  fontSize: size.width * 0.036,
+                  letterSpacing: 0,
+                  fontWeight: FontWeight.normal,
+                  height: 1),
             ),
-            ),
-            Expanded(
-                child : Text(
-                  '${Value}',
-                  textAlign: TextAlign.right,
-                  style: TextStyle(
-                      color: Color.fromRGBO(91, 99, 106, 1),
-
-                      fontFamily: 'ABeeZee',
-                      fontSize: size.width * 0.036,
-                      letterSpacing: 0,
-                      fontWeight: FontWeight.normal,
-                      height: 1
-                  ),
-                )
-            )
-
-          ],
-        )
+          )
+        ],
+      ),
     );
   }
+
   Widget stockNews(Map<String, String> news) {
     var Title = news['title'];
     var newsText = news['text'];
     // String? 에러
-    if(Title == null){
+    if (Title == null) {
       return SizedBox();
     }
-    if(newsText == null){
+    if (newsText == null) {
       return SizedBox();
     }
 
-
-    return Container(
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                Title,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              newsResult(news),
-            ],
-          ),
-          SizedBox(height: 2,),
-          Container(
-            child : Text(
-              '- ${newsText}',
-              style: TextStyle(fontWeight: FontWeight.normal,
-                  color: Color(0xff888888)),
-            )
-          )
-        ],
-
-      ),
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              Title,
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            newsResult(news),
+          ],
+        ),
+        SizedBox(
+          height: 2,
+        ),
+        Text(
+          '- $newsText',
+          style: TextStyle(
+              fontWeight: FontWeight.normal, color: Color(0xff888888)),
+        )
+      ],
     );
   }
+
   Widget newsResult(Map<String, String> news) {
     var res = news['result'];
     var resultColor;
     var resultBackgrouncolor;
-    if(res == null){
+    if (res == null) {
       return Container();
     }
-    if(res == "호재"){
+    if (res == "호재") {
       resultColor = Color(0xff0EBD8D);
       resultBackgrouncolor = Color(0xffE7F9F4);
-    }else if(res == "악재"){
+    } else if (res == "악재") {
       resultColor = Color(0xffEF3641);
       resultBackgrouncolor = Color(0xffF9E7E7);
     }
@@ -607,10 +617,10 @@ class _StockscreenState extends State<Stockscreen> {
       ),
       child: Text(
         res,
-        style: TextStyle(color: resultColor,
+        style: TextStyle(
+          color: resultColor,
         ),
       ),
-
     );
   }
 
@@ -618,31 +628,33 @@ class _StockscreenState extends State<Stockscreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
 
-    return
-        FutureBuilder(
-        // 종목명
-        future: chartInit("000660.KS"),
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (dayData.isNotEmpty) {
-            return Scaffold(
-              appBar: mainAppBar(context, "종목 정보"),
-              body: SafeArea(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Stockmain(size),
-                      infoTab(size),
-                    ],
-                  ),
+    return FutureBuilder(
+      // 종목명
+      future: chartInit("000660.KS"),
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        if (dayData.isNotEmpty) {
+          return Scaffold(
+            appBar: mainAppBar(
+              context,
+              "종목 정보",
+              StarButton(context),
+            ),
+            body: SafeArea(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Stockmain(size),
+                    infoTab(size),
+                  ],
                 ),
               ),
-            );
-          } else {
-            return Center(child: CircularProgressIndicator());
-          }
-        },
-      );
-
+            ),
+          );
+        } else {
+          return Center(child: CircularProgressIndicator());
+        }
+      },
+    );
   }
 }
 

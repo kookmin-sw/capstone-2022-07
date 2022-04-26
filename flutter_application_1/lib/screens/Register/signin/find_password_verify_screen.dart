@@ -1,28 +1,23 @@
-// ignore_for_file: prefer_const_constructors_in_immutables, prefer_const_constructors, prefer_final_fields, curly_braces_in_flow_control_structures
+// ignore_for_file: prefer_const_constructors_in_immutables, prefer_const_constructors, prefer_final_fields, unused_field
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application_1/Animation/fade_animation.dart';
-import 'package:flutter_application_1/screens/signup/register_screen.dart';
+import 'package:flutter_application_1/screens/Register/signin/signin_screen.dart';
 import 'package:flutter_application_1/tool/validator.dart';
 
-class FindPasswordInputNewPassword extends StatefulWidget {
-  FindPasswordInputNewPassword({Key? key}) : super(key: key);
+class FindPasswordVerifyScreen extends StatefulWidget {
+  FindPasswordVerifyScreen({Key? key}) : super(key: key);
 
   @override
-  State<FindPasswordInputNewPassword> createState() =>
-      _FindPasswordInputNewPasswordState();
+  State<FindPasswordVerifyScreen> createState() =>
+      _FindPasswordVerifyScreenState();
 }
 
-class _FindPasswordInputNewPasswordState
-    extends State<FindPasswordInputNewPassword> {
-  var _password = "";
-  var _checkPassword = "";
-  final _passwordKey = GlobalKey<FormState>();
-  final _checkPasswordKey = GlobalKey<FormState>();
-
-  FocusNode _passwordFocusNode = FocusNode();
-  FocusNode _checkPasswordFocusNode = FocusNode();
+class _FindPasswordVerifyScreenState extends State<FindPasswordVerifyScreen> {
+  FocusNode _focus = FocusNode();
+  final _findVerifyKey = GlobalKey<FormState>();
+  var _findVerify = "";
 
   Widget informaion(Size size) {
     return Container(
@@ -45,19 +40,19 @@ class _FindPasswordInputNewPasswordState
           Row(
             children: [
               Text(
-                "새 ",
+                "입력하신 이메일 계정으로 ",
                 style: TextStyle(
                   color: Colors.grey.shade600,
                 ),
               ),
               Text(
-                "비밀번호",
+                "비밀번호 변경 메일",
                 style: TextStyle(
                   color: Color(0xff0039A4),
                 ),
               ),
               Text(
-                "를 입력해주세요!",
+                "을 보냈습니다!",
                 style: TextStyle(
                   color: Colors.grey.shade600,
                 ),
@@ -69,42 +64,31 @@ class _FindPasswordInputNewPasswordState
     );
   }
 
-  Widget decoText(Size size, String text) {
-    return Container(
-      padding: EdgeInsets.only(
-          top: size.height * 0.01,
-          left: size.width * 0.1,
-          bottom: size.height * 0.01),
-      child: Text(text),
-    );
-  }
-
-  Widget passwordInput(Size size) {
+  Widget findVerifyInput(Size size) {
     return Form(
-      key: _passwordKey,
+      key: _findVerifyKey,
       child: Center(
         child: SizedBox(
           height: size.height * 0.1,
           width: size.width * 0.8,
           child: TextFormField(
-            obscureText: true,
+            textAlign: TextAlign.center,
             decoration: InputDecoration(
                 contentPadding: EdgeInsets.all(size.height * 0.02),
-                prefixIcon: Icon(Icons.lock),
                 border: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black),
+                    borderSide: BorderSide(color: Colors.grey[600]!),
                     borderRadius: BorderRadius.circular(10)),
                 focusedBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Color(0xff0039A4)),
                     borderRadius: BorderRadius.circular(10)),
-                hintText: "ㆍㆍㆍㆍㆍㆍㆍㆍ",
+                hintText: "123456",
                 hintStyle: TextStyle(color: Colors.grey[400])),
             validator: (value) =>
-                CheckValidate().validatePassword(_passwordFocusNode, value!),
+                CheckValidate().validateVerification(_focus, value!),
             onChanged: (value) {
-              _password = value;
-              if (_passwordKey.currentState != null) {
-                _passwordKey.currentState!.validate();
+              _findVerify = value;
+              if (_findVerifyKey.currentState != null) {
+                _findVerifyKey.currentState!.validate();
               }
             },
           ),
@@ -113,46 +97,7 @@ class _FindPasswordInputNewPasswordState
     );
   }
 
-  Widget checkPasswordInput(Size size) {
-    return Form(
-      key: _checkPasswordKey,
-      child: Center(
-        child: SizedBox(
-          height: size.height * 0.1,
-          width: size.width * 0.8,
-          child: TextFormField(
-            obscureText: true,
-            decoration: InputDecoration(
-                contentPadding: EdgeInsets.all(size.height * 0.02),
-                prefixIcon: Icon(Icons.lock),
-                border: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black),
-                    borderRadius: BorderRadius.circular(10)),
-                focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xff0039A4)),
-                    borderRadius: BorderRadius.circular(10)),
-                hintText: "ㆍㆍㆍㆍㆍㆍㆍㆍ",
-                hintStyle: TextStyle(color: Colors.grey[400])),
-            validator: (value) {
-              if (value!.isEmpty) {
-                return '비밀번호를 입력하세요.';
-              }
-              if (value != _password) return '비밀번호가 일치하지 않습니다.';
-              return null;
-            },
-            onChanged: (value) {
-              _checkPassword = value;
-              if (_checkPasswordKey.currentState != null) {
-                _checkPasswordKey.currentState!.validate();
-              }
-            },
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget confirmButton(Size size) {
+  Widget submitButton(Size size) {
     return Center(
       child: Container(
         height: size.height * 0.06,
@@ -163,9 +108,18 @@ class _FindPasswordInputNewPasswordState
           borderRadius: BorderRadius.circular(10),
         ),
         child: TextButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  return SigninScreen();
+                },
+              ),
+            );
+          },
           child: Text(
-            "확인",
+            "새 비밀번호로 다시 로그인하기",
             style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: size.width * 0.035,
@@ -200,11 +154,9 @@ class _FindPasswordInputNewPasswordState
               children: [
                 informaion(size),
                 SizedBox(height: size.height * 0.05),
-                decoText(size, "새로운 비밀번호"),
-                passwordInput(size),
-                decoText(size, "비밀번호 확인"),
-                checkPasswordInput(size),
-                confirmButton(size),
+                // decoText(size, "인증번호"),
+                // findVerifyInput(size),
+                submitButton(size),
               ],
             ),
           ),
