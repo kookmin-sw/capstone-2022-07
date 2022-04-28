@@ -10,23 +10,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_application_1/screens/mainScreen/interestsscreen.dart';
 
-//view용 임시 리스트
-final List<String> Name = <String>["1"];
-final List<String> Price = <String>["1"];
-final List<String> Perc = <String>["1"];
-final List<String> Volume = <String>["1"];
-
-// ===============================
-// Firebase 적용사항
-// Firebase의 users컬렉션에서 관심종목을 찾고
-// name, price, perc, volume를 가져와야함.
-// Name.add(stock.name)
-// Price.add(stock.price)
-// Perc.add(stock.perc)
-// Volume.add(stock.volume)
-//================================
-
-
 
 //종목을 카드로 나타냄
 Widget Stockcard(BuildContext context, Size size, String name, var price, String perc,
@@ -276,8 +259,7 @@ Widget Stockcard(BuildContext context, Size size, String name, var price, String
 
 // 종목카드를 모은 리스트
 Widget Cardlist(Size size, List<Map<String, dynamic>> stocklist ) {
-        print(stocklist);
-  // return Text('test');
+
         return Expanded(
 
             child: ListView.builder(
@@ -287,7 +269,6 @@ Widget Cardlist(Size size, List<Map<String, dynamic>> stocklist ) {
               itemBuilder: (BuildContext context, int index) {
                 return Stockcard(context, size, stocklist[index]['name'], stocklist[index]['price'],
                     stocklist[index]['perc'], stocklist[index]['volume']);
-                return Stockcard(context, size, "10",1000,"100",20);
               },
             ),
         );
