@@ -199,7 +199,7 @@ Widget Stockcard(BuildContext context, Size size, String name, var price, String
                         context,
                         MaterialPageRoute(
                           builder: (context) {
-                            return Stockscreen();
+                            return Stockscreen(stockname : name);
                           },
                         ),
                       );
