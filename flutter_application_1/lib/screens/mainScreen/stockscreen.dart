@@ -54,33 +54,7 @@ class _StockscreenState extends State<Stockscreen> {
 
 
   //Firebase 적용사항
-  var news = [
-    {
-      "title": "",
-      "text": "",
-      "result" : ""
-    },
-    {
-      "title": "",
-      "text": "",
-        "result" : ""
-    },
-    {
-      "title": "",
-      "text": "",
-        "result" : ""
-    },
-    {
-      "title": "",
-      "text": "",
-        "result" : ""
-    },
-    {
-      "title": "",
-      "text": "",
-      "result" : ""
-    }
-  ];
+  List<Map<String, dynamic>> news = [];
   List<String> stockIcon = <String>[
     'price',
     'perc',
@@ -626,11 +600,11 @@ class _StockscreenState extends State<Stockscreen> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return FutureBuilder(
+    // return FutureBuilder(
       // 종목명
       // future: chartInit("000660.KS"),
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        if (dayData.isNotEmpty) {
+      // builder: (BuildContext context, AsyncSnapshot snapshot) {
+      //   if (dayData.isNotEmpty) {
           return Scaffold(
             appBar: mainAppBar(
               context,
@@ -648,11 +622,11 @@ class _StockscreenState extends State<Stockscreen> {
               ),
             ),
           );
-        } else {
-          return Center(child: CircularProgressIndicator());
-        }
-      },
-    );
+    //     } else {
+    //       return Center(child: CircularProgressIndicator());
+    //     }
+    //   },
+    // );
   }
 }
 

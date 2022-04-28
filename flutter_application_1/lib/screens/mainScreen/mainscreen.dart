@@ -260,7 +260,7 @@ class _MainscreenState extends State<Mainscreen> {
     return FutureBuilder(
       future:     _getList(topnewslist),
       builder: (BuildContext context, AsyncSnapshot snapshot) {
-      if (topnewslist.isNotEmpty) {
+      if (snapshot.connectionState == ConnectionState.done) {
         return Scaffold(
           appBar: mainAppBar(
             context,
