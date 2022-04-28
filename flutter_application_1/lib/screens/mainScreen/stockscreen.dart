@@ -15,7 +15,13 @@ import 'dart:math';
 import 'package:contained_tab_bar_view/contained_tab_bar_view.dart';
 
 class Stockscreen extends StatefulWidget {
-  Stockscreen({Key? key}) : super(key: key);
+  final String stockname;
+
+  Stockscreen({
+    Key? key,
+    required this.stockname,
+  }) : super(key: key);
+
 
   @override
   State<Stockscreen> createState() => _StockscreenState();
@@ -24,11 +30,13 @@ class Stockscreen extends StatefulWidget {
 class _StockscreenState extends State<Stockscreen> {
   @override
   void initState() {
+
     super.initState();
   }
 
   @override
   void dispose() {
+
     super.dispose();
     // animationController.dispose() instead of your controller.dispose
   }
@@ -599,6 +607,7 @@ class _StockscreenState extends State<Stockscreen> {
 
   @override
   Widget build(BuildContext context) {
+
     Size size = MediaQuery.of(context).size;
     // return FutureBuilder(
       // 종목명
@@ -608,7 +617,7 @@ class _StockscreenState extends State<Stockscreen> {
           return Scaffold(
             appBar: mainAppBar(
               context,
-              "종목 정보",
+              widget.stockname,
               StarButton(context),
             ),
             body: SafeArea(
