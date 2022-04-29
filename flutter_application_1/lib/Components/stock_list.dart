@@ -72,9 +72,8 @@ Widget Stockcard(BuildContext context, Size size, var name, var price, var perc,
                 child: Text(
                   name,
                   textAlign: TextAlign.left,
-                  style:  TextStyle(
+                  style: TextStyle(
                     color: const Color.fromRGBO(0, 0, 0, 1),
-
                     fontFamily: 'Content',
                     fontSize: size.width * 0.035,
                     letterSpacing: 0,
@@ -209,7 +208,9 @@ Widget Stockcard(BuildContext context, Size size, var name, var price, var perc,
                         context,
                         MaterialPageRoute(
                           builder: (context) {
-                            return Stockscreen();
+                            return Stockscreen(
+                              stockName: "동국산업",
+                            );
                           },
                         ),
                       );

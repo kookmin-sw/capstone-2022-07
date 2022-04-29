@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Components/setting_button.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_application_1/Components/main_app_bar.dart';
-import 'package:flutter_application_1/Color/color.dart';
 
 class Searchscreen extends StatefulWidget {
   Searchscreen({Key? key}) : super(key: key);
@@ -50,28 +49,30 @@ Widget Searchbar(Size size) {
         bottomLeft: Radius.circular(10),
         bottomRight: Radius.circular(10),
       ),
-      child: Row(
-        children: [
-          Container(
-              margin: EdgeInsets.only(left: size.width * 0.9 * 0.02),
-              child: SvgPicture.asset('assets/icons/search.svg',
-                  semanticsLabel: 'search')),
-          
-          // Firebase 적용 사항
-          // 입력 시 입력한 string이 포함되는 종목이 노출되도록해야함 
-          Expanded(
-            child: Text(
-              '찾으시는 종목을 입력하세요',
-              textAlign: TextAlign.left,
-              style: TextStyle(
-                  color: Color.fromRGBO(91, 99, 106, 1),
-                  fontFamily: 'ABeeZee',
-                  fontSize: size.width * 0.035,
-                  letterSpacing: 0,
-                  fontWeight: FontWeight.normal,
-                  height: 1),
-            ),
-          )
-        ],
-      ));
+    ),
+    child: Row(
+      children: [
+        Container(
+            margin: EdgeInsets.only(left: size.width * 0.9 * 0.02),
+            child: SvgPicture.asset('assets/icons/search.svg',
+                semanticsLabel: 'search')),
+
+        // Firebase 적용 사항
+        // 입력 시 입력한 string이 포함되는 종목이 노출되도록해야함
+        Expanded(
+          child: Text(
+            '찾으시는 종목을 입력하세요',
+            textAlign: TextAlign.left,
+            style: TextStyle(
+                color: Color.fromRGBO(91, 99, 106, 1),
+                fontFamily: 'ABeeZee',
+                fontSize: size.width * 0.035,
+                letterSpacing: 0,
+                fontWeight: FontWeight.normal,
+                height: 1),
+          ),
+        )
+      ],
+    ),
+  );
 }

@@ -20,7 +20,9 @@ class _StartScreenState extends State<StartScreen> {
     Mainscreen(),
     InterestScreen(),
     Searchscreen(),
-    Stockscreen(),
+    Stockscreen(
+      stockName: "동국산업",
+    ),
   ];
 
   int selectedIndex = 0;

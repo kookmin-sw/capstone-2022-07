@@ -3,8 +3,8 @@
 // found in the LICENSE file.
 
 // ignore_for_file: prefer_const_constructors, prefer_const_constructors_in_immutables, non_constant_identifier_names, prefer_const_literals_to_create_immutables, prefer_typing_uninitialized_variables
-
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_application_1/Components/star_button.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_application_1/Color/color.dart';
@@ -15,7 +15,12 @@ import 'dart:math';
 import 'package:contained_tab_bar_view/contained_tab_bar_view.dart';
 
 class Stockscreen extends StatefulWidget {
-  Stockscreen({Key? key}) : super(key: key);
+  Stockscreen({
+    Key? key,
+    required this.stockName,
+  }) : super(key: key);
+
+  final String stockName;
 
   @override
   State<Stockscreen> createState() => _StockscreenState();
@@ -52,34 +57,35 @@ class _StockscreenState extends State<Stockscreen> {
   var yearMinimum;
   var tenYearMinimum;
 
+  Map<String, dynamic> firebaseStockData = {};
+
+  Future getStockInfo() async {
+    CollectionReference stocks = FirebaseFirestore.instance.collection('stock');
+    QuerySnapshot stockData =
+        await stocks.where('name', isEqualTo: widget.stockName).get();
+
+    CollectionReference news =
+        stocks.doc(stockData.docs[0].id).collection("news");
+    QuerySnapshot newsData =
+        await news.where('name', isEqualTo: widget.stockName).get();
+
+    if (stockData.size == 0 && newsData.size == 0) {
+      return null;
+    } else {
+      // firebaseStockData = newsData.docs[0].data();
+      return stockData.docs[0].data();
+    }
+  }
+
+  // Future
 
   //Firebase 적용사항
   var news = [
-    {
-      "title": "",
-      "text": "",
-      "result" : ""
-    },
-    {
-      "title": "",
-      "text": "",
-        "result" : ""
-    },
-    {
-      "title": "",
-      "text": "",
-        "result" : ""
-    },
-    {
-      "title": "",
-      "text": "",
-        "result" : ""
-    },
-    {
-      "title": "",
-      "text": "",
-      "result" : ""
-    }
+    {"title": "", "text": "", "result": ""},
+    {"title": "", "text": "", "result": ""},
+    {"title": "", "text": "", "result": ""},
+    {"title": "", "text": "", "result": ""},
+    {"title": "", "text": "", "result": ""}
   ];
 
   List<String> stockIcon = <String>[
@@ -92,7 +98,7 @@ class _StockscreenState extends State<Stockscreen> {
   List<String> stockInfodetail = <String>['주가', '주가수익률', '주당순이익', '시가총액', '배당'];
 
   //Firebase 적용사항
-  List<String> stockValue = <String>['','','','',''];
+  List<String> stockValue = <String>['', '', '', '', ''];
   Future getDayData(String ticker) async {
     var yfin = YahooFin();
     StockHistory hist = yfin.initStockHistory(ticker: ticker);
@@ -420,7 +426,7 @@ class _StockscreenState extends State<Stockscreen> {
               Text(
                 //Firebase 적용사항
 
-              "",
+                "",
                 style: TextStyle(
                     color: Colors.grey[700], fontSize: size.width * 0.04),
               )
@@ -430,7 +436,7 @@ class _StockscreenState extends State<Stockscreen> {
           Text(
             //Firebase 적용사항
 
-          '',
+            '',
             style: TextStyle(
               color: CHART_MINUS,
               fontFamily: 'Content',
@@ -445,7 +451,7 @@ class _StockscreenState extends State<Stockscreen> {
             child: Text(
               //Firebase 적용사항
 
-            '',
+              '',
               textAlign: TextAlign.left,
               style: TextStyle(
                 color: CHART_MINUS,
@@ -627,31 +633,42 @@ class _StockscreenState extends State<Stockscreen> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-
     return FutureBuilder(
-      // 종목명
-      future: chartInit("000660.KS"),
+      future: getStockInfo(),
       builder: (BuildContext context, AsyncSnapshot snapshot) {
-        if (dayData.isNotEmpty) {
-          return Scaffold(
-            appBar: mainAppBar(
-              context,
-              "종목 정보",
-              StarButton(context),
-            ),
-            body: SafeArea(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Stockmain(size),
-                    infoTab(size),
-                  ],
-                ),
-              ),
-            ),
+        if (snapshot.hasData) {
+          firebaseStockData = snapshot.data;
+          return FutureBuilder(
+            // 종목명 - 상위 클래스에서 받아와야함
+            future: chartInit(firebaseStockData["code"] + ".KS"),
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if (dayData.isNotEmpty) {
+                return Scaffold(
+                  appBar: mainAppBar(
+                    context,
+                    "종목 정보",
+                    StarButton(context),
+                  ),
+                  body: SafeArea(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          Stockmain(size),
+                          infoTab(size),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              } else {
+                return Center(child: CircularProgressIndicator());
+              }
+            },
           );
         } else {
-          return Center(child: CircularProgressIndicator());
+          return Center(
+            child: CircularProgressIndicator(),
+          );
         }
       },
     );
