@@ -3,8 +3,8 @@
 // found in the LICENSE file.
 
 // ignore_for_file: prefer_const_constructors, prefer_const_constructors_in_immutables, non_constant_identifier_names, prefer_const_literals_to_create_immutables, prefer_typing_uninitialized_variables
-
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_application_1/Components/star_button.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_application_1/Color/color.dart';
@@ -15,13 +15,12 @@ import 'dart:math';
 import 'package:contained_tab_bar_view/contained_tab_bar_view.dart';
 
 class Stockscreen extends StatefulWidget {
-  final String stockname;
-
   Stockscreen({
     Key? key,
-    required this.stockname,
+    required this.stockName,
   }) : super(key: key);
 
+  final String stockName;
 
   @override
   State<Stockscreen> createState() => _StockscreenState();
@@ -60,6 +59,27 @@ class _StockscreenState extends State<Stockscreen> {
   var yearMinimum;
   var tenYearMinimum;
 
+  Map<String, dynamic> firebaseStockData = {};
+
+  Future getStockInfo() async {
+    CollectionReference stocks = FirebaseFirestore.instance.collection('stock');
+    QuerySnapshot stockData =
+        await stocks.where('name', isEqualTo: widget.stockName).get();
+
+    CollectionReference news =
+        stocks.doc(stockData.docs[0].id).collection("news");
+    QuerySnapshot newsData =
+        await news.where('name', isEqualTo: widget.stockName).get();
+
+    if (stockData.size == 0 && newsData.size == 0) {
+      return null;
+    } else {
+      // firebaseStockData = newsData.docs[0].data();
+      return stockData.docs[0].data();
+    }
+  }
+
+  // Future
 
   //Firebase 적용사항
   List<Map<String, dynamic>> news = [];
@@ -73,109 +93,110 @@ class _StockscreenState extends State<Stockscreen> {
   List<String> stockInfodetail = <String>['주가', '주가수익률', '주당순이익', '시가총액', '배당'];
 
   //Firebase 적용사항
-  List<String> stockValue = <String>['','','','',''];
-  // Future getDayData(String ticker) async {
-  //   var yfin = YahooFin();
-  //   StockHistory hist = yfin.initStockHistory(ticker: ticker);
-  //   StockChart chart = await yfin.getChartQuotes(
-  //       stockHistory: hist,
-  //       interval: StockInterval.thirtyMinute,
-  //       period: StockRange.oneDay);
-  //
-  //   dayVolume = chart.chartQuotes!.close;
-  //   dayTime = chart.chartQuotes!.timestamp;
-  //
-  //   for (int i = 0; i < dayVolume!.length; i++) {
-  //     if (dayTime!.isNotEmpty) {
-  //       var date =
-  //           DateTime.fromMillisecondsSinceEpoch(dayTime![i].toInt() * 1000);
-  //       dayData.add(_ChartData(date, dayVolume![i].toDouble()));
-  //     }
-  //   }
-  //   if (mounted) {
-  //     setState(
-  //       () {
-  //         dayMinimum = dayVolume!.cast<num>().reduce(min);
-  //       },
-  //     );
-  //   }
-  //
-  //   return "";
-  // }
-  //
-  // Future getMonthData(String ticker) async {
-  //   var yfin = YahooFin();
-  //   StockHistory hist = yfin.initStockHistory(ticker: ticker);
-  //   StockChart chart = await yfin.getChartQuotes(
-  //       stockHistory: hist,
-  //       interval: StockInterval.oneDay,
-  //       period: StockRange.oneMonth);
-  //
-  //   monthVolume = chart.chartQuotes!.close;
-  //   monthTime = chart.chartQuotes!.timestamp;
-  //   for (int i = 0; i < monthVolume!.length; i++) {
-  //     if (monthTime!.isNotEmpty) {
-  //       var date =
-  //           DateTime.fromMillisecondsSinceEpoch(monthTime![i].toInt() * 1000);
-  //       monthData.add(_ChartData(date, monthVolume![i].toDouble()));
-  //     }
-  //   }
-  //   monthMinimum = monthVolume!.cast<num>().reduce(min);
-  //
-  //   return "";
-  // }
-  //
-  // Future getYearData(String ticker) async {
-  //   var yfin = YahooFin();
-  //   StockHistory hist = yfin.initStockHistory(ticker: ticker);
-  //   StockChart chart = await yfin.getChartQuotes(
-  //       stockHistory: hist,
-  //       interval: StockInterval.oneMonth,
-  //       period: StockRange.oneYear);
-  //
-  //   yearVolume = chart.chartQuotes!.close;
-  //   yearTime = chart.chartQuotes!.timestamp;
-  //   for (int i = 0; i < yearVolume!.length; i++) {
-  //     if (yearTime!.isNotEmpty) {
-  //       var date =
-  //           DateTime.fromMillisecondsSinceEpoch(yearTime![i].toInt() * 1000);
-  //       yearData.add(_ChartData(date, yearVolume![i].toDouble()));
-  //     }
-  //   }
-  //   yearMinimum = yearVolume!.cast<num>().reduce(min);
-  //
-  //   return "";
-  // }
-  //
-  // Future getTenYearData(String ticker) async {
-  //   var yfin = YahooFin();
-  //   StockHistory hist = yfin.initStockHistory(ticker: ticker);
-  //   StockChart chart = await yfin.getChartQuotes(
-  //       stockHistory: hist,
-  //       interval: StockInterval.oneMonth,
-  //       period: StockRange.tenYear);
-  //
-  //   tenYearVolume = chart.chartQuotes!.close;
-  //   tenYearTime = chart.chartQuotes!.timestamp;
-  //
-  //   for (int i = 0; i < tenYearVolume!.length; i++) {
-  //     if (tenYearTime!.isNotEmpty) {
-  //       var date =
-  //           DateTime.fromMillisecondsSinceEpoch(tenYearTime![i].toInt() * 1000);
-  //       tenYearData.add(_ChartData(date, tenYearVolume![i].toDouble()));
-  //     }
-  //   }
-  //   tenYearMinimum = tenYearVolume!.cast<num>().reduce(min);
-  //
-  //   return "";
-  // }
+  List<String> stockValue = <String>['', '', '', '', ''];
+  Future getDayData(String ticker) async {
+    var yfin = YahooFin();
+    StockHistory hist = yfin.initStockHistory(ticker: ticker);
+    StockChart chart = await yfin.getChartQuotes(
+        stockHistory: hist,
+        interval: StockInterval.thirtyMinute,
+        period: StockRange.oneDay);
 
-  // chartInit(String ticker) {
-  //   getMonthData(ticker);
-  //   getYearData(ticker);
-  //   getTenYearData(ticker);
-  //   getDayData(ticker);
-  // }
+    dayVolume = chart.chartQuotes!.close;
+    dayTime = chart.chartQuotes!.timestamp;
+
+    for (int i = 0; i < dayVolume!.length; i++) {
+      if (dayTime!.isNotEmpty) {
+        var date =
+            DateTime.fromMillisecondsSinceEpoch(dayTime![i].toInt() * 1000);
+        dayData.add(_ChartData(date, dayVolume![i].toDouble()));
+      }
+    }
+    if (mounted) {
+      setState(
+        () {
+          dayMinimum = dayVolume!.cast<num>().reduce(min);
+        },
+      );
+    }
+
+    return "";
+  }
+
+  Future getMonthData(String ticker) async {
+    var yfin = YahooFin();
+    StockHistory hist = yfin.initStockHistory(ticker: ticker);
+    StockChart chart = await yfin.getChartQuotes(
+        stockHistory: hist,
+        interval: StockInterval.oneDay,
+        period: StockRange.oneMonth);
+
+    monthVolume = chart.chartQuotes!.close;
+    monthTime = chart.chartQuotes!.timestamp;
+    for (int i = 0; i < monthVolume!.length; i++) {
+      if (monthTime!.isNotEmpty) {
+        var date =
+            DateTime.fromMillisecondsSinceEpoch(monthTime![i].toInt() * 1000);
+        monthData.add(_ChartData(date, monthVolume![i].toDouble()));
+      }
+    }
+    monthMinimum = monthVolume!.cast<num>().reduce(min);
+
+    return "";
+  }
+
+  Future getYearData(String ticker) async {
+    var yfin = YahooFin();
+    StockHistory hist = yfin.initStockHistory(ticker: ticker);
+    StockChart chart = await yfin.getChartQuotes(
+        stockHistory: hist,
+        interval: StockInterval.oneMonth,
+        period: StockRange.oneYear);
+
+    yearVolume = chart.chartQuotes!.close;
+    yearTime = chart.chartQuotes!.timestamp;
+    for (int i = 0; i < yearVolume!.length; i++) {
+      if (yearTime!.isNotEmpty) {
+        var date =
+            DateTime.fromMillisecondsSinceEpoch(yearTime![i].toInt() * 1000);
+        yearData.add(_ChartData(date, yearVolume![i].toDouble()));
+      }
+    }
+    yearMinimum = yearVolume!.cast<num>().reduce(min);
+
+    return "";
+  }
+
+  Future getTenYearData(String ticker) async {
+    var yfin = YahooFin();
+    StockHistory hist = yfin.initStockHistory(ticker: ticker);
+    StockChart chart = await yfin.getChartQuotes(
+        stockHistory: hist,
+        interval: StockInterval.oneMonth,
+        period: StockRange.tenYear);
+
+    tenYearVolume = chart.chartQuotes!.close;
+    tenYearTime = chart.chartQuotes!.timestamp;
+
+    for (int i = 0; i < tenYearVolume!.length; i++) {
+      if (tenYearTime!.isNotEmpty) {
+        var date =
+            DateTime.fromMillisecondsSinceEpoch(tenYearTime![i].toInt() * 1000);
+        tenYearData.add(_ChartData(date, tenYearVolume![i].toDouble()));
+      }
+    }
+    tenYearMinimum = tenYearVolume!.cast<num>().reduce(min);
+
+    return "";
+  }
+
+  chartInit(String ticker) {
+    getMonthData(ticker);
+    getYearData(ticker);
+    getTenYearData(ticker);
+    getDayData(ticker);
+  }
+
   // 종목 이름,가격,대비,긍/부정, 관심
 
   Widget TabContainer(String text) {
@@ -401,7 +422,7 @@ class _StockscreenState extends State<Stockscreen> {
               Text(
                 //Firebase 적용사항
 
-              "",
+                "",
                 style: TextStyle(
                     color: Colors.grey[700], fontSize: size.width * 0.04),
               )
@@ -411,7 +432,7 @@ class _StockscreenState extends State<Stockscreen> {
           Text(
             //Firebase 적용사항
 
-          '',
+            '',
             style: TextStyle(
               color: CHART_MINUS,
               fontFamily: 'Content',
@@ -426,7 +447,7 @@ class _StockscreenState extends State<Stockscreen> {
             child: Text(
               //Firebase 적용사항
 
-            '',
+              '',
               textAlign: TextAlign.left,
               style: TextStyle(
                 color: CHART_MINUS,
@@ -607,35 +628,46 @@ class _StockscreenState extends State<Stockscreen> {
 
   @override
   Widget build(BuildContext context) {
-
     Size size = MediaQuery.of(context).size;
-    // return FutureBuilder(
-      // 종목명
-      // future: chartInit("000660.KS"),
-      // builder: (BuildContext context, AsyncSnapshot snapshot) {
-      //   if (dayData.isNotEmpty) {
-          return Scaffold(
-            appBar: mainAppBar(
-              context,
-              widget.stockname,
-              StarButton(context),
-            ),
-            body: SafeArea(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Stockmain(size),
-                    infoTab(size),
-                  ],
-                ),
-              ),
-            ),
+    return FutureBuilder(
+      future: getStockInfo(),
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        if (snapshot.hasData) {
+          firebaseStockData = snapshot.data;
+          return FutureBuilder(
+            // 종목명 - 상위 클래스에서 받아와야함
+            future: chartInit(firebaseStockData["code"] + ".KS"),
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if (dayData.isNotEmpty) {
+                return Scaffold(
+                  appBar: mainAppBar(
+                    context,
+                    "종목 정보",
+                    StarButton(context),
+                  ),
+                  body: SafeArea(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          Stockmain(size),
+                          infoTab(size),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              } else {
+                return Center(child: CircularProgressIndicator());
+              }
+            },
           );
-    //     } else {
-    //       return Center(child: CircularProgressIndicator());
-    //     }
-    //   },
-    // );
+        } else {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+      },
+    );
   }
 }
 
