@@ -122,6 +122,8 @@ def formatting_date(date):
 # Naver client key
 client_id= "4NnYXQRzNVwTEO2_rwpd"
 client_secret = "mZP8JBDOBK"
+last_title=dict()
+
 
 # 네이버 api 함수
 def api_search(tuple_list, stock):
@@ -146,17 +148,24 @@ def api_search(tuple_list, stock):
    
         for dict in temp['items']:
             title  = text_clean(dict['title'])
-            #학습데이터를 통해서 라벨링
-            temp_title = okt.morphs(str(title), stem=True)
-            temp_title = [word for word in temp_title if not word in stopwords]
-            temp_title = tokenizer.texts_to_sequences(temp_title)
-            
-            predict = model.predict(temp_title)
-            predict_labels = np.argmax(predict, axis=1)
-            pov_or_neg = predict_labels
-            date = formatting_date(dict['pubDate'])
-            tuple_list.append((stock ,title ,dict['originallink'] ,date ,pov_or_neg))
-            # print(stock ,title ,dict['originallink'] ,date ,pov_or_neg)
+
+            if stock not in last_title:
+                last_title[stock] = title
+
+            end_point = last_title[stock]
+            while(end_point != title):
+                #학습데이터를 통해서 라벨링
+                temp_title = okt.morphs(str(title), stem=True)
+                temp_title = [word for word in temp_title if not word in stopwords]
+                temp_title = tokenizer.texts_to_sequences(temp_title)
+                
+                predict = model.predict(temp_title)
+                predict_labels = np.argmax(predict, axis=1)
+                pov_or_neg = predict_labels
+
+                date = formatting_date(dict['pubDate'])
+                tuple_list.append((stock ,title ,dict['originallink'] ,date ,pov_or_neg))
+                # print(stock ,title ,dict['originallink'] ,date ,pov_or_neg)
     else:
         print("Error Code:" + str(res.status_code)+" Stock name is "+ str(stock))
 
@@ -184,12 +193,12 @@ def run():
             count=0
             for i in range(num):
                 api_search(tuple_list, company[i])
-                count+=1    #api는 초당 10개라서 10개당 0.5초씩 딜레이 
+                count+=1    
+                #api는 초당 10개라서 10개당 0.5초씩 딜레이 
                 if count==10:
                     count=0
                     time.sleep(0.5)
 
-            print("tupple", len(tuple_list))
             end = time.time()
             rest_time = 900 - (end-start)
             time.sleep(rest_time) # 15분 휴식
