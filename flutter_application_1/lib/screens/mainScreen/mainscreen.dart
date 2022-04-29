@@ -9,6 +9,11 @@ import 'package:flutter_application_1/Color/color.dart';
 import 'package:flutter_application_1/Components/main_app_bar.dart';
 import 'package:flutter_application_1/Components/setting_button.dart';
 import 'package:yahoofin/yahoofin.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
+
+
+
 
 class Mainscreen extends StatefulWidget {
   Mainscreen({Key? key}) : super(key: key);
@@ -18,10 +23,33 @@ class Mainscreen extends StatefulWidget {
 }
 
 class _MainscreenState extends State<Mainscreen> {
+
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
   final finance = YahooFin();
+
+  Future<void> _getList(List<Map<String, dynamic>> list) async{
+
+      await firestore
+          .collection('stock')
+          .orderBy("dailynewscount", descending: true)
+          .limit(10)
+          .get()
+          .then((QuerySnapshot qs) {
+        qs.docs.forEach((doc) {
+          Map<String, dynamic> topnews = doc.data() as Map<String, dynamic>;
+          list.add(topnews);
+        },
+        );
+      }
+      );
+
+  }
+
   // 주요지수를 알려주는 위젯
   // 기사 많이 나온 종목
-  Widget Topstocklist(Size size) {
+
+  Widget Topstocklist(Size size, List<Map<String, dynamic>> list) {
+    // 특정 콜렉션 참조
     return Container(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(
@@ -55,23 +83,19 @@ class _MainscreenState extends State<Mainscreen> {
             color: Color.fromRGBO(255, 255, 255, 1),
           ),
           child: Column(
-            children: [
-              // Firebase 적용 사항
-              //  list.forEach((element)
-              // {
-              //  Topstock(size, element['stockname'], element['stockperc'], element['stockprice'])
-              // }
+            children: <Widget>[
+              for(var item in list)
 
+                  Topstock(size, item['name'], item['perc'], item['price'],
+                      item['dailynewscount'])
 
-
-
-            ],
-          ))
+            ]
+          )
+    )
     ]));
   }
 
-  Widget Topstock(Size size, String stockname, var stockperc, var stockprice,
-      var newscount) {
+  Widget Topstock(Size size, String stockname, var stockperc, var stockprice, var newscount) {
     Color color;
     if (stockperc[0] == '+') {
       color = CHART_PLUS;
@@ -145,10 +169,11 @@ class _MainscreenState extends State<Mainscreen> {
 
 // 주요지수를 알려주는 위젯
   Widget Stockindex(Size size) {
+
     return Center(
       child: Container(
         width: size.width * 0.9,
-        height: size.height * 0.3,
+        height: size.height * 0.27,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(8),
@@ -229,23 +254,33 @@ class _MainscreenState extends State<Mainscreen> {
 
   @override
   Widget build(BuildContext context) {
+    List<Map<String, dynamic>> topnewslist = [];
     Size size = MediaQuery.of(context).size;
-    return Scaffold(
-      appBar: mainAppBar(
-        context,
-        "홈",
-        SettingButton(context),
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            SizedBox(height: size.height * 0.03),
-            Topstocklist(size),
-            SizedBox(height: size.height * 0.03),
-            Stockindex(size),
-          ],
-        ),
-      ),
+
+    return FutureBuilder(
+      future:     _getList(topnewslist),
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+      if (snapshot.connectionState == ConnectionState.done) {
+        return Scaffold(
+          appBar: mainAppBar(
+            context,
+            "홈",
+            SettingButton(context),
+          ),
+          body: SafeArea(
+            child: Column(
+              children: [
+                Topstocklist(size, topnewslist),
+                SizedBox(height: size.height * 0.03),
+                Stockindex(size),
+              ],
+            ),
+          ),
+        );
+      } else {
+        return Center(child: CircularProgressIndicator());
+      }
+    },
     );
-  }
+    }
 }

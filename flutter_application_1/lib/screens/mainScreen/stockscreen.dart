@@ -29,11 +29,13 @@ class Stockscreen extends StatefulWidget {
 class _StockscreenState extends State<Stockscreen> {
   @override
   void initState() {
+
     super.initState();
   }
 
   @override
   void dispose() {
+
     super.dispose();
     // animationController.dispose() instead of your controller.dispose
   }
@@ -80,14 +82,7 @@ class _StockscreenState extends State<Stockscreen> {
   // Future
 
   //Firebase 적용사항
-  var news = [
-    {"title": "", "text": "", "result": ""},
-    {"title": "", "text": "", "result": ""},
-    {"title": "", "text": "", "result": ""},
-    {"title": "", "text": "", "result": ""},
-    {"title": "", "text": "", "result": ""}
-  ];
-
+  List<Map<String, dynamic>> news = [];
   List<String> stockIcon = <String>[
     'price',
     'perc',
@@ -201,6 +196,7 @@ class _StockscreenState extends State<Stockscreen> {
     getTenYearData(ticker);
     getDayData(ticker);
   }
+
   // 종목 이름,가격,대비,긍/부정, 관심
 
   Widget TabContainer(String text) {
