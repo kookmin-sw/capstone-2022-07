@@ -10,10 +10,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_application_1/screens/mainScreen/interestsscreen.dart';
 
-
 //종목을 카드로 나타냄
-Widget Stockcard(BuildContext context, Size size, String name, var price, String perc,
-    var volume) {
+Widget Stockcard(BuildContext context, Size size, String name, var price,
+    String perc, var volume) {
   var color;
   if (perc[0] == '+') {
     color = CHART_PLUS;
@@ -199,7 +198,7 @@ Widget Stockcard(BuildContext context, Size size, String name, var price, String
                         MaterialPageRoute(
                           builder: (context) {
                             return Stockscreen(
-                              stockName: "동국산업",
+                              stockName: name,
                             );
                           },
                         ),
@@ -259,19 +258,21 @@ Widget Stockcard(BuildContext context, Size size, String name, var price, String
 }
 
 // 종목카드를 모은 리스트
-Widget Cardlist(Size size, List<Map<String, dynamic>> stocklist ) {
-
-        return Expanded(
-
-            child: ListView.builder(
-              scrollDirection: Axis.vertical,
-              padding: EdgeInsets.symmetric(horizontal: size.width * 0.05),
-              itemCount: stocklist.length,
-              itemBuilder: (BuildContext context, int index) {
-                return Stockcard(context, size, stocklist[index]['name'], stocklist[index]['price'],
-                    stocklist[index]['perc'], stocklist[index]['volume']);
-              },
-            ),
-        );
-
+Widget Cardlist(Size size, List<Map<String, dynamic>> stocklist) {
+  return Expanded(
+    child: ListView.builder(
+      scrollDirection: Axis.vertical,
+      padding: EdgeInsets.symmetric(horizontal: size.width * 0.05),
+      itemCount: stocklist.length,
+      itemBuilder: (BuildContext context, int index) {
+        return Stockcard(
+            context,
+            size,
+            stocklist[index]['name'],
+            stocklist[index]['price'],
+            stocklist[index]['perc'],
+            stocklist[index]['volume']);
+      },
+    ),
+  );
 }
