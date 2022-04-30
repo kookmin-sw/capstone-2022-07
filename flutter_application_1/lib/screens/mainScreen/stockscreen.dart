@@ -62,6 +62,7 @@ class _StockscreenState extends State<Stockscreen> {
   var tenYearMinimum;
 
   Map<String, dynamic> firebaseStockData = {};
+  List<Map<String, dynamic>> newsDataList = [];
 
   Future getStockInfo() async {
     CollectionReference stocks = FirebaseFirestore.instance.collection('stock');
@@ -70,20 +71,28 @@ class _StockscreenState extends State<Stockscreen> {
 
     CollectionReference news =
         stocks.doc(stockData.docs[0].id).collection("news");
-    QuerySnapshot newsData =
-        await news.where('name', isEqualTo: widget.stockName).get();
 
-    if (stockData.size == 0 && newsData.size == 0) {
+    Future<void> _getNewsList(List<Map<String, dynamic>> list) async {
+      await news.get().then(
+        (QuerySnapshot qs) {
+          for (var doc in qs.docs) {
+            Map<String, dynamic> topnews = doc.data() as Map<String, dynamic>;
+            list.add(topnews);
+          }
+        },
+      );
+    }
+
+    _getNewsList(newsDataList);
+
+    if (stockData.size == 0) {
       return null;
     } else {
       return stockData.docs[0].data();
     }
   }
 
-  // Future
-
   //Firebase 적용사항
-  List<Map<String, dynamic>> news = [];
   List<String> stockIcon = <String>[
     'price',
     'perc',
@@ -322,8 +331,8 @@ class _StockscreenState extends State<Stockscreen> {
             ),
           ),
           views: [
-            Info(size, '종목 뉴스', news),
-            Info(size, '종목 정보', news),
+            stockNewsTab(size, '종목 뉴스'),
+            stockInfoTab(size, '종목 정보'),
           ],
           onChange: (index) {},
         ),
@@ -462,7 +471,7 @@ class _StockscreenState extends State<Stockscreen> {
   }
 
   // 하단 위젯 구성
-  Widget Info(Size size, String msg, List news) {
+  Widget stockNewsTab(Size size, String msg) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.only(
@@ -474,35 +483,53 @@ class _StockscreenState extends State<Stockscreen> {
         color: Colors.white,
       ),
       width: size.width * 0.9,
+      height: size.height * 0.4,
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Column(
           children: [
-            // Container(
-            //   padding: EdgeInsets.all(size.height * 0.02),
-            //   child: Text(
-            //     msg,
-            //     style: TextStyle(fontWeight: FontWeight.bold),
-            //   ),
-            // ),
-            // Divider(),
             SizedBox(
               height: size.height * 0.02,
             ),
             ListView.separated(
-              scrollDirection: Axis.vertical,
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              padding: EdgeInsets.symmetric(horizontal: size.width * 0.04),
-              itemCount: (msg == '종목 정보') ? stockIcon.length : news.length,
-              itemBuilder: (BuildContext context, int index) {
-                return (msg == '종목 정보'
-                    ? stockdetail(size, stockIcon[index],
-                        stockInfodetail[index], stockValue[index])
-                    : stockNews(news[index]));
-              },
+              itemCount: newsDataList.length,
               separatorBuilder: (BuildContext context, int index) =>
                   const Divider(color: GREY),
+              itemBuilder: (BuildContext context, int index) {
+                return stockNews(
+                    newsDataList[index]["title"],
+                    newsDataList[index]["content"],
+                    newsDataList[index]["distinction"]);
+              },
+            ),
+            SizedBox(
+              height: size.height * 0.02,
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget stockInfoTab(Size size, String msg) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(16),
+          topRight: Radius.circular(16),
+          bottomLeft: Radius.circular(16),
+          bottomRight: Radius.circular(16),
+        ),
+        color: Colors.white,
+      ),
+      width: size.width * 0.9,
+      height: size.height * 0.4,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Column(
+          children: [
+            SizedBox(
+              height: size.height * 0.02,
             ),
             SizedBox(
               height: size.height * 0.02,
@@ -554,14 +581,12 @@ class _StockscreenState extends State<Stockscreen> {
     );
   }
 
-  Widget stockNews(Map<String, String> news) {
-    var Title = news['title'];
-    var newsText = news['text'];
+  Widget stockNews(String title, String content, int result) {
     // String? 에러
-    if (Title == null) {
+    if (title == null) {
       return SizedBox();
     }
-    if (newsText == null) {
+    if (content == null) {
       return SizedBox();
     }
 
@@ -571,17 +596,17 @@ class _StockscreenState extends State<Stockscreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              Title,
+              title,
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
-            newsResult(news),
+            newsResult(result),
           ],
         ),
         SizedBox(
           height: 2,
         ),
         Text(
-          '- $newsText',
+          content,
           style: TextStyle(
               fontWeight: FontWeight.normal, color: Color(0xff888888)),
         )
@@ -589,17 +614,16 @@ class _StockscreenState extends State<Stockscreen> {
     );
   }
 
-  Widget newsResult(Map<String, String> news) {
-    var res = news['result'];
+  Widget newsResult(int result) {
     var resultColor;
     var resultBackgrouncolor;
-    if (res == null) {
+    if (result == null) {
       return Container();
     }
-    if (res == "호재") {
+    if (result == 1) {
       resultColor = Color(0xff0EBD8D);
       resultBackgrouncolor = Color(0xffE7F9F4);
-    } else if (res == "악재") {
+    } else if (result == 0) {
       resultColor = Color(0xffEF3641);
       resultBackgrouncolor = Color(0xffF9E7E7);
     }
@@ -615,7 +639,7 @@ class _StockscreenState extends State<Stockscreen> {
         color: resultBackgrouncolor,
       ),
       child: Text(
-        res,
+        (result == 1) ? "호재" : "악재",
         style: TextStyle(
           color: resultColor,
         ),
@@ -664,9 +688,7 @@ class _StockscreenState extends State<Stockscreen> {
             },
           );
         } else {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
+          return Center(child: CircularProgressIndicator());
         }
       },
     );
