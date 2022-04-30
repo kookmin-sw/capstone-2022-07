@@ -331,8 +331,8 @@ class _StockscreenState extends State<Stockscreen> {
             ),
           ),
           views: [
-            stockNewsTab(size, '종목 뉴스'),
-            stockInfoTab(size, '종목 정보'),
+            Info(size, '종목 뉴스'),
+            Info(size, '종목 정보'),
           ],
           onChange: (index) {},
         ),
@@ -361,7 +361,7 @@ class _StockscreenState extends State<Stockscreen> {
             height: size.height * 0.4,
             child: SfCartesianChart(
               plotAreaBorderColor: Colors.transparent,
-              primaryXAxis: DateTimeAxis(isVisible: false),
+              primaryXAxis: DateTimeAxis(isVisible: true),
               primaryYAxis: NumericAxis(
                 minimum: minimum,
                 isVisible: false,
@@ -471,7 +471,7 @@ class _StockscreenState extends State<Stockscreen> {
   }
 
   // 하단 위젯 구성
-  Widget stockNewsTab(Size size, String msg) {
+  Widget Info(Size size, String msg) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.only(
@@ -483,7 +483,6 @@ class _StockscreenState extends State<Stockscreen> {
         color: Colors.white,
       ),
       width: size.width * 0.9,
-      height: size.height * 0.4,
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Column(
@@ -492,44 +491,23 @@ class _StockscreenState extends State<Stockscreen> {
               height: size.height * 0.02,
             ),
             ListView.separated(
-              itemCount: newsDataList.length,
+              scrollDirection: Axis.vertical,
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              padding: EdgeInsets.symmetric(horizontal: size.width * 0.04),
+              itemCount:
+                  (msg == '종목 정보') ? stockIcon.length : newsDataList.length,
+              itemBuilder: (BuildContext context, int index) {
+                return (msg == '종목 정보'
+                    ? stockdetail(size, stockIcon[index],
+                        stockInfodetail[index], stockValue[index])
+                    : stockNews(
+                        newsDataList[index]["title"],
+                        newsDataList[index]["content"],
+                        newsDataList[index]["distinction"]));
+              },
               separatorBuilder: (BuildContext context, int index) =>
                   const Divider(color: GREY),
-              itemBuilder: (BuildContext context, int index) {
-                return stockNews(
-                    newsDataList[index]["title"],
-                    newsDataList[index]["content"],
-                    newsDataList[index]["distinction"]);
-              },
-            ),
-            SizedBox(
-              height: size.height * 0.02,
-            )
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget stockInfoTab(Size size, String msg) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(16),
-          topRight: Radius.circular(16),
-          bottomLeft: Radius.circular(16),
-          bottomRight: Radius.circular(16),
-        ),
-        color: Colors.white,
-      ),
-      width: size.width * 0.9,
-      height: size.height * 0.4,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: Column(
-          children: [
-            SizedBox(
-              height: size.height * 0.02,
             ),
             SizedBox(
               height: size.height * 0.02,

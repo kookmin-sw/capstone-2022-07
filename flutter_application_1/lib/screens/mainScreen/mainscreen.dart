@@ -314,7 +314,6 @@ class _MainscreenState extends State<Mainscreen> {
             body: SafeArea(
               child: Column(
                 children: [
-                  // Topstocklist(size, topnewslist),
                   rankingTab(size, topnewslist),
                   SizedBox(height: size.height * 0.03),
                   Stockindex(size),
