@@ -145,7 +145,7 @@ def api_search(tuple_list, stock):
         #     print(index+1, item['title'], item['link'], item['description'],item['pubDate'])
 
         # TODO
-   
+        title_temp = temp['items'][0]['title']
         for dict in temp['items']:
             title  = text_clean(dict['title'])
 
@@ -166,6 +166,7 @@ def api_search(tuple_list, stock):
                 date = formatting_date(dict['pubDate'])
                 tuple_list.append((stock ,title ,dict['originallink'] ,date ,pov_or_neg))
                 # print(stock ,title ,dict['originallink'] ,date ,pov_or_neg)
+        last_title[stock]=title_temp
     else:
         print("Error Code:" + str(res.status_code)+" Stock name is "+ str(stock))
 
@@ -225,6 +226,7 @@ schedule.every().day.at("08:30").do(run)
 
 
 if __name__ == "__main__":
+    print("start")
     get_companylist()
     now = datetime.datetime.now()
     time_now = datetime.timedelta(hours= now.hour , minutes=now.minute)
