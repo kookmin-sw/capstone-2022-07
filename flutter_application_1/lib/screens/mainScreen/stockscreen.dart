@@ -27,18 +27,20 @@ class Stockscreen extends StatefulWidget {
 }
 
 class _StockscreenState extends State<Stockscreen> {
+  late TooltipBehavior _tooltipBehavior;
   @override
   void initState() {
-
+    _tooltipBehavior = TooltipBehavior(enable: true, format: 'point.size');
     super.initState();
   }
 
   @override
   void dispose() {
-
     super.dispose();
     // animationController.dispose() instead of your controller.dispose
   }
+
+  late Color stockColor;
 
   List<_ChartData> dayData = [];
   List<_ChartData> monthData = [];
@@ -74,7 +76,6 @@ class _StockscreenState extends State<Stockscreen> {
     if (stockData.size == 0 && newsData.size == 0) {
       return null;
     } else {
-      // firebaseStockData = newsData.docs[0].data();
       return stockData.docs[0].data();
     }
   }
@@ -111,13 +112,6 @@ class _StockscreenState extends State<Stockscreen> {
             DateTime.fromMillisecondsSinceEpoch(dayTime![i].toInt() * 1000);
         dayData.add(_ChartData(date, dayVolume![i].toDouble()));
       }
-    }
-    if (mounted) {
-      setState(
-        () {
-          dayMinimum = dayVolume!.cast<num>().reduce(min);
-        },
-      );
     }
 
     return "";
@@ -190,11 +184,11 @@ class _StockscreenState extends State<Stockscreen> {
     return "";
   }
 
-  chartInit(String ticker) {
-    getMonthData(ticker);
-    getYearData(ticker);
-    getTenYearData(ticker);
-    getDayData(ticker);
+  chartInit(String ticker) async {
+    await getMonthData(ticker);
+    await getYearData(ticker);
+    await getTenYearData(ticker);
+    await getDayData(ticker);
   }
 
   // 종목 이름,가격,대비,긍/부정, 관심
@@ -232,7 +226,6 @@ class _StockscreenState extends State<Stockscreen> {
           vertical: size.height * 0.02, horizontal: size.width * 0.05),
       padding: EdgeInsets.all(size.width * 0.01),
       width: size.width * 0.9,
-      // height: size.height * 0.4,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(8),
@@ -246,7 +239,8 @@ class _StockscreenState extends State<Stockscreen> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Stockinfo(size),
+          Stockinfo(size, firebaseStockData["name"], firebaseStockData["code"],
+              firebaseStockData["price"], firebaseStockData["perc"]),
           chartTab(size),
         ],
       ),
@@ -290,7 +284,6 @@ class _StockscreenState extends State<Stockscreen> {
             YearChart(size, yearData),
             TenYearChart(size, tenYearData),
           ],
-          onChange: (index) {},
         ),
       ),
     );
@@ -358,20 +351,26 @@ class _StockscreenState extends State<Stockscreen> {
             width: size.width * 0.9 * 0.9,
             height: size.height * 0.4,
             child: SfCartesianChart(
-              primaryXAxis: DateTimeAxis(),
-              primaryYAxis: NumericAxis(minimum: minimum),
-              // tooltipBehavior: _tooltip,
+              plotAreaBorderColor: Colors.transparent,
+              primaryXAxis: DateTimeAxis(isVisible: false),
+              primaryYAxis: NumericAxis(
+                minimum: minimum,
+                isVisible: false,
+              ),
+              tooltipBehavior: _tooltipBehavior,
               // zoomPanBehavior: _zoompan,
               series: <ChartSeries<_ChartData, DateTime>>[
                 AreaSeries<_ChartData, DateTime>(
                   dataSource: data,
+                  borderDrawMode: BorderDrawMode.top,
+                  borderWidth: 2,
+                  borderColor: stockColor,
                   xValueMapper: (_ChartData data, _) => data.x,
                   yValueMapper: (_ChartData data, _) => data.y,
-                  name: 'Gold',
-                  color: Color(0xff0039A4),
+                  color: stockColor,
                   gradient: LinearGradient(colors: [
-                    Color(0xff0039A4).withOpacity(0.1),
-                    Color(0xff0039A4),
+                    stockColor.withOpacity(0.1),
+                    stockColor,
                   ], begin: Alignment.bottomCenter, end: Alignment.topCenter),
                 ),
               ],
@@ -398,7 +397,8 @@ class _StockscreenState extends State<Stockscreen> {
     return Chart(size, data, tenYearMinimum);
   }
 
-  Widget Stockinfo(Size size) {
+  Widget Stockinfo(Size size, String stockName, String stockCode,
+      int stockPrice, String stockPerc) {
     return Container(
       padding: EdgeInsets.all(size.width * 0.05),
       child: Column(
@@ -408,7 +408,7 @@ class _StockscreenState extends State<Stockscreen> {
             children: [
               Text(
                 //Firebase 적용사항
-                '',
+                stockName,
                 textAlign: TextAlign.justify,
                 style: TextStyle(
                   color: Color.fromRGBO(0, 0, 0, 1),
@@ -421,8 +421,7 @@ class _StockscreenState extends State<Stockscreen> {
               SizedBox(width: size.width * 0.01),
               Text(
                 //Firebase 적용사항
-
-                "",
+                stockCode,
                 style: TextStyle(
                     color: Colors.grey[700], fontSize: size.width * 0.04),
               )
@@ -431,10 +430,9 @@ class _StockscreenState extends State<Stockscreen> {
           SizedBox(height: size.height * 0.01),
           Text(
             //Firebase 적용사항
-
-            '',
+            stockPrice.toString(),
             style: TextStyle(
-              color: CHART_MINUS,
+              color: stockColor,
               fontFamily: 'Content',
               fontSize: size.width * 0.06,
               letterSpacing: 0,
@@ -446,11 +444,10 @@ class _StockscreenState extends State<Stockscreen> {
             margin: EdgeInsets.only(top: size.height * 0.005),
             child: Text(
               //Firebase 적용사항
-
-              '',
+              stockPerc,
               textAlign: TextAlign.left,
               style: TextStyle(
-                color: CHART_MINUS,
+                color: stockColor,
                 fontFamily: 'Content',
                 fontSize: size.width * 0.04,
                 letterSpacing: 0,
@@ -634,6 +631,11 @@ class _StockscreenState extends State<Stockscreen> {
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (snapshot.hasData) {
           firebaseStockData = snapshot.data;
+          if (firebaseStockData["perc"][0] == '+') {
+            stockColor = CHART_PLUS;
+          } else {
+            stockColor = CHART_MINUS;
+          }
           return FutureBuilder(
             // 종목명 - 상위 클래스에서 받아와야함
             future: chartInit(firebaseStockData["code"] + ".KS"),
