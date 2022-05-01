@@ -53,7 +53,18 @@ model.add(Dense(3, activation = 'softmax'))
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics = ['accuracy'])
 history = model.fit(X_train, y_train, epochs=10, batch_size=10, validation_split=0.1)
 
+# 파이어베이스 연동!!!!
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
+from firebase_admin import db
+# 쿼링 보낼 database
+cred = credentials.Certificate('./firebase_key.json')
+firebase_admin.initialize_app(cred, {
+  'projectId': 'capstone-2022-07-dac76',
+})
 
+db = firestore.client()
  
 
 # 공공데이터포털 api 주소(Without param)
@@ -123,6 +134,10 @@ def formatting_date(date):
 client_id= "4NnYXQRzNVwTEO2_rwpd"
 client_secret = "mZP8JBDOBK"
 
+# Naver clint key by sj
+# client_id = "8Sbpzhlz4LPc0MPsiaOO"
+# client_secret = "HPqxX8HZfG"
+
 # 네이버 api 함수
 def api_search(tuple_list, stock):
     url = 'https://openapi.naver.com/v1/search/news.json' 
@@ -143,9 +158,9 @@ def api_search(tuple_list, stock):
         #     print(index+1, item['title'], item['link'], item['description'],item['pubDate'])
 
         # TODO
-   
         for dict in temp['items']:
             title  = text_clean(dict['title'])
+
             #학습데이터를 통해서 라벨링
             temp_title = okt.morphs(str(title), stem=True)
             temp_title = [word for word in temp_title if not word in stopwords]
@@ -153,15 +168,30 @@ def api_search(tuple_list, stock):
             
             predict = model.predict(temp_title)
             predict_labels = np.argmax(predict, axis=1)
+            # 호악재 예측값 저장
             pov_or_neg = predict_labels
+
             date = formatting_date(dict['pubDate'])
+
+            '''
+            # 쿼링 코드
+            #
+            # 마지막 temp3 부분을 올라갈 문서의 제목으로 바꿔야함.
+            news_temp = db.collection(u'stock').document(stock).collection(u'news').document(u'temp3')
+            news_temp.set({
+                u'date': date,
+                u'title': title,
+                u'label': pov_or_neg,
+                u'url':dict['originallink']
+            })
+            '''
             tuple_list.append((stock ,title ,dict['originallink'] ,date ,pov_or_neg))
-            # print(stock ,title ,dict['originallink'] ,date ,pov_or_neg)
+                # print(stock ,title ,dict['originallink'] ,date ,pov_or_neg)
     else:
         print("Error Code:" + str(res.status_code)+" Stock name is "+ str(stock))
 
 
-
+# 종목들 전역변수로 가져오기
 company=[]
 def get_companylist():
     temp = list()
@@ -170,11 +200,10 @@ def get_companylist():
     global company
     company = list(itertools.chain.from_iterable(temp))
 
-def run():
+def run(reset):
     try:
-        # 8시 30분부터 7시간 동안 15분 주기로 
+        # 계산된 횟수만 실행
         print("run")
-        reset = 7*4 # 15분씩 4번 7시간
         while reset:
             print("남은횟수: ", reset)
             start = time.time()
@@ -182,23 +211,27 @@ def run():
             tuple_list.append(("stock" ,"title" ,"url" ,"date" ,"pov_or_neg"))
             num = len(company)
             count=0
+            tmp_time = time.time()
             for i in range(num):
                 api_search(tuple_list, company[i])
-                count+=1    #api는 초당 10개라서 10개당 0.5초씩 딜레이 
+                count+=1    
+                #api는 초당 10개라서 딜레이를 주었음
                 if count==10:
+                    time_10 = time.time()-tmp_time
+                    take_a_nap = 1-time_10 if  0 < (time_10) and (time_10) < 1 else 0
+                    time.sleep(take_a_nap)
                     count=0
-                    time.sleep(0.5)
+                    tmp_time=time.time()
 
-            print("tupple", len(tuple_list))
+            # 쿼링 포함 15분 제한
             end = time.time()
             rest_time = 900 - (end-start)
-            time.sleep(rest_time) # 15분 휴식
+            time.sleep(rest_time) 
 
             reset -= 1
 
-    except ValueError:
-        print("valueERR")
-        print(time.time()-start)
+    except :
+        print("error!!!!!!")
 
 
 
@@ -216,14 +249,20 @@ schedule.every().day.at("08:30").do(run)
 
 
 if __name__ == "__main__":
+    print("start")
+    # 주식 종목을 global로 설정
     get_companylist()
     now = datetime.datetime.now()
     time_now = datetime.timedelta(hours= now.hour , minutes=now.minute)
     time_start = datetime.timedelta(hours= 8, minutes=30)
     time_end = datetime.timedelta(hours= 17, minutes=30)
-    #만약 장 중 이라면
+    #시간 계산해서 장 중일 때만 작동하도록..
     if (time_now > time_start) and (time_end > time_now):
-        run()
+        time_diff_s = (time_end-time_now).total_seconds()
+        time_diff_m = time_diff_s/60
+        run_time = int(time_diff_m/15)
+
+        run(run_time)
     while True:
         schedule.run_pending()
         time.sleep(1)
