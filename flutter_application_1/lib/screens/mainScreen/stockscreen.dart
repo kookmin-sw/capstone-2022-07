@@ -65,9 +65,10 @@ class _StockscreenState extends State<Stockscreen> {
   List<Map<String, dynamic>> newsDataList = [];
 
   Future getStockInfo() async {
-    CollectionReference stocks = FirebaseFirestore.instance.collection('stock');
+    CollectionReference stocks =
+        FirebaseFirestore.instance.collection('stock_API2');
     QuerySnapshot stockData =
-        await stocks.where('name', isEqualTo: widget.stockName).get();
+        await stocks.where('stockName', isEqualTo: widget.stockName).get();
 
     CollectionReference news =
         stocks.doc(stockData.docs[0].id).collection("news");
@@ -112,14 +113,18 @@ class _StockscreenState extends State<Stockscreen> {
         interval: StockInterval.thirtyMinute,
         period: StockRange.oneDay);
 
-    dayVolume = chart.chartQuotes!.close;
-    dayTime = chart.chartQuotes!.timestamp;
+    await Future.delayed(Duration(milliseconds: 500));
 
-    for (int i = 0; i < dayVolume!.length; i++) {
-      if (dayTime!.isNotEmpty) {
-        var date =
-            DateTime.fromMillisecondsSinceEpoch(dayTime![i].toInt() * 1000);
-        dayData.add(_ChartData(date, dayVolume![i].toDouble()));
+    if (chart.chartQuotes != null) {
+      dayVolume = chart.chartQuotes!.close;
+      dayTime = chart.chartQuotes!.timestamp;
+
+      for (int i = 0; i < dayVolume!.length; i++) {
+        if (dayTime!.isNotEmpty) {
+          var date =
+              DateTime.fromMillisecondsSinceEpoch(dayTime![i].toInt() * 1000);
+          dayData.add(_ChartData(date, dayVolume![i].toDouble()));
+        }
       }
     }
 
@@ -133,17 +138,20 @@ class _StockscreenState extends State<Stockscreen> {
         stockHistory: hist,
         interval: StockInterval.oneDay,
         period: StockRange.oneMonth);
+    await Future.delayed(Duration(milliseconds: 500));
+    if (chart.chartQuotes != null) {
+      monthVolume = chart.chartQuotes!.close;
+      monthTime = chart.chartQuotes!.timestamp;
 
-    monthVolume = chart.chartQuotes!.close;
-    monthTime = chart.chartQuotes!.timestamp;
-    for (int i = 0; i < monthVolume!.length; i++) {
-      if (monthTime!.isNotEmpty) {
-        var date =
-            DateTime.fromMillisecondsSinceEpoch(monthTime![i].toInt() * 1000);
-        monthData.add(_ChartData(date, monthVolume![i].toDouble()));
+      for (int i = 0; i < monthVolume!.length; i++) {
+        if (monthTime!.isNotEmpty) {
+          var date =
+              DateTime.fromMillisecondsSinceEpoch(monthTime![i].toInt() * 1000);
+          monthData.add(_ChartData(date, monthVolume![i].toDouble()));
+        }
       }
+      monthMinimum = monthVolume!.cast<num>().reduce(min);
     }
-    monthMinimum = monthVolume!.cast<num>().reduce(min);
 
     return "";
   }
@@ -155,17 +163,25 @@ class _StockscreenState extends State<Stockscreen> {
         stockHistory: hist,
         interval: StockInterval.oneMonth,
         period: StockRange.oneYear);
+    await Future.delayed(Duration(milliseconds: 500));
+    if (chart.chartQuotes != null) {
+      yearVolume = chart.chartQuotes!.close;
+      yearTime = chart.chartQuotes!.timestamp;
 
-    yearVolume = chart.chartQuotes!.close;
-    yearTime = chart.chartQuotes!.timestamp;
-    for (int i = 0; i < yearVolume!.length; i++) {
-      if (yearTime!.isNotEmpty) {
-        var date =
-            DateTime.fromMillisecondsSinceEpoch(yearTime![i].toInt() * 1000);
-        yearData.add(_ChartData(date, yearVolume![i].toDouble()));
+      print(yearTime);
+
+      for (int i = 0; i < yearVolume!.length; i++) {
+        if (yearVolume![i] == null) {
+          continue;
+        }
+        if (yearTime!.isNotEmpty) {
+          var date =
+              DateTime.fromMillisecondsSinceEpoch(yearTime![i].toInt() * 1000);
+          print(yearVolume);
+          yearData.add(_ChartData(date, yearVolume![i].toDouble()));
+        }
       }
     }
-    yearMinimum = yearVolume!.cast<num>().reduce(min);
 
     return "";
   }
@@ -177,18 +193,34 @@ class _StockscreenState extends State<Stockscreen> {
         stockHistory: hist,
         interval: StockInterval.oneMonth,
         period: StockRange.tenYear);
+    await Future.delayed(Duration(milliseconds: 500));
+    if (chart.chartQuotes != null) {
+      tenYearVolume = chart.chartQuotes!.close;
+      tenYearTime = chart.chartQuotes!.timestamp;
 
-    tenYearVolume = chart.chartQuotes!.close;
-    tenYearTime = chart.chartQuotes!.timestamp;
+      int nullCheck = tenYearVolume!.indexWhere((element) => element == null);
 
-    for (int i = 0; i < tenYearVolume!.length; i++) {
-      if (tenYearTime!.isNotEmpty) {
-        var date =
-            DateTime.fromMillisecondsSinceEpoch(tenYearTime![i].toInt() * 1000);
-        tenYearData.add(_ChartData(date, tenYearVolume![i].toDouble()));
+      print(nullCheck);
+
+      if (nullCheck != -1) {
+        tenYearVolume!.remove(nullCheck);
+        tenYearTime!.remove(nullCheck);
       }
+
+      for (int i = 0; i < tenYearVolume!.length; i++) {
+        if (tenYearVolume![i] == null) {
+          continue;
+        }
+        if (tenYearTime!.isNotEmpty) {
+          var date = DateTime.fromMillisecondsSinceEpoch(
+              tenYearTime![i].toInt() * 1000);
+          tenYearData.add(_ChartData(date, tenYearVolume![i].toDouble()));
+        }
+      }
+
+      tenYearVolume!.removeWhere((element) => element == null);
+      tenYearMinimum = tenYearVolume!.cast<num>().reduce(min);
     }
-    tenYearMinimum = tenYearVolume!.cast<num>().reduce(min);
 
     return "";
   }
@@ -248,8 +280,12 @@ class _StockscreenState extends State<Stockscreen> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Stockinfo(size, firebaseStockData["name"], firebaseStockData["code"],
-              firebaseStockData["price"], firebaseStockData["perc"]),
+          Stockinfo(
+              size,
+              firebaseStockData["stockName"],
+              firebaseStockData["stockCode"],
+              firebaseStockData["stockPrice"],
+              firebaseStockData["stockPerChange"]),
           chartTab(size),
         ],
       ),
@@ -407,7 +443,7 @@ class _StockscreenState extends State<Stockscreen> {
   }
 
   Widget Stockinfo(Size size, String stockName, String stockCode,
-      int stockPrice, String stockPerc) {
+      double stockPrice, double stockPerc) {
     return Container(
       padding: EdgeInsets.all(size.width * 0.05),
       child: Column(
@@ -453,7 +489,7 @@ class _StockscreenState extends State<Stockscreen> {
             margin: EdgeInsets.only(top: size.height * 0.005),
             child: Text(
               //Firebase 적용사항
-              stockPerc,
+              stockPerc.toString(),
               textAlign: TextAlign.left,
               style: TextStyle(
                 color: stockColor,
@@ -633,14 +669,14 @@ class _StockscreenState extends State<Stockscreen> {
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (snapshot.hasData) {
           firebaseStockData = snapshot.data;
-          if (firebaseStockData["perc"][0] == '+') {
+          if (firebaseStockData["stockPerChange"] > 0) {
             stockColor = CHART_PLUS;
           } else {
             stockColor = CHART_MINUS;
           }
           return FutureBuilder(
             // 종목명 - 상위 클래스에서 받아와야함
-            future: chartInit(firebaseStockData["code"] + ".KS"),
+            future: chartInit(firebaseStockData["stockCode"] + ".KS"),
             builder: (BuildContext context, AsyncSnapshot snapshot) {
               if (dayData.isNotEmpty) {
                 return Scaffold(

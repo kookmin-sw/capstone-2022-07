@@ -21,7 +21,7 @@ class _StartScreenState extends State<StartScreen> {
     InterestScreen(),
     Searchscreen(),
     Stockscreen(
-      stockName: "",
+      stockName: "AJ네트웍스",
     ),
   ];
 

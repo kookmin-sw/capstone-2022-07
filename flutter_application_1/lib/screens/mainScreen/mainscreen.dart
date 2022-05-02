@@ -22,25 +22,168 @@ class Mainscreen extends StatefulWidget {
 
 class _MainscreenState extends State<Mainscreen> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
-  Future<void> _getList(List<Map<String, dynamic>> list) async {
+  Future<void> _getList(List<Map<String, dynamic>> topList,
+      List<Map<String, dynamic>> mainList) async {
     await firestore
-        .collection('stock')
-        .orderBy("dailynewscount", descending: true)
+        .collection('stock_API2')
+        .orderBy("stockPerChange",
+            descending: true) // stockPerChange -> DailyNewsCount
         .limit(5)
         .get()
         .then(
       (QuerySnapshot qs) {
         for (var doc in qs.docs) {
           Map<String, dynamic> topnews = doc.data() as Map<String, dynamic>;
-          list.add(topnews);
+          topList.add(topnews);
         }
       },
+    );
+    await _getMainList(mainList);
+  }
+
+  Future<void> _getMainList(List<Map<String, dynamic>?> list) async {
+    var docSnapshot = await firestore.collection('stock_API2').doc("코스피").get();
+    list.add(docSnapshot.data());
+    docSnapshot = await firestore.collection('stock_API2').doc("코스닥").get();
+    list.add(docSnapshot.data());
+  }
+
+  Widget mainStockList(Size size, List<Map<String, dynamic>> list) {
+    return Container(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            margin: EdgeInsets.only(
+                left: size.width * 0.01,
+                top: size.height * 0.01,
+                bottom: size.height * 0.01),
+            child: Text(
+              // api 수정 필요함
+              '업데이트 날짜 시간',
+              style: TextStyle(
+                color: Color.fromRGBO(0, 0, 0, 0.7),
+                fontFamily: 'Content',
+                fontSize: size.width * 0.025,
+                fontWeight: FontWeight.normal,
+                height: 1,
+              ),
+            ),
+          ) // Firebase 적용 사항
+          ,
+          Container(
+            width: size.width * 0.9,
+            height: size.height * 0.1,
+            padding: EdgeInsets.symmetric(vertical: size.height * 0.01),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(8),
+                topRight: Radius.circular(8),
+                bottomLeft: Radius.circular(8),
+                bottomRight: Radius.circular(8),
+              ),
+              color: Color.fromRGBO(255, 255, 255, 1),
+            ),
+            child: ListView.separated(
+              itemCount: 2,
+              itemBuilder: (BuildContext context, int index) {
+                return mainStock(
+                  size,
+                  list[index]['stockName'],
+                  list[index]['stockPerChange'],
+                  list[index]['stockPrice'],
+                );
+              },
+              separatorBuilder: (BuildContext context, int index) =>
+                  const Divider(color: GREY),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget mainStock(Size size, String stockname, var stockperc, var stockprice) {
+    Color color;
+    if (stockperc > 0) {
+      color = CHART_PLUS;
+    } else if (stockperc < 0) {
+      color = CHART_MINUS;
+    } else {
+      color = GREY;
+    }
+
+    return GestureDetector(
+      child: Container(
+        width: size.width * 0.9,
+        height: size.height * 0.37 * 0.08,
+        margin:
+            EdgeInsets.only(left: size.width * 0.05, right: size.width * 0.03),
+        child: Row(
+          children: [
+            Container(
+              child: Text(
+                stockname, //Firebase 적용사항
+                style: TextStyle(
+                    color: Color.fromRGBO(0, 0, 0, 1),
+                    fontFamily: 'ABeeZee',
+                    fontSize: size.width * 0.035,
+                    fontWeight: FontWeight.bold,
+                    height: 1.2),
+              ),
+            ),
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Container(
+                    child: Column(
+                      children: [
+                        Text(
+                          '$stockperc', //Firebase 적용사항
+                          style: TextStyle(
+                              color: color,
+                              fontFamily: 'Content',
+                              fontSize: size.width * 0.03,
+                              fontWeight: FontWeight.normal,
+                              height: 1.2),
+                        ),
+                        Text(
+                          '$stockprice', //Firebase 적용사항
+                          style: TextStyle(
+                              color: Color.fromRGBO(0, 0, 0, 1),
+                              fontFamily: 'Content',
+                              fontSize: size.width * 0.02,
+                              fontWeight: FontWeight.normal,
+                              height: 1.2),
+                        )
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
+      ),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) {
+              return Stockscreen(
+                stockName: stockname,
+              );
+            },
+          ),
+        );
+      },
+      behavior: HitTestBehavior.opaque,
     );
   }
 
   // 주요지수를 알려주는 위젯
   // 기사 많이 나온 종목
-
   Widget Topstocklist(Size size, List<Map<String, dynamic>> list) {
     // 특정 콜렉션 참조
     return Container(
@@ -83,9 +226,9 @@ class _MainscreenState extends State<Mainscreen> {
               itemBuilder: (BuildContext context, int index) {
                 return Topstock(
                   size,
-                  list[index]['name'],
-                  list[index]['perc'],
-                  list[index]['price'],
+                  list[index]['stockName'],
+                  list[index]['stockPerChange'],
+                  list[index]['stockPrice'],
                   list[index]['dailynewscount'],
                 );
               },
@@ -101,10 +244,12 @@ class _MainscreenState extends State<Mainscreen> {
   Widget Topstock(Size size, String stockname, var stockperc, var stockprice,
       var newscount) {
     Color color;
-    if (stockperc[0] == '+') {
+    if (stockperc > 0) {
       color = CHART_PLUS;
-    } else {
+    } else if (stockperc < 0) {
       color = CHART_MINUS;
+    } else {
+      color = GREY;
     }
 
     return GestureDetector(
@@ -298,11 +443,12 @@ class _MainscreenState extends State<Mainscreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<Map<String, dynamic>> topnewslist = [];
+    List<Map<String, dynamic>> topStocklist = [];
+    List<Map<String, dynamic>> mainStocklist = [];
     Size size = MediaQuery.of(context).size;
 
     return FutureBuilder(
-      future: _getList(topnewslist),
+      future: _getList(topStocklist, mainStocklist),
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           return Scaffold(
@@ -312,12 +458,15 @@ class _MainscreenState extends State<Mainscreen> {
               SettingButton(context),
             ),
             body: SafeArea(
-              child: Column(
-                children: [
-                  rankingTab(size, topnewslist),
-                  SizedBox(height: size.height * 0.03),
-                  Stockindex(size),
-                ],
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    mainStockList(size, mainStocklist),
+                    rankingTab(size, topStocklist),
+                    SizedBox(height: size.height * 0.03),
+                    Stockindex(size),
+                  ],
+                ),
               ),
             ),
           );
