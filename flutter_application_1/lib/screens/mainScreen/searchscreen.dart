@@ -42,19 +42,17 @@ class _SearchscreenState extends State<Searchscreen> {
 
 Widget Searchbar(Size size) {
   return Container(
-    width: size.width * 0.9,
-    height: size.height * 0.04,
-    margin: EdgeInsets.symmetric(horizontal: size.width * 0.1),
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.only(
-        topLeft: Radius.circular(10),
-        topRight: Radius.circular(10),
-        bottomLeft: Radius.circular(10),
-        bottomRight: Radius.circular(10),
+      width: size.width * 0.9,
+      height: size.height * 0.04,
+      margin: EdgeInsets.symmetric(horizontal: size.width * 0.1),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(10),
+          topRight: Radius.circular(10),
+          bottomLeft: Radius.circular(10),
+          bottomRight: Radius.circular(10),
+        ),
       ),
-      color: Color.fromRGBO(224, 228, 233, 1)
-
-    ),
       child: Row(
         children: [
           Container(
