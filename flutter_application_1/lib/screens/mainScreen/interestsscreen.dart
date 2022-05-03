@@ -29,11 +29,9 @@ class _InterestScreenState extends State<InterestScreen> {
     Map<String, dynamic> userdocdata;
     String useruid = FirebaseAuth.instance.currentUser!.uid;
     // user의 device token
-    print(useruid);
 
     var userdata = await firestore.collection('users').where(
       "uid" , isEqualTo: "${useruid}").get();
-    print(userdata.docs[0]);
 
     userdocdata = userdata.docs[0].data();
     List<dynamic> nlist = userdocdata['favorite'];
