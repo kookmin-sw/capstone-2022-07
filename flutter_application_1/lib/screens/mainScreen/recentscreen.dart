@@ -7,7 +7,7 @@
 // import 'package:flutter/material.dart';
 // import 'package:flutter_application_1/Components/main_app_bar.dart';
 // import 'package:flutter_application_1/Components/setting_button.dart';
-// import 'package:flutter_application_1/Components/stock_list.dart';
+// import 'package:flutter_application_1/Components/stockcard.dart';
 //
 // class Recentscreen extends StatefulWidget {
 //   Recentscreen({Key? key}) : super(key: key);

@@ -9,7 +9,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Components/main_app_bar.dart';
 import 'package:flutter_application_1/Components/setting_button.dart';
-import 'package:flutter_application_1/Components/stock_list.dart';
+import 'package:flutter_application_1/Components/stockcard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class InterestScreen extends StatefulWidget {
@@ -18,6 +18,8 @@ class InterestScreen extends StatefulWidget {
   @override
   State<InterestScreen> createState() => _InterestScreenState();
 }
+
+
 
 class _InterestScreenState extends State<InterestScreen> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
