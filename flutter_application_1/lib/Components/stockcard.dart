@@ -12,12 +12,14 @@ import 'package:flutter_application_1/screens/mainScreen/interestsscreen.dart';
 
 //종목을 카드로 나타냄
 Widget Stockcard(BuildContext context, Size size, String name, var price,
-    String perc, var volume) {
-  var color;
-  if (perc[0] == '+') {
+    var stockperc, var volume) {
+  Color color;
+  if (stockperc > 0) {
     color = CHART_PLUS;
-  } else {
+  } else if (stockperc < 0) {
     color = CHART_MINUS;
+  } else {
+    color = GREY;
   }
   var intl = NumberFormat.currency(locale: "ko_KR", symbol: "￦");
 
@@ -136,7 +138,7 @@ Widget Stockcard(BuildContext context, Size size, String name, var price,
                         horizontal: size.width * 0.03,
                         vertical: size.height * 0.01),
                     child: Text(
-                      '대비(등락) : $perc',
+                      '대비(등락) : ' + stockperc.toString(),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: color,
@@ -268,10 +270,10 @@ Widget Cardlist(Size size, List<Map<String, dynamic>> stocklist) {
         return Stockcard(
             context,
             size,
-            stocklist[index]['name'],
-            stocklist[index]['price'],
-            stocklist[index]['perc'],
-            stocklist[index]['volume']);
+            stocklist[index]['stockName'],
+            stocklist[index]['stockPrice'],
+            stocklist[index]['stockPerChange'],
+            stocklist[index]['stockVolume']);
       },
     ),
   );
