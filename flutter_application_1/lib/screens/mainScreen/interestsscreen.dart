@@ -11,6 +11,7 @@ import 'package:flutter_application_1/Components/main_app_bar.dart';
 import 'package:flutter_application_1/Components/setting_button.dart';
 import 'package:flutter_application_1/Components/stockcard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class InterestScreen extends StatefulWidget {
   InterestScreen({Key? key}) : super(key: key);
@@ -26,11 +27,15 @@ class _InterestScreenState extends State<InterestScreen> {
 
   Future<List<dynamic>> _getstockList() async {
     Map<String, dynamic> userdocdata;
-
+    String useruid = FirebaseAuth.instance.currentUser!.uid;
     // user의 device token
-    var userdata = await firestore.collection('users').doc(
-        'NVPjZEAZneKblrubGZSW').get();
-    userdocdata = userdata.data() as Map<String, dynamic>;
+    print(useruid);
+
+    var userdata = await firestore.collection('users').where(
+      "uid" , isEqualTo: "${useruid}").get();
+    print(userdata.docs[0]);
+
+    userdocdata = userdata.docs[0].data();
     List<dynamic> nlist = userdocdata['favorite'];
     return nlist;
 
