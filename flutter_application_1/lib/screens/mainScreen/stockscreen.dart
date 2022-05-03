@@ -113,8 +113,6 @@ class _StockscreenState extends State<Stockscreen> {
         interval: StockInterval.thirtyMinute,
         period: StockRange.oneDay);
 
-    await Future.delayed(Duration(milliseconds: 500));
-
     if (chart.chartQuotes != null) {
       dayVolume = chart.chartQuotes!.close;
       dayTime = chart.chartQuotes!.timestamp;
@@ -138,7 +136,7 @@ class _StockscreenState extends State<Stockscreen> {
         stockHistory: hist,
         interval: StockInterval.oneDay,
         period: StockRange.oneMonth);
-    await Future.delayed(Duration(milliseconds: 500));
+
     if (chart.chartQuotes != null) {
       monthVolume = chart.chartQuotes!.close;
       monthTime = chart.chartQuotes!.timestamp;
@@ -163,7 +161,7 @@ class _StockscreenState extends State<Stockscreen> {
         stockHistory: hist,
         interval: StockInterval.oneMonth,
         period: StockRange.oneYear);
-    await Future.delayed(Duration(milliseconds: 500));
+
     if (chart.chartQuotes != null) {
       yearVolume = chart.chartQuotes!.close;
       yearTime = chart.chartQuotes!.timestamp;
@@ -193,7 +191,7 @@ class _StockscreenState extends State<Stockscreen> {
         stockHistory: hist,
         interval: StockInterval.oneMonth,
         period: StockRange.tenYear);
-    await Future.delayed(Duration(milliseconds: 500));
+
     if (chart.chartQuotes != null) {
       tenYearVolume = chart.chartQuotes!.close;
       tenYearTime = chart.chartQuotes!.timestamp;
@@ -226,10 +224,12 @@ class _StockscreenState extends State<Stockscreen> {
   }
 
   chartInit(String ticker) async {
-    await getMonthData(ticker);
-    await getYearData(ticker);
-    await getTenYearData(ticker);
-    await getDayData(ticker);
+    String temp = ticker;
+    if (ticker != "^KS11" && ticker != "^KQ11") temp += ".KS";
+    await getMonthData(temp);
+    await getYearData(temp);
+    await getTenYearData(temp);
+    await getDayData(temp);
   }
 
   // 종목 이름,가격,대비,긍/부정, 관심
@@ -663,20 +663,25 @@ class _StockscreenState extends State<Stockscreen> {
 
   @override
   Widget build(BuildContext context) {
+    print(widget.stockName);
     Size size = MediaQuery.of(context).size;
     return FutureBuilder(
       future: getStockInfo(),
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (snapshot.hasData) {
           firebaseStockData = snapshot.data;
+          print(firebaseStockData);
           if (firebaseStockData["stockPerChange"] > 0) {
             stockColor = CHART_PLUS;
-          } else {
+          } else if (firebaseStockData["stockPerChange"] < 0) {
             stockColor = CHART_MINUS;
+          } else if (firebaseStockData["stockPerChange"] == 0) {
+            stockColor = Color.fromARGB(255, 120, 119, 119);
           }
+
           return FutureBuilder(
             // 종목명 - 상위 클래스에서 받아와야함
-            future: chartInit(firebaseStockData["stockCode"] + ".KS"),
+            future: chartInit(firebaseStockData["stockCode"]),
             builder: (BuildContext context, AsyncSnapshot snapshot) {
               if (dayData.isNotEmpty) {
                 return Scaffold(

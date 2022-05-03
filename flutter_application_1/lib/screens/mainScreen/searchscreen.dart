@@ -39,40 +39,37 @@ class _SearchscreenState extends State<Searchscreen> {
 
 Widget Searchbar(Size size) {
   return Container(
-    width: size.width * 0.9,
-    height: size.height * 0.04,
-    margin: EdgeInsets.symmetric(horizontal: size.width * 0.1),
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.only(
-        topLeft: Radius.circular(10),
-        topRight: Radius.circular(10),
-        bottomLeft: Radius.circular(10),
-        bottomRight: Radius.circular(10),
+      width: size.width * 0.9,
+      height: size.height * 0.04,
+      margin: EdgeInsets.symmetric(horizontal: size.width * 0.1),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(10),
+          topRight: Radius.circular(10),
+          bottomLeft: Radius.circular(10),
+          bottomRight: Radius.circular(10),
+        ),
       ),
-    ),
-      child: Row(
-        children: [
-          Container(
-              margin: EdgeInsets.only(left: size.width * 0.9 * 0.02),
-              child: SvgPicture.asset('assets/icons/search.svg',
-                  semanticsLabel: 'search')),
-          
-          // Firebase 적용 사항
-          // 입력 시 입력한 string이 포함되는 종목이 노출되도록해야함 
-          Expanded(
-            child: Text(
-              '찾으시는 종목을 입력하세요',
-              textAlign: TextAlign.left,
-              style: TextStyle(
-                  color: Color.fromRGBO(91, 99, 106, 1),
-                  fontFamily: 'ABeeZee',
-                  fontSize: size.width * 0.035,
-                  letterSpacing: 0,
-                  fontWeight: FontWeight.normal,
-                  height: 1),
-            ),
-          )
-        ]
-      )
-  );
+      child: Row(children: [
+        Container(
+            margin: EdgeInsets.only(left: size.width * 0.9 * 0.02),
+            child: SvgPicture.asset('assets/icons/search.svg',
+                semanticsLabel: 'search')),
+
+        // Firebase 적용 사항
+        // 입력 시 입력한 string이 포함되는 종목이 노출되도록해야함
+        Expanded(
+          child: Text(
+            '  찾으시는 종목을 입력하세요',
+            textAlign: TextAlign.left,
+            style: TextStyle(
+                color: Color.fromRGBO(91, 99, 106, 1),
+                fontFamily: 'ABeeZee',
+                fontSize: size.width * 0.035,
+                letterSpacing: 0,
+                fontWeight: FontWeight.normal,
+                height: 1),
+          ),
+        )
+      ]));
 }
