@@ -199,7 +199,7 @@ def api_search(tuple_list, stock, id_key):
         # TODO
         ## 파베에서 제일 최근 기사 time stamp 불러오기
         temp_stamp = time_to_stamp(temp['items'][0]['pubDate'])
-        docs = db.collection(u'test_승준').document(u'BGF').collection(u'news').where(u"timestamp", u">", dt).order_by(u'timestamp',direction=firestore.Query.DESCENDING).limit(1).stream()
+        docs = db.collection(u'test_승준').document(stock).collection(u'news').where(u"timestamp", u">", dt).order_by(u'timestamp',direction=firestore.Query.DESCENDING).limit(1).stream()
         bb={}
         for doc in docs:
             bb = doc.to_dict()
