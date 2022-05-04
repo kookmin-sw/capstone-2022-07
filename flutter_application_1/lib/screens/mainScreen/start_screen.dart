@@ -5,6 +5,8 @@ import 'package:flutter_application_1/screens/mainScreen/interestsscreen.dart';
 import 'package:flutter_application_1/screens/mainScreen/mainscreen.dart';
 import 'package:flutter_application_1/screens/mainScreen/searchscreen.dart';
 import 'package:flutter_application_1/screens/mainScreen/stockscreen.dart';
+import 'package:flutter_application_1/screens/mainScreen/profilescreen.dart';
+
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:badges/badges.dart';
 
