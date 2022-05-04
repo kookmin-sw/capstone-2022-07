@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Controller/alertController.dart';
-import 'package:flutter_application_1/initUser.dart';
+import 'package:flutter_application_1/Init/initUser.dart';
 import 'package:get/get.dart';
 
 class InitAlert extends StatelessWidget {
@@ -20,7 +20,9 @@ class InitAlert extends StatelessWidget {
           );
         } else {
           return Center(
-            child: CircularProgressIndicator(),
+            child: CircularProgressIndicator(
+              backgroundColor: Colors.white,
+            ),
           );
         }
       },

@@ -2,8 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_application_1/initAlert.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_application_1/Init/initdisplayMode.dart';
 
 class InitFirebase extends StatelessWidget {
   const InitFirebase({Key? key}) : super(key: key);
@@ -25,11 +25,13 @@ class InitFirebase extends StatelessWidget {
             ),
           );
           return MaterialApp(
-            home: InitAlert(),
+            home: InitDisplayMode(),
           );
         } else {
           return Center(
-            child: CircularProgressIndicator(),
+            child: CircularProgressIndicator(
+              backgroundColor: Colors.white,
+            ),
           );
         }
       },

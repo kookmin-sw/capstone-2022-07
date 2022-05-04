@@ -3,7 +3,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/initFirebase.dart';
+import 'package:flutter_application_1/Init/initFirebase.dart';
 
 void main() => runApp(MaterialApp(
       home: SplashPage(),
@@ -43,6 +43,5 @@ class _SplashPageState extends State<SplashPage> {
         ),
       ),
     );
-    ;
   }
 }
