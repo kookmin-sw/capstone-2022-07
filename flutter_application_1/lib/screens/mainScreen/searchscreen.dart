@@ -12,6 +12,7 @@ import 'package:flutter_application_1/Color/color.dart';
 import 'package:flutter_application_1/Components/stock_list.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class Searchscreen extends StatefulWidget {
   Searchscreen({Key? key}) : super(key: key);
@@ -135,7 +136,23 @@ class _SearchscreenState extends State<Searchscreen> {
           ],
         ),
       ),
-      onTap: () {
+      onTap: () async {
+        // Map a = fromMap(FirebaseAuth.instance.currentUser!);
+        // String useruid = FirebaseAuth.instance.currentUser!.uid;
+        // print("user uid is ${useruid}");
+        // var writestock = FirebaseFirestore.instance.collection('users')
+        // .where("uid", isEqualTo: useruid);
+        // print(writestock);
+
+
+        // updateData({
+        //   'visited' : FieldValue.arrayUnion([stockname])
+        // });
+        // var finduser = await FirebaseFirestore.instance.collection('users')
+        //     .where("uid", isEqualTo : useruid)
+        //     .setData();
+        // List<dynamic> list = finduser.docs[0].data()['visit history'];
+        // print(list);
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -167,6 +184,7 @@ class _SearchscreenState extends State<Searchscreen> {
         setState(
           () {
             selectedTerm = query;
+
           },
         );
       },
