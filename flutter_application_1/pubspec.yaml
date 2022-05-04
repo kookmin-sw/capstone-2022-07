@@ -51,6 +51,7 @@ dev_dependencies:
   badges: ^2.0.2
   flutter_svg: ^1.0.3
   intl: ^0.17.0
+  getwidget: ^2.0.4
 
   # Firebase dependencies
   firebase_core: ^1.13.1
