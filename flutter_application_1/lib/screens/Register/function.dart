@@ -202,7 +202,7 @@ Future<Map<String, dynamic>> fromMap(User firebaseUser) async {
 
 Future<void> saveUserToFirebase() async {
   CollectionReference users = FirebaseFirestore.instance.collection('users');
-  users.add(await fromMap(FirebaseAuth.instance.currentUser!));
+  users.doc(FirebaseAuth.instance.currentUser!.uid).set(await fromMap(FirebaseAuth.instance.currentUser!));
 }
 
 void updateLoginTime() async {
