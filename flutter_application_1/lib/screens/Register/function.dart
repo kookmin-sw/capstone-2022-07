@@ -1,6 +1,7 @@
 // ignore_for_file: import_of_legacy_library_into_null_safe, prefer_const_constructors, unnecessary_null_comparison
 
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/init.dart';
 import 'package:flutter_application_1/screens/Register/signup/input_nickname_screen.dart';
 import 'package:flutter_application_1/screens/Register/signup/register_screen.dart';
 import 'package:flutter_application_1/screens/Register/signup/verify_screen.dart';

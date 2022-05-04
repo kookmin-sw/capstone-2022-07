@@ -532,21 +532,21 @@ class _MainscreenState extends State<Mainscreen> {
     List<Map<String, dynamic>> mainStocklist = [];
     Size size = MediaQuery.of(context).size;
 
-    return FutureBuilder(
-      future: _getList(increaseList, decreaseList, positiveList, negativeList,
-          mainStocklist),
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          return Scaffold(
-            appBar: mainPageAppBar(
-              context,
-              "홈",
-              SettingButton(context),
-            ),
-            body: SafeArea(
-              child: Container(
-                alignment: Alignment.topCenter,
-                child: SingleChildScrollView(
+    return Scaffold(
+      appBar: mainPageAppBar(
+        context,
+        "홈",
+        SettingButton(context),
+      ),
+      body: SafeArea(
+        child: Container(
+          alignment: Alignment.topCenter,
+          child: FutureBuilder(
+            future: _getList(increaseList, decreaseList, positiveList,
+                negativeList, mainStocklist),
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                return SingleChildScrollView(
                   child: Column(
                     children: [
                       mainStockList(size, mainStocklist),
@@ -558,14 +558,14 @@ class _MainscreenState extends State<Mainscreen> {
                       // Stockindex(size),
                     ],
                   ),
-                ),
-              ),
-            ),
-          );
-        } else {
-          return Center(child: CircularProgressIndicator());
-        }
-      },
+                );
+              } else {
+                return Center(child: CircularProgressIndicator());
+              }
+            },
+          ),
+        ),
+      ),
     );
   }
 }

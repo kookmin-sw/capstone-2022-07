@@ -36,7 +36,31 @@ class _SearchscreenState extends State<Searchscreen> {
       body: SizedBox(
         height: size.height,
         width: size.width,
-        child: buildFloatingSearchBar(context, size),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Positioned(
+              top: size.height * 0.1,
+              child: Container(
+                  width: size.width * 0.9,
+                  height: size.height * 0.1,
+                  padding: EdgeInsets.symmetric(vertical: size.height * 0.01),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(8),
+                      topRight: Radius.circular(8),
+                      bottomLeft: Radius.circular(8),
+                      bottomRight: Radius.circular(8),
+                    ),
+                    color: Color.fromRGBO(255, 255, 255, 1),
+                  ),
+                  child: Container(
+                      // alignment: Alignment.center,
+                      child: Center(child: Text("Test용 Container")))),
+            ),
+            buildFloatingSearchBar(context, size),
+          ],
+        ),
       ),
     );
   }
@@ -171,38 +195,31 @@ class _SearchscreenState extends State<Searchscreen> {
         );
       },
       builder: (context, transition) {
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: Material(
-            color: Colors.white,
-            elevation: 4,
-            child: StreamBuilder(
-                stream: FirebaseFirestore.instance
-                    .collection('stock_API2')
-                    .where("stockName", isGreaterThanOrEqualTo: selectedTerm)
-                    .where("stockName",
-                        isLessThanOrEqualTo: selectedTerm + "\uF7FF")
-                    .snapshots(),
-                builder: (context, AsyncSnapshot snapshot) {
-                  if (!snapshot.hasData) {
-                    return Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  } else {
-                    if (snapshot.data!.docs.length == 0 ||
-                        snapshot.data!.docs.length > 300) {
-                      return Container();
-                    } else {
-                      for (int i = 0; i < snapshot.data!.docs.length; i++) {
-                        increaseList.add(snapshot.data.docs[i].data()
-                            as Map<String, dynamic>);
-                      }
-                      return searchStockList(size, increaseList);
-                    }
-                    // return _buildList(context, snapshot.data);
-                  }
-                }),
-          ),
+        return StreamBuilder(
+          stream: FirebaseFirestore.instance
+              .collection('stock_API2')
+              .where("stockName", isGreaterThanOrEqualTo: selectedTerm)
+              .where("stockName", isLessThanOrEqualTo: selectedTerm + "\uF7FF")
+              .snapshots(),
+          builder: (context, AsyncSnapshot snapshot) {
+            if (!snapshot.hasData) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            } else {
+              if (snapshot.data!.docs.length == 0 ||
+                  snapshot.data!.docs.length > 300) {
+                return Container();
+              } else {
+                for (int i = 0; i < snapshot.data!.docs.length; i++) {
+                  increaseList.add(
+                      snapshot.data.docs[i].data() as Map<String, dynamic>);
+                }
+                return searchStockList(size, increaseList);
+              }
+              // return _buildList(context, snapshot.data);
+            }
+          },
         );
       },
     );

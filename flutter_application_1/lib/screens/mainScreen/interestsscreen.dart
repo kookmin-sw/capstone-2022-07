@@ -60,27 +60,28 @@ class _InterestScreenState extends State<InterestScreen> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return FutureBuilder<List<Map<String, dynamic>>>(
+    return Scaffold(
+      appBar: mainPageAppBar(
+        context,
+        "관심 종목",
+        SettingButton(context),
+      ),
+      body: FutureBuilder<List<Map<String, dynamic>>>(
         future: customFuture(),
         builder: (BuildContext context,
             AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             List<Map<String, dynamic>> stockcardlist = snapshot.data ?? [];
-            return Scaffold(
-              appBar: mainPageAppBar(
-                context,
-                "관심 종목",
-                SettingButton(context),
-              ),
-              body: Column(
-                children: [
-                  Cardlist(size, stockcardlist),
-                ],
-              ),
+            return Column(
+              children: [
+                Cardlist(size, stockcardlist),
+              ],
             );
           } else {
             return Center(child: CircularProgressIndicator());
           }
-        });
+        },
+      ),
+    );
   }
 }
