@@ -151,7 +151,7 @@ client_secret = "mZP8JBDOBK"
 def api_search(tuple_list, stock):
     url = 'https://openapi.naver.com/v1/search/news.json' 
     header = {'X-Naver-Client-Id':client_id, 'X-Naver-Client-Secret':client_secret} 
-    param = {'query':stock, 'display':100, 'start':1, 'sort':'date'} 
+    param = {'query':stock, 'display':3, 'start':1, 'sort':'date'} 
     # query     : 검색할 단어
     # display   : 검색 출력 건수 (기본 10 / 최대 100)
     # start     : 검색 시작 위치 (기본 1  / 최대 1000)
@@ -175,21 +175,21 @@ def api_search(tuple_list, stock):
             temp_X = okt.morphs(str(title), stem=True) #토큰화
             temp_X = [word for word in temp_X if not word in stopwords] #안쓰는 말 제거
             X_test.append(temp_X)
+            tokenizer = Tokenizer(num_words = 35000)
+            tokenizer.fit_on_texts(X_test)
             X_test = tokenizer.texts_to_sequences(X_test)
+            X_test = pad_sequences(X_test, maxlen=max_len)
             predict= model.predict(X_test)
             # 호악재 예측값 저장
             pov_or_neg = np.argmax(predict,axis=1)[0]
-
             date = formatting_date(dict['pubDate'])
-
             # 쿼링 코드
-            
             news_temp = db.collection(u'merge').document(stock).collection(u'news').document(str(index+1))
             news_temp.set({
                 u'date': date,
                 u'title': title,
                 u'label': str(pov_or_neg),
-                u'url':dict[str('originallink')]
+                u'url':dict[str('originallink')],
             })
             
             tuple_list.append((stock ,title ,dict['originallink'] ,date ,pov_or_neg))
@@ -305,6 +305,7 @@ def run(reset):
     print("run")
     stock_information()
     while reset:
+        get_companylist()
         print("남은횟수: ", reset)
         start = time.time()
         tuple_list=[]
@@ -355,7 +356,7 @@ if __name__ == "__main__":
     now = datetime.datetime.now()
     time_now = datetime.timedelta(hours= now.hour , minutes=now.minute)
     time_start = datetime.timedelta(hours= 8, minutes=30)
-    time_end = datetime.timedelta(hours= 16, minutes=00)
+    time_end = datetime.timedelta(hours= 20, minutes=00)
     #시간 계산해서 장 중일 때만 작동하도록..
     if (time_now > time_start) and (time_end > time_now):
         time_diff_s = (time_end-time_now).total_seconds()
