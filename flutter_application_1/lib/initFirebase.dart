@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_application_1/initUser.dart';
+import 'package:flutter_application_1/initAlert.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 class InitFirebase extends StatelessWidget {
@@ -25,7 +25,7 @@ class InitFirebase extends StatelessWidget {
             ),
           );
           return MaterialApp(
-            home: InitUser(),
+            home: InitAlert(),
           );
         } else {
           return Center(

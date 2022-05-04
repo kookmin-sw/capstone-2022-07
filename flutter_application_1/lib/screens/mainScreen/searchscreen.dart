@@ -168,7 +168,6 @@ class _SearchscreenState extends State<Searchscreen> {
         // .where("uid", isEqualTo: useruid);
         // print(writestock);
 
-
         // updateData({
         //   'visited' : FieldValue.arrayUnion([stockname])
         // });
@@ -207,8 +206,7 @@ class _SearchscreenState extends State<Searchscreen> {
       onQueryChanged: (query) {
         setState(
           () {
-            selectedTerm = query;
-
+            selectedTerm = query.toUpperCase();
           },
         );
       },
@@ -227,12 +225,15 @@ class _SearchscreenState extends State<Searchscreen> {
             } else {
               if (snapshot.data!.docs.length == 0 ||
                   snapshot.data!.docs.length > 300) {
+                print(selectedTerm);
+                print(snapshot.data.docs.length);
                 return Container();
               } else {
                 for (int i = 0; i < snapshot.data!.docs.length; i++) {
                   increaseList.add(
                       snapshot.data.docs[i].data() as Map<String, dynamic>);
                 }
+                print(increaseList);
                 return searchStockList(size, increaseList);
               }
               // return _buildList(context, snapshot.data);
