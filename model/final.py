@@ -1,13 +1,18 @@
 # -*- coding: utf-8 -*-
-from bs4 import BeautifulSoup
 import requests
+import pandas as pd
+import math
+from tqdm import tqdm
+import yfinance as yf
+import exchange_calendars as ecals
+
+from bs4 import BeautifulSoup
 import re
 import time
 import itertools
 import csv
 import datetime
 import schedule
-import pandas as pd
 import konlpy
 from konlpy.tag import Okt
 import numpy as np
@@ -15,6 +20,11 @@ from keras.layers import Embedding, Dense, LSTM
 from keras.models import Sequential
 from keras.preprocessing.sequence import pad_sequences
 from keras.preprocessing.text import Tokenizer
+
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
+from firebase_admin import db
 
 #기존 트레이닝 데이터 학습
 train_data = pd.read_csv("./train.csv")
@@ -53,11 +63,6 @@ model.add(Dense(3, activation = 'softmax'))
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics = ['accuracy'])
 history = model.fit(X_train, y_train, epochs=10, batch_size=10, validation_split=0.1)
 
-# 파이어베이스 연동!!!!
-import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import firestore
-from firebase_admin import db
 # 쿼링 보낼 database
 cred = credentials.Certificate('./firebase_key.json')
 firebase_admin.initialize_app(cred, {
@@ -142,7 +147,7 @@ client_secret = "mZP8JBDOBK"
 def api_search(tuple_list, stock):
     url = 'https://openapi.naver.com/v1/search/news.json' 
     header = {'X-Naver-Client-Id':client_id, 'X-Naver-Client-Secret':client_secret} 
-    param = {'query':stock, 'display':1, 'start':1, 'sort':'date'} 
+    param = {'query':stock, 'display':100, 'start':1, 'sort':'date'} 
     # query     : 검색할 단어
     # display   : 검색 출력 건수 (기본 10 / 최대 100)
     # start     : 검색 시작 위치 (기본 1  / 최대 1000)
@@ -158,33 +163,31 @@ def api_search(tuple_list, stock):
         #     print(index+1, item['title'], item['link'], item['description'],item['pubDate'])
 
         # TODO
-        for dict in temp['items']:
+        for index, dict in enumerate(temp['items']):
             title  = text_clean(dict['title'])
 
             #학습데이터를 통해서 라벨링
-            temp_title = okt.morphs(str(title), stem=True)
-            temp_title = [word for word in temp_title if not word in stopwords]
-            temp_title = tokenizer.texts_to_sequences(temp_title)
-            
-            predict = model.predict(temp_title)
-            predict_labels = np.argmax(predict, axis=1)
+            X_test=[]
+            temp_X = okt.morphs(str(title), stem=True) #토큰화
+            temp_X = [word for word in temp_X if not word in stopwords] #안쓰는 말 제거
+            X_test.append(temp_X)
+            X_test = tokenizer.texts_to_sequences(X_test)
+            predict= model.predict(X_test)
             # 호악재 예측값 저장
-            pov_or_neg = predict_labels
+            pov_or_neg = np.argmax(predict,axis=1)[0]
 
             date = formatting_date(dict['pubDate'])
 
-            '''
             # 쿼링 코드
-            #
-            # 마지막 temp3 부분을 올라갈 문서의 제목으로 바꿔야함.
-            news_temp = db.collection(u'stock').document(stock).collection(u'news').document(u'temp3')
+            
+            news_temp = db.collection(u'stock').document(stock).collection(u'news').document(str(index+1))
             news_temp.set({
                 u'date': date,
                 u'title': title,
-                u'label': pov_or_neg,
-                u'url':dict['originallink']
+                u'label': str(pov_or_neg),
+                u'url':dict[str('originallink')]
             })
-            '''
+            
             tuple_list.append((stock ,title ,dict['originallink'] ,date ,pov_or_neg))
                 # print(stock ,title ,dict['originallink'] ,date ,pov_or_neg)
     else:
@@ -201,37 +204,35 @@ def get_companylist():
     company = list(itertools.chain.from_iterable(temp))
 
 def run(reset):
-    try:
-        # 계산된 횟수만 실행
-        print("run")
-        while reset:
-            print("남은횟수: ", reset)
-            start = time.time()
-            tuple_list=[]
-            tuple_list.append(("stock" ,"title" ,"url" ,"date" ,"pov_or_neg"))
-            num = len(company)
-            count=0
-            tmp_time = time.time()
-            for i in range(num):
-                api_search(tuple_list, company[i])
-                count+=1    
-                #api는 초당 10개라서 딜레이를 주었음
-                if count==10:
-                    time_10 = time.time()-tmp_time
-                    take_a_nap = 1-time_10 if  0 < (time_10) and (time_10) < 1 else 0
-                    time.sleep(take_a_nap)
-                    count=0
-                    tmp_time=time.time()
+    # 계산된 횟수만 실행
+    print("run")
+    while reset:
+        print("남은횟수: ", reset)
+        start = time.time()
+        tuple_list=[]
+        tuple_list.append(("stock" ,"title" ,"url" ,"date" ,"pov_or_neg"))
+        num = len(company)
+        count=0
+        tmp_time = time.time()
+        for i in range(num):
+            api_search(tuple_list, company[i])
+            count+=1    
+            #api는 초당 10개라서 딜레이를 주었음
+            if count==10:
+                time_10 = time.time()-tmp_time
+                take_a_nap = 1-time_10 if  0 < (time_10) and (time_10) < 1 else 0
+                time.sleep(take_a_nap)
+                count=0
+                tmp_time=time.time()
 
-            # 쿼링 포함 15분 제한
-            end = time.time()
-            rest_time = 900 - (end-start)
-            time.sleep(rest_time) 
+        # 쿼링 포함 15분 제한
+        end = time.time()
+        rest_time = 900 - (end-start)
+        time.sleep(rest_time) 
 
-            reset -= 1
+        reset -= 1
 
-    except :
-        print("error!!!!!!")
+    
 
 
 
@@ -255,7 +256,7 @@ if __name__ == "__main__":
     now = datetime.datetime.now()
     time_now = datetime.timedelta(hours= now.hour , minutes=now.minute)
     time_start = datetime.timedelta(hours= 8, minutes=30)
-    time_end = datetime.timedelta(hours= 17, minutes=30)
+    time_end = datetime.timedelta(hours= 16, minutes=00)
     #시간 계산해서 장 중일 때만 작동하도록..
     if (time_now > time_start) and (time_end > time_now):
         time_diff_s = (time_end-time_now).total_seconds()

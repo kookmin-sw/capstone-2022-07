@@ -45,35 +45,48 @@ param = {'query':stock, 'display':5, 'start':1, 'sort':'date'}
 # start     : 검색 시작 위치 (기본 1  / 최대 1000)
 # sort      : 정렬순서      (기본 sim : 유사도 / date : 날짜)
 res = requests.get(url, params=param, headers=header)
+stopwords = ['의','가','이','은','들','는','좀','잘','걍','과','도','를','으로','자','에','와','한','하다']
+stocks = ["삼성전자","카카오","sk하이닉스","lg디스플레이"]
 
 pov_or_neg = 0 #긍부정 라벨링 값
-tuple_list=[]
-if res.status_code == 200:
-    temp = res.json()
+for stock in stocks:
+    url = 'https://openapi.naver.com/v1/search/news.json' 
+    header = {'X-Naver-Client-Id':client_id, 'X-Naver-Client-Secret':client_secret} 
+    param = {'query':stock, 'display':10, 'start':1, 'sort':'date'} 
+    res = requests.get(url, params=param, headers=header)
+    tuple_list=[]
+    if res.status_code == 200:
+        temp = res.json()
 
-    # for index, item in enumerate(temp['items']):
-    #     print(index+1, item['title'], item['link'], item['description'],item['pubDate'])
+        # for index, item in enumerate(temp['items']):
+        #     print(index+1, item['title'], item['link'], item['description'],item['pubDate'])
 
-    # TODO
-    i =0
-    document_title=["1","2","3","4","5"]
-    for dict in temp['items']:
-        title  = text_clean(dict['title'])
-        date = formatting_date(dict['pubDate'])
-        # 쿼링을 여기서 줘야겠죠..??
-        news_temp = db.collection(u'test_승준').document(stock).collection(u'news').document(document_title[i])
-        i+=1
-        news_temp.set({
-            u'date': date,
-            u'title': title,
-            u'label': pov_or_neg,
-            u'url':dict['originallink']
-        })
+        # TODO
+        index=0
+        for dict in temp['items']:
+            title  = text_clean(dict['title'])
+            date = formatting_date(dict['pubDate'])
+            # 쿼링을 여기서 줘야겠죠..??
+            # X_test=[]
+            # temp_X = okt.morphs(str(title), stem=True) #토큰화
+            # temp_X = [word for word in temp_X if not word in stopwords] #안쓰는 말 제거
+            # X_test.append(temp_X)
+            # X_test = tokenizer.texts_to_sequences(X_test)
+            print(str(index+1))
 
-        # tuple_list.append((stock ,title ,dict['originallink'] ,date ,pov_or_neg))
-            # print(stock ,title ,dict['originallink'] ,date ,pov_or_neg)
-else:
-    print("Error Code:" + str(res.status_code)+" Stock name is "+ str(stock))
+            news_temp = db.collection(u'test_승준').document(stock).collection(u'news').document(str(index+1))
+
+            news_temp.set({
+                u'date': date,
+                u'title': title,
+                u'label': pov_or_neg,
+                u'url':dict['originallink']
+            })
+
+            # tuple_list.append((stock ,title ,dict['originallink'] ,date ,pov_or_neg))
+                # print(stock ,title ,dict['originallink'] ,date ,pov_or_neg)
+    else:
+        print("Error Code:" + str(res.status_code)+" Stock name is "+ str(stock))
 
 
 # news_temp = db.collection(u'stock').document(u'카카오').collection(u'news').document(u'temp3')
