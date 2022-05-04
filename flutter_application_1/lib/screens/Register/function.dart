@@ -1,7 +1,7 @@
 // ignore_for_file: import_of_legacy_library_into_null_safe, prefer_const_constructors, unnecessary_null_comparison
 
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/init.dart';
+import 'package:flutter_application_1/initUser.dart';
 import 'package:flutter_application_1/screens/Register/signup/input_nickname_screen.dart';
 import 'package:flutter_application_1/screens/Register/signup/register_screen.dart';
 import 'package:flutter_application_1/screens/Register/signup/verify_screen.dart';
@@ -202,7 +202,9 @@ Future<Map<String, dynamic>> fromMap(User firebaseUser) async {
 
 Future<void> saveUserToFirebase() async {
   CollectionReference users = FirebaseFirestore.instance.collection('users');
-  users.doc(FirebaseAuth.instance.currentUser!.uid).set(await fromMap(FirebaseAuth.instance.currentUser!));
+  users
+      .doc(FirebaseAuth.instance.currentUser!.uid)
+      .set(await fromMap(FirebaseAuth.instance.currentUser!));
 }
 
 void updateLoginTime() async {

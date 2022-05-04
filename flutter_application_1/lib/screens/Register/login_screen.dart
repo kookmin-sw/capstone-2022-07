@@ -1,11 +1,9 @@
 // ignore_for_file: prefer_const_constructors_in_immutables, unnecessary_new, prefer_const_constructors, prefer_const_literals_to_create_immutables, prefer_final_fields
 
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_application_1/Animation/fade_animation.dart';
 import 'package:flutter_application_1/screens/Register/function.dart';
 import 'package:flutter_application_1/screens/Register/registerComponents.dart';
-import 'package:flutter_application_1/screens/Register/signin/signin_screen.dart';
 import 'package:flutter_application_1/screens/Register/signup/register_screen.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 

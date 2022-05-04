@@ -7,8 +7,8 @@ import 'package:flutter_application_1/screens/Register/signup/input_nickname_scr
 import 'package:flutter_application_1/screens/Register/login_screen.dart';
 import 'package:flutter_application_1/screens/mainScreen/start_screen.dart';
 
-class Init extends StatelessWidget {
-  const Init({Key? key}) : super(key: key);
+class InitUser extends StatelessWidget {
+  const InitUser({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

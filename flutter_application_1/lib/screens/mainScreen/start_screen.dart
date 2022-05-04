@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/screens/mainScreen/interestsscreen.dart';
 import 'package:flutter_application_1/screens/mainScreen/mainscreen.dart';
 import 'package:flutter_application_1/screens/mainScreen/searchscreen.dart';
-import 'package:flutter_application_1/screens/mainScreen/stockscreen.dart';
 import 'package:flutter_application_1/screens/mainScreen/profilescreen.dart';
 
 import 'package:google_nav_bar/google_nav_bar.dart';
@@ -22,9 +21,7 @@ class _StartScreenState extends State<StartScreen> {
     Mainscreen(),
     InterestScreen(),
     Searchscreen(),
-    Stockscreen(
-      stockName: "AJ네트웍스",
-    ),
+    Profilescreen()
   ];
 
   int selectedIndex = 0;
