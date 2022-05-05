@@ -13,6 +13,7 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:yahoofin/yahoofin.dart';
 import 'dart:math';
 import 'package:contained_tab_bar_view/contained_tab_bar_view.dart';
+import 'package:flutter_application_1/Components/numFormat.dart';
 
 class Stockscreen extends StatefulWidget {
   Stockscreen({
@@ -443,13 +444,17 @@ class _StockscreenState extends State<Stockscreen> {
   }
 
   Widget Stockinfo(Size size, String stockName, String stockCode,
-      double stockPrice, double stockPerc) {
+      var stockPrice, var stockPerc) {
+    stockPrice = intlprice.format(stockPrice);
+    stockPerc = intlperc.format(stockPerc) + "%";
+
     return Container(
       padding: EdgeInsets.all(size.width * 0.05),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+
             children: [
               Text(
                 //Firebase 적용사항
