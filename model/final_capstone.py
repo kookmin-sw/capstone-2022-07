@@ -25,8 +25,14 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 from firebase_admin import db
+# 멀티프로세싱
+import multiprocessing
+from multiprocessing import Manager, Pool, freeze_support  
+#warning 문자 무시
+import warnings
+warnings.filterwarnings('ignore')
 
-#기존 트레이닝 데이터 학습
+# #기존 트레이닝 데이터 학습
 train_data = pd.read_csv("./train.csv")
 stopwords = ['의','가','이','은','들','는','좀','잘','걍','과','도','를','으로','자','에','와','한','하다']
 #형태소분석
@@ -62,11 +68,16 @@ model.add(Dense(3, activation = 'softmax'))
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics = ['accuracy'])
 history = model.fit(X_train, y_train, epochs=10, batch_size=10, validation_split=0.1)
 
+# 파이어베이스 에러시 아래꺼 지우고 이거로..
+# if not firebase_admin._apps:
+#     cred = credentials.Certificate('./firebase_key.json') 
+#     default_app = firebase_admin.initialize_app(cred)
 # 쿼링 보낼 database
 cred = credentials.Certificate('./firebase_key.json')
 firebase_admin.initialize_app(cred, {
   'projectId': 'capstone-2022-07-dac76',
 })
+
 db = firestore.client()
 
 
@@ -160,28 +171,22 @@ def formatting_date(date):
 def time_to_stamp(date):
     format ='%a, %d %b %Y %H:%M:%S %z'
     date = datetime.datetime.strptime(date, format) # str to datetime
+
     return date
 
 
 # Naver client key
-#client_id= "4NnYXQRzNVwTEO2_rwpd"
-#client_secret = "mZP8JBDOBK"
-
-# Naver clint key by sj
-# client_id = "8Sbpzhlz4LPc0MPsiaOO"
-# client_secret = "HPqxX8HZfG"
-
 Naver_client_id=["4NnYXQRzNVwTEO2_rwpd", "8Sbpzhlz4LPc0MPsiaOO"]
 Naver_client_secret=["mZP8JBDOBK", "HPqxX8HZfG"]
 
-
-firstDayOfMonth = datetime.date.today().replace(day=1)
-dt = datetime.datetime.combine(firstDayOfMonth, datetime.datetime.min.time())
+temp_dt = "Thu, 05 May 2022 06:02:00 +0900"
+format ='%a, %d %b %Y %H:%M:%S %z'
+temp_dt = datetime.datetime.strptime(temp_dt, format) # str to datetime
 # 네이버 api 함수
 def api_search(tuple_list, stock, id_key):
     url = 'https://openapi.naver.com/v1/search/news.json' 
     header = {'X-Naver-Client-Id':Naver_client_id[id_key], 'X-Naver-Client-Secret':Naver_client_secret[id_key]}
-    param = {'query':stock, 'display':10, 'start':1, 'sort':'date'} 
+    param = {'query':stock, 'display':100, 'start':1, 'sort':'date'} 
     # query     : 검색할 단어
     # display   : 검색 출력 건수 (기본 10 / 최대 100)
     # start     : 검색 시작 위치 (기본 1  / 최대 1000)
@@ -193,17 +198,12 @@ def api_search(tuple_list, stock, id_key):
     if res.status_code == 200:
         temp = res.json()
 
-        # for index, item in enumerate(temp['items']):
-        #     print(index+1, item['title'], item['link'], item['description'],item['pubDate'])
-
-        # TODO
         ## 파베에서 제일 최근 기사 time stamp 불러오기
-        temp_stamp = time_to_stamp(temp['items'][0]['pubDate'])
-        docs = db.collection(u'test_승준').document(stock).collection(u'news').where(u"timestamp", u">", dt).order_by(u'timestamp',direction=firestore.Query.DESCENDING).limit(1).stream()
+        docs = db.collection(u'stock').document(stock).collection(u'news').where(u"timestamp", u">", temp_dt).order_by(u'timestamp',direction=firestore.Query.DESCENDING).limit(1).stream()
         bb={}
         for doc in docs:
             bb = doc.to_dict()
-        endPoint = bb['timestamp']
+        endPoint = bb['timestamp'] if len(bb) >0 else temp_dt
 
         for index, dict in enumerate(temp['items']):
             news_timestamp = time_to_stamp(dict['pubDate'])
@@ -224,9 +224,10 @@ def api_search(tuple_list, stock, id_key):
             predict= model.predict(X_test)
             # 호악재 예측값 저장
             pov_or_neg = np.argmax(predict,axis=1)[0]
+
             date = formatting_date(dict['pubDate'])
             # 쿼링 코드
-            news_temp = db.collection(u'merge').document(stock).collection(u'news').document()
+            news_temp = db.collection(u'stock').document(stock).collection(u'news').document()
             news_temp.set({
                 u'date': date,
                 u'title': title,
@@ -244,9 +245,6 @@ def api_search(tuple_list, stock, id_key):
 # 종목들 전역변수로 가져오기
 company=[]
 def get_companylist():
-
-    #temp = list()
-    #temp.append(getStockCode(11, "StockSvc"))
     global code_list
     code_list = []
     item_list = getStockCode("KOSPI", code_list)
@@ -267,7 +265,6 @@ def get_companylist():
     company=item_list
 
 def stock_information():
-    # 여기서부터는 시간별로 실행 - 실시간 코드
     # start에는 장이 열리는 날 - 하루가 들어가야 함
     #날짜반영
     XKRX = ecals.get_calendar("XKRX") # 한국 코드
@@ -356,31 +353,22 @@ def run(reset):
         tuple_list=[]
         tuple_list.append(("stock" ,"title" ,"url" ,"date" ,"pov_or_neg"))
         id_key = reset%2
-        count=0
-        tmp_time = time.time()
-        for stock in tqdm(company):
-            api_search(tuple_list, stock["stockName"], id_key)
-            '''
-            count+=1
-            #api는 초당 10개라서 딜레이를 주었음
-            if count==10:
-                time_10 = time.time()-tmp_time
-                take_a_nap = 1-time_10 if  0 < (time_10) and (time_10) < 1 else 0
-                time.sleep(take_a_nap)
-                count=0
-                tmp_time=time.time()
-            '''
+        st = time.time()
+        #### Pool() 프로세스 수는 변경 가능
+        with Pool(2) as pool:
+            pool.starmap(
+                api_search, [(tuple_list, stock['stockName'], id_key) for stock in company] 
+            )
+            pool.close()
+            pool.join()
+        print("quering end, it takes to ",int(time.time() -st),"s" )
         # 쿼링 포함 15분 제한
-        print("quering finish, sleep ")
+        print("sleep ")
         end = time.time()
         rest_time = 900 - (end-start) if 900-(end-start) >0 else 0
         time.sleep(rest_time) 
 
         reset -= 1
-
-    
-
-
 
     # #tuple to csv 저장
     # with open('news.csv', 'w') as f:
@@ -412,6 +400,7 @@ if __name__ == "__main__":
     while True:
         schedule.run_pending()
         time.sleep(1)
+
 
 #시간제한없는거랑
 #중복제거
