@@ -76,6 +76,7 @@ class _SigninScreenState extends State<SigninScreen> {
           height: size.height * 0.1,
           width: size.width * 0.8,
           child: TextFormField(
+            keyboardType: TextInputType.emailAddress,
             decoration: InputDecoration(
                 contentPadding: EdgeInsets.all(size.height * 0.02),
                 prefixIcon: Icon(Icons.email),

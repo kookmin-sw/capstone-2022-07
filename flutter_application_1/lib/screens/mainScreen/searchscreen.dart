@@ -373,44 +373,39 @@ class _SearchscreenState extends State<Searchscreen> {
       onQueryChanged: (query) {
         setState(
           () {
-            selectedTerm = query;
-
+            selectedTerm = query.toUpperCase();
           },
         );
       },
       builder: (context, transition) {
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: Material(
-            color: Colors.white,
-            elevation: 4,
-            child: StreamBuilder(
-                stream: FirebaseFirestore.instance
-                    .collection('stock_API2')
-                    .where("stockName", isGreaterThanOrEqualTo: selectedTerm)
-                    .where("stockName",
-                        isLessThanOrEqualTo: selectedTerm + "\uF7FF")
-                    .snapshots(),
-                builder: (context, AsyncSnapshot snapshot) {
-                  if (!snapshot.hasData) {
-                    return Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  } else {
-                    if (snapshot.data!.docs.length == 0 ||
-                        snapshot.data!.docs.length > 300) {
-                      return Container();
-                    } else {
-                      for (int i = 0; i < snapshot.data!.docs.length; i++) {
-                        increaseList.add(snapshot.data.docs[i].data()
-                            as Map<String, dynamic>);
-                      }
-                      return searchStockList(size, increaseList);
-                    }
-                    // return _buildList(context, snapshot.data);
-                  }
-                }),
-          ),
+        return StreamBuilder(
+          stream: FirebaseFirestore.instance
+              .collection('stock_API2')
+              .where("stockName", isGreaterThanOrEqualTo: selectedTerm)
+              .where("stockName", isLessThanOrEqualTo: selectedTerm + "\uF7FF")
+              .snapshots(),
+          builder: (context, AsyncSnapshot snapshot) {
+            if (!snapshot.hasData) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            } else {
+              if (snapshot.data!.docs.length == 0 ||
+                  snapshot.data!.docs.length > 300) {
+                print(selectedTerm);
+                print(snapshot.data.docs.length);
+                return Container();
+              } else {
+                for (int i = 0; i < snapshot.data!.docs.length; i++) {
+                  increaseList.add(
+                      snapshot.data.docs[i].data() as Map<String, dynamic>);
+                }
+                print(increaseList);
+                return searchStockList(size, increaseList);
+              }
+              // return _buildList(context, snapshot.data);
+            }
+          },
         );
       },
     );
