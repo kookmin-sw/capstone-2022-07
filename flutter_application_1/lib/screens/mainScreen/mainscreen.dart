@@ -11,6 +11,8 @@ import 'package:flutter_application_1/Components/setting_button.dart';
 import 'package:flutter_application_1/screens/mainScreen/stockscreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:contained_tab_bar_view/contained_tab_bar_view.dart';
+import 'package:flutter_application_1/Components/numFormat.dart';
+
 
 class Mainscreen extends StatefulWidget {
   Mainscreen({Key? key}) : super(key: key);
@@ -168,7 +170,8 @@ class _MainscreenState extends State<Mainscreen> {
     } else {
       color = GREY;
     }
-
+    stockprice = intlmarket.format(stockprice);
+    stockperc = intlperc.format(stockperc) + "%";
     return GestureDetector(
       child: Container(
         width: size.width * 0.9,
@@ -290,7 +293,8 @@ class _MainscreenState extends State<Mainscreen> {
     } else {
       color = GREY;
     }
-
+    stockprice = intlmarket.format(stockprice);
+    stockperc = intlperc.format(stockperc) + "%";
     return GestureDetector(
       child: Container(
         width: size.width * 0.9,

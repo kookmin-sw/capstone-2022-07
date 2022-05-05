@@ -4,6 +4,7 @@ import 'package:flutter_application_1/screens/mainScreen/stockscreen.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_application_1/Color/color.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_application_1/Components/numFormat.dart';
 
 //종목을 카드로 나타냄
 Widget Stockcard(BuildContext context, Size size, String name, var price,
@@ -16,11 +17,10 @@ Widget Stockcard(BuildContext context, Size size, String name, var price,
   } else {
     color = GREY;
   }
-  var intl = NumberFormat.currency(locale: "ko_KR", symbol: "￦");
 
-  price = intl.format(price);
-  volume = intl.format(volume);
-
+  price = intlprice.format(price);
+  stockperc = intlperc.format(stockperc) + "%";
+  volume = intlvol.format(volume);
   return Container(
     height: size.height * 0.185,
     width: size.width * 0.9,
