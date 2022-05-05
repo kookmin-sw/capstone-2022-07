@@ -15,9 +15,7 @@ class InitAlert extends StatelessWidget {
       future: controller.initialize(), // 여기서 앱 실행 전에 해야 하는 초기화 진행
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          return MaterialApp(
-            home: InitUser(),
-          );
+          return InitUser();
         } else {
           return Center(
             child: CircularProgressIndicator(

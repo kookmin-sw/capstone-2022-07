@@ -33,9 +33,7 @@ class InitDisplayMode extends StatelessWidget {
       future: initialize(), // 여기서 앱 실행 전에 해야 하는 초기화 진행
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          return MaterialApp(
-            home: InitAlert(),
-          );
+          return InitAlert();
         } else {
           return Center(
             child: CircularProgressIndicator(

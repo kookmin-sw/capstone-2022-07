@@ -36,13 +36,13 @@ class _ProfilescreenState extends State<Profilescreen> {
   Widget profileimgandnickname(size, data) {
     String nickname = data['nickname'];
     return Container(
+      margin: EdgeInsets.only(top: size.height * 0.05),
       color: Color.fromRGBO(249, 249, 249, 1),
       height: size.height * 0.35,
       width: size.width * 0.9,
       child: Column(
         children: [
-          SvgPicture.asset('assets/icons/profileimg.svg',
-              width: size.height * 0.25),
+          Image.asset('assets/icons/user.png', width: size.height * 0.2),
           SizedBox(
             height: size.height * 0.03,
           ),

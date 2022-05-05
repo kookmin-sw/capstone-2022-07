@@ -109,17 +109,10 @@ class _InputNicknameScreenState extends State<InputNicknameScreen> {
           borderRadius: BorderRadius.circular(10),
         ),
         child: TextButton(
-          onPressed: () {
+          onPressed: () async {
             if (_nickNameKey.currentState!.validate()) {
-              updateNickname(_nickName);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return StartScreen();
-                  },
-                ),
-              );
+              await updateNickname(_nickName);
+              authStateChanges(context);
             }
           },
           child: Text(

@@ -56,6 +56,8 @@ dev_dependencies:
   intl: ^0.17.0
   getwidget: ^2.0.4
   flutter_native_splash: ^2.1.6
+  fluttertoast: ^8.0.9
+  argon_buttons_flutter: ^1.1.0
 
   # Firebase dependencies
   firebase_core: ^1.13.1

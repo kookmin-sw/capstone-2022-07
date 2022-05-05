@@ -1,5 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:flutter_application_1/screens/mainScreen/notification_details_page.dart';
+import 'package:flutter_application_1/screens/mainScreen/start_screen.dart';
 import 'package:get/get.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -9,6 +11,11 @@ class AlertController extends GetxController {
   final Rxn<RemoteMessage> remoteMessage = Rxn<RemoteMessage>();
 
   Future<bool> initialize() async {
+    String? token = await FirebaseMessaging.instance.getToken();
+    try {
+      print(token);
+    } catch (e) {}
+
     await FirebaseMessaging.instance.requestPermission(
       alert: true,
       announcement: true,
@@ -38,6 +45,7 @@ class AlertController extends GetxController {
     // Notification Channel을 디바이스에 생성
     final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
         FlutterLocalNotificationsPlugin();
+
     await flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>()
@@ -45,9 +53,12 @@ class AlertController extends GetxController {
 
     await flutterLocalNotificationsPlugin.initialize(
         InitializationSettings(
-            android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+            android: AndroidInitializationSettings('@mipmap/launcher_icon'),
             iOS: IOSInitializationSettings()),
-        onSelectNotification: (String? payload) async {});
+        onSelectNotification: (String? payload) async {
+      print(payload);
+      Get.to(() => StartScreen(), arguments: payload);
+    });
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       remoteMessage.value = message;
@@ -56,20 +67,34 @@ class AlertController extends GetxController {
 
       if (notification != null && android != null) {
         flutterLocalNotificationsPlugin.show(
-          0,
+          notification.hashCode,
           notification.title,
           notification.body,
           NotificationDetails(
             android: AndroidNotificationDetails(
-              'high_importance_channel', // AndroidNotificationChannel()에서 생성한 ID
-              'High Importance Notifications',
-              channelDescription:
-                  'This channel is used for important notifications.',
+              androidNotificationChannel
+                  .id, // AndroidNotificationChannel()에서 생성한 ID
+              androidNotificationChannel.name,
+              channelDescription: androidNotificationChannel.description,
             ),
           ),
+          payload: message.data['argument'],
         );
       }
     });
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage rm) {
+      print(rm);
+      Get.to(() => NotificationDetailsPage(), arguments: rm.data['argument']);
+    });
+
+    // Terminated 상태에서 도착한 메시지에 대한 처리
+    RemoteMessage? initialMessage =
+        await FirebaseMessaging.instance.getInitialMessage();
+    if (initialMessage != null) {
+      Get.to(() => NotificationDetailsPage(),
+          arguments: initialMessage.data['argument']);
+    }
 
     return true;
   }

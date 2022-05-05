@@ -2,6 +2,7 @@
 
 import 'dart:async';
 
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Init/initFirebase.dart';
 
@@ -20,16 +21,23 @@ class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
-    Timer(Duration(milliseconds: 1500), () {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => InitFirebase()));
-    });
+    Timer(
+      Duration(milliseconds: 1500),
+      () {
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (BuildContext context) => (InitFirebase()),
+            ),
+            (route) => false);
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return MaterialApp(
+    return GetMaterialApp(
       home: Scaffold(
         backgroundColor: Color(0xff0039A4),
         body: SafeArea(
