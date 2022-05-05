@@ -68,7 +68,7 @@ model.add(Embedding(max_words, 100))
 model.add(LSTM(128))
 model.add(Dense(3, activation = 'softmax'))
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics = ['accuracy'])
-#history = model.fit(X_train, y_train, epochs=10, batch_size=10, validation_split=0.1)
+history = model.fit(X_train, y_train, epochs=10, batch_size=10, validation_split=0.1)
 
 # 파이어베이스 에러시 아래꺼 지우고 이거로..
 # if not firebase_admin._apps:
@@ -182,10 +182,10 @@ def time_to_stamp(date):
 Naver_client_id=["4NnYXQRzNVwTEO2_rwpd", "8Sbpzhlz4LPc0MPsiaOO"]
 Naver_client_secret=["mZP8JBDOBK", "HPqxX8HZfG"]
 
-temp_dt = "Thu, 01 May 2022 06:02:00 +0900"
+temp_dt = "Tue, 01 Mar 2022 06:02:00 +0900"
 format ='%a, %d %b %Y %H:%M:%S %z'
 temp_dt = datetime.datetime.strptime(temp_dt, format) # str to datetime
-# 네이버 api 함수
+# 네이버 api 함수 
 def api_search(tuple_list, stock, id_key):
     url = 'https://openapi.naver.com/v1/search/news.json' 
     header = {'X-Naver-Client-Id':Naver_client_id[id_key], 'X-Naver-Client-Secret':Naver_client_secret[id_key]}
@@ -269,7 +269,7 @@ def api_search(tuple_list, stock, id_key):
         DayNewsCount+=1
 
     
-    news_temp = db.collection(u'stock').document(stock)
+    news_temp = db.collection(u'seungjun').document(stock)
     news_temp.set({
         u'DayNewsCount': DayNewsCount,
         u'TimeNewsCount': TimeNewsCount,
@@ -418,11 +418,11 @@ if __name__ == "__main__":
     print("start")
     # 주식 종목을 global로 설정
     get_companylist()
-    '''
+    
     now = datetime.datetime.now()
     time_now = datetime.timedelta(hours= now.hour , minutes=now.minute)
-    time_start = datetime.timedelta(hours= 0, minutes=00)
-    time_end = datetime.timedelta(hours= 24, minutes=00)
+    time_start = datetime.timedelta(hours= 8, minutes=20)
+    time_end = datetime.timedelta(hours= 15, minutes=30)
     #시간 계산해서 장 중일 때만 작동하도록..
     if (time_now > time_start) and (time_end > time_now):
         time_diff_s = (time_end-time_now).total_seconds()
@@ -430,8 +430,8 @@ if __name__ == "__main__":
         run_time = int(time_diff_m/15)
 
         run(run_time)
-    '''
-    run(1)
+
+
     while True:
         schedule.run_pending()
         time.sleep(1)
