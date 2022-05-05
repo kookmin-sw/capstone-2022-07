@@ -36,36 +36,32 @@ class _SearchscreenState extends State<Searchscreen> {
         SettingButton(context),
       ),
       body: SizedBox(
-        height: size.height,
-        width: size.width,
-        child: Stack(
-          children : [
+          height: size.height,
+          width: size.width,
+          child: Stack(children: [
             visitedstock(size),
             visitedtitle(size),
             buildFloatingSearchBar(context, size),
-
-          ]
-
-        )
-      ),
+          ])),
     );
   }
 
-  Widget visitedtitle(size){
-      return Positioned(
-          // padding: EdgeInsets.only(left : size.width*0.02),
-          top: size.width * 0.15,
-          left : size.width * 0.04,
-          height: size.height*0.04,
-          // color:Colors.grey[100],
-          child : Text('최근 조회',
-              style: GoogleFonts.notoSans(fontSize: size.width*0.025,
-                  fontWeight: FontWeight.bold, height: size.width*0.005))
-      );
-
+  Widget visitedtitle(size) {
+    return Positioned(
+        // padding: EdgeInsets.only(left : size.width*0.02),
+        top: size.width * 0.2,
+        left: size.width * 0.04,
+        height: size.height * 0.04,
+        // color:Colors.grey[100],
+        child: Text('최근 조회 종목',
+            style: GoogleFonts.notoSans(
+                fontSize: size.width * 0.025,
+                fontWeight: FontWeight.bold,
+                height: size.width * 0.005)));
   }
+
   //주식 정보를 가져옴
-  Future<List<Map<String, dynamic>>> _getstockInfo(List<dynamic> list) async{
+  Future<List<Map<String, dynamic>>> _getstockInfo(List<dynamic> list) async {
     List<Map<String, dynamic>> stockcardlist = [];
     Map<String, dynamic> stockdata;
 
@@ -83,7 +79,8 @@ class _SearchscreenState extends State<Searchscreen> {
   //사용자의 visited와 favorite 정보를 가져옴
   Future<List<dynamic>> _getvisitedstockanddata() async {
     String useruid = FirebaseAuth.instance.currentUser!.uid;
-    var user = await FirebaseFirestore.instance.collection('users').doc(useruid).get();
+    var user =
+        await FirebaseFirestore.instance.collection('users').doc(useruid).get();
     List<dynamic> visitedlist = user['visited'];
     List<dynamic> favoritelist = user['favorite'];
 
@@ -91,46 +88,44 @@ class _SearchscreenState extends State<Searchscreen> {
     return [data, favoritelist];
   }
 
-
-  Widget visitedstock(Size size)  {
+  Widget visitedstock(Size size) {
     return FutureBuilder<List<dynamic>>(
-      future: _getvisitedstockanddata(),
-      builder: (BuildContext context,
-          AsyncSnapshot<List<dynamic>> snapshot){
-        if(snapshot.connectionState == ConnectionState.done){
-          List<dynamic> visitedstocklist = snapshot.data ?? [];
-          return visitedstockview(size, visitedstocklist[0], visitedstocklist[1]);
-          }else{
-          return Center(child: CircularProgressIndicator());
+        future: _getvisitedstockanddata(),
+        builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            List<dynamic> visitedstocklist = snapshot.data ?? [];
+            return visitedstockview(
+                size, visitedstocklist[0], visitedstocklist[1]);
+          } else {
+            return Center(child: CircularProgressIndicator());
           }
-            }
-    );
+        });
   }
 
-  Widget favoritestock(Size size, bool res){
+  Widget favoritestock(Size size, bool res) {
     String val;
-    if(res == true){
+    if (res == true) {
       val = "on";
-    }else{
+    } else {
       val = "off";
     }
     return Container(
-        child : SvgPicture.asset('assets/icons/searchstar${val}.svg',
-            width : size.width * 0.05)
-    );
+        child: SvgPicture.asset('assets/icons/searchstar${val}.svg',
+            width: size.width * 0.05));
   }
 
-  Widget visitedstockview(Size size, List<Map<String, dynamic>>? visitedlist, List<dynamic> favoritelist){
-    List<Map<String,dynamic>> stocklist = visitedlist!.reversed.toList();
-    if (stocklist == null){
+  Widget visitedstockview(Size size, List<Map<String, dynamic>>? visitedlist,
+      List<dynamic> favoritelist) {
+    List<Map<String, dynamic>> stocklist = visitedlist!.reversed.toList();
+    if (stocklist == null) {
       return Text('최근 조회 목록 없음');
-    }else {
+    } else {
       return Positioned(
-          top: size.width * 0.2,
-          left : size.width * 0.03,
+          top: size.width * 0.27,
+          left: size.width * 0.03,
           child: SizedBox(
               height: size.height * 0.8,
-              width: size.width*0.94,
+              width: size.width * 0.94,
               child: ListView.builder(
                 scrollDirection: Axis.vertical,
                 itemCount: visitedlist.length,
@@ -139,110 +134,121 @@ class _SearchscreenState extends State<Searchscreen> {
 
                   // index -= 1;
                   bool initstar;
-                  if(favoritelist.contains(stocklist[index]['stockName'])){
+                  if (favoritelist.contains(stocklist[index]['stockName'])) {
                     initstar = true;
-                  }else{
+                  } else {
                     initstar = false;
                   }
                   return Column(
                     children: [
-                  Container(
-                      height: size.height*0.06,
-                      color:Colors.white,
-                      padding: EdgeInsets.only(left : size.width*0.02),
-                      child :Row(
-                        children: [
-                          InkWell(
-                            child : Container(
-                              width: size.width *0.75,
-                              height: size.height *0.06,
-
-                              child : Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(stocklist[index]['stockName'],
-                                      textAlign: TextAlign.left,
-                                      style: GoogleFonts.notoSans(fontSize: size.width*0.03,
-                                          height: size.width*0.005,
-                                          fontWeight: FontWeight.bold)),
-                                  Text(stocklist[index]['stockCode'],
-                                  style:GoogleFonts.notoSans(fontSize: size.width*0.025,
-                                  fontWeight: FontWeight.normal,
-                                  textStyle : TextStyle(color:Colors.grey[600])),
-                                  )
-                                ],
-                              )
-                            ),
-                            onTap: (){
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) {
-                                    return Stockscreen(
-                                      stockName: stocklist[index]['stockName'],
-                                    );
-                                  },
-                                ),
-                              );
-                            },
-                          ),
-
-                        GestureDetector(
-                          child : favoritestock(size, initstar),
-                          onTap: () async {
-
-                            setState(() {
-                              initstar = !initstar ;
-                            });
-                            if(initstar == false){
-                              await FirebaseFirestore.instance.collection('users')
-                              .doc(FirebaseAuth.instance.currentUser!.uid)
-                                  .update({
-                                "favorite" : FieldValue.arrayRemove([stocklist[index]['stockName']])
+                      Container(
+                          height: size.height * 0.06,
+                          color: Colors.white,
+                          padding: EdgeInsets.only(left: size.width * 0.02),
+                          child: Row(
+                            children: [
+                              InkWell(
+                                child: Container(
+                                    width: size.width * 0.75,
+                                    height: size.height * 0.06,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(stocklist[index]['stockName'],
+                                            textAlign: TextAlign.left,
+                                            style: GoogleFonts.notoSans(
+                                                fontSize: size.width * 0.03,
+                                                height: size.width * 0.005,
+                                                fontWeight: FontWeight.bold)),
+                                        Text(
+                                          stocklist[index]['stockCode'],
+                                          style: GoogleFonts.notoSans(
+                                              fontSize: size.width * 0.025,
+                                              fontWeight: FontWeight.normal,
+                                              textStyle: TextStyle(
+                                                  color: Colors.grey[600])),
+                                        )
+                                      ],
+                                    )),
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) {
+                                        return Stockscreen(
+                                          stockName: stocklist[index]
+                                              ['stockName'],
+                                        );
+                                      },
+                                    ),
+                                  );
+                                },
+                              ),
+                              GestureDetector(
+                                child: favoritestock(size, initstar),
+                                onTap: () async {
+                                  setState(() {
+                                    initstar = !initstar;
                                   });
-                            }else{
-                              await FirebaseFirestore.instance.collection('users')
-                                  .doc(FirebaseAuth.instance.currentUser!.uid)
-                                  .update({
-                                "favorite" : FieldValue.arrayUnion([stocklist[index]['stockName']])
-                              });
-                            }
-                          },
-
-                        ),
-                          VerticalDivider(
-                            color: Colors.grey[200],
-                            thickness: 0.5,
-                          ),SizedBox(width: size.width*0.015),
-                       InkWell(
-                         child : SvgPicture.asset('assets/icons/searchclose.svg',
-                           width : size.width * 0.03,
-                         ),
-                         onTap: () async{
-                           String useruid;
-                           useruid = await FirebaseAuth.instance.currentUser!.uid;
-                           await FirebaseFirestore.instance.collection('users').doc(useruid)
-                           .update({"visited" : FieldValue.arrayRemove([name])});
-                           setState(() {
-                           });
-                         },
-                       )
-
-                        ],
-
+                                  if (initstar == false) {
+                                    await FirebaseFirestore.instance
+                                        .collection('users')
+                                        .doc(FirebaseAuth
+                                            .instance.currentUser!.uid)
+                                        .update({
+                                      "favorite": FieldValue.arrayRemove(
+                                          [stocklist[index]['stockName']])
+                                    });
+                                  } else {
+                                    await FirebaseFirestore.instance
+                                        .collection('users')
+                                        .doc(FirebaseAuth
+                                            .instance.currentUser!.uid)
+                                        .update({
+                                      "favorite": FieldValue.arrayUnion(
+                                          [stocklist[index]['stockName']])
+                                    });
+                                  }
+                                },
+                              ),
+                              VerticalDivider(
+                                color: Colors.grey[200],
+                                thickness: 0.5,
+                              ),
+                              SizedBox(width: size.width * 0.015),
+                              InkWell(
+                                child: SvgPicture.asset(
+                                  'assets/icons/searchclose.svg',
+                                  width: size.width * 0.03,
+                                ),
+                                onTap: () async {
+                                  String useruid;
+                                  useruid = await FirebaseAuth
+                                      .instance.currentUser!.uid;
+                                  await FirebaseFirestore.instance
+                                      .collection('users')
+                                      .doc(useruid)
+                                      .update({
+                                    "visited": FieldValue.arrayRemove([name])
+                                  });
+                                  setState(() {});
+                                },
+                              )
+                            ],
+                          )),
+                      Container(
+                        height: 1.0,
+                        width: size.width,
+                        color: Colors.grey[200],
                       )
-                  ),
-                      Container( height:1.0,
-                        width:size.width,
-                        color:Colors.grey[200],)
                     ],
                   );
-                  },
-              )
-          )
-      );
+                },
+              )));
     }
   }
+
   Widget searchStockList(Size size, List<Map<String, dynamic>> list) {
     return SingleChildScrollView(
       child: Container(
@@ -339,10 +345,12 @@ class _SearchscreenState extends State<Searchscreen> {
       ),
       onTap: () async {
         String useruid = FirebaseAuth.instance.currentUser!.uid;
-        await FirebaseFirestore.instance.collection('users').doc(useruid).update(
-            {
-              "visited" : FieldValue.arrayUnion([stockname])
-            });
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(useruid)
+            .update({
+          "visited": FieldValue.arrayUnion([stockname])
+        });
         Navigator.push(
           context,
           MaterialPageRoute(
