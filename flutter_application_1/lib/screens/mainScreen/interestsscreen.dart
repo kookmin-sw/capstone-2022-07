@@ -7,6 +7,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/Color/color.dart';
 import 'package:flutter_application_1/Components/main_app_bar.dart';
 import 'package:flutter_application_1/Components/setting_button.dart';
 import 'package:flutter_application_1/Components/stockcard.dart';
@@ -53,34 +54,64 @@ class _InterestScreenState extends State<InterestScreen> {
 
   Future<List<Map<String, dynamic>>> customFuture() async {
     var userstockinfo = await _getstockList();
-    var stockinfo = await _getstockInfo(userstockinfo);
-    return stockinfo;
+    if (userstockinfo == null) {
+      return [];
+    } else {
+      var stockinfo = await _getstockInfo(userstockinfo);
+      return stockinfo;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return FutureBuilder<List<Map<String, dynamic>>>(
+    return Scaffold(
+      appBar: mainPageAppBar(
+        context,
+        "관심 종목",
+        SettingButton(context),
+      ),
+      body: FutureBuilder<List<Map<String, dynamic>>>(
         future: customFuture(),
         builder: (BuildContext context,
             AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             List<Map<String, dynamic>> stockcardlist = snapshot.data ?? [];
-            return Scaffold(
-              appBar: mainPageAppBar(
-                context,
-                "관심 종목",
-                SettingButton(context),
-              ),
-              body: Column(
+            if (stockcardlist.isEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.favorite,
+                      color: GREY,
+                      size: size.height * 0.1,
+                    ),
+                    SizedBox(
+                      height: size.height * 0.05,
+                    ),
+                    Text(
+                      "관심 종목이 없습니다.",
+                      style: TextStyle(
+                        fontSize: size.width * 0.07,
+                        color: GREY,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            } else {
+              return Column(
                 children: [
                   Cardlist(size, stockcardlist),
                 ],
-              ),
-            );
+              );
+            }
           } else {
             return Center(child: CircularProgressIndicator());
           }
-        });
+        },
+      ),
+    );
   }
 }

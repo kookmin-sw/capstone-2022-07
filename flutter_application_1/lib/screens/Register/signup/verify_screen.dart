@@ -10,6 +10,7 @@ import 'package:flutter_application_1/screens/Register/registerComponents.dart';
 import 'package:flutter_application_1/screens/Register/signup/register_screen.dart';
 import 'package:flutter_application_1/tool/validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:argon_buttons_flutter/argon_buttons_flutter.dart';
 
 class VerifyScreen extends StatefulWidget {
   VerifyScreen({Key? key}) : super(key: key);
@@ -66,7 +67,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
             ],
           ),
           Text(
-            "링크를 클릭해주세요!",
+            "링크를 클릭해서 인증을 완료하고 아래 버튼을 눌러주세요!",
             style: TextStyle(
               color: Color(0xff0039A4),
             ),
@@ -109,11 +110,48 @@ class _VerifyScreenState extends State<VerifyScreen> {
     );
   }
 
+  Widget resendButton(Size size) {
+    return Center(
+      child: Container(
+        margin: EdgeInsets.only(top: size.height * 0.02),
+        child: ArgonTimerButton(
+          color: Color.fromARGB(255, 48, 94, 180),
+          borderRadius: 10,
+          height: size.height * 0.06,
+          width: size.width * 0.2,
+          onTap: (startTimer, btnState) {
+            if (btnState == ButtonState.Idle) {
+              startTimer(60);
+              FirebaseAuth.instance.currentUser!.sendEmailVerification();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('링크를 다시 보냈습니다!'),
+                ),
+              );
+            }
+          },
+          child: Text(
+            "재전송",
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+          ),
+          loader: (timeLeft) {
+            return Text(
+              "$timeLeft",
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+            );
+          },
+          roundLoadingShape: false,
+        ),
+      ),
+    );
+  }
+
   Widget registerButton(Size size) {
     return Center(
       child: Container(
         height: size.height * 0.06,
-        width: size.width * 0.8,
+        width: size.width * 0.6,
         margin: EdgeInsets.only(top: size.height * 0.02),
         decoration: BoxDecoration(
           color: Color(0xff0039A4),
@@ -121,17 +159,18 @@ class _VerifyScreenState extends State<VerifyScreen> {
         ),
         child: TextButton(
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) {
-                  return RegisterScreen();
-                },
-              ),
-            );
+            if (FirebaseAuth.instance.currentUser!.emailVerified) {
+              authStateChanges(context);
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('이메일 인증이 완료되지 않았습니다.'),
+                ),
+              );
+            }
           },
           child: Text(
-            "회원가입",
+            "인증 완료",
             style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: size.width * 0.035,
@@ -152,14 +191,15 @@ class _VerifyScreenState extends State<VerifyScreen> {
           (timer) async {
             await FirebaseAuth.instance.currentUser!.reload();
             var user = FirebaseAuth.instance.currentUser!;
+            print(user.emailVerified);
             if (user.emailVerified) {
+              timer.cancel();
               setState(
                 () {
                   _isUserEmailVerified = user.emailVerified;
                 },
               );
               authStateChanges(context);
-              timer.cancel();
             }
           },
         );
@@ -191,9 +231,16 @@ class _VerifyScreenState extends State<VerifyScreen> {
               children: [
                 informaion(size),
                 SizedBox(height: size.height * 0.05),
-                decoText(size, "인증번호"),
-                verifyInput(size),
-                registerButton(size),
+                // decoText(size, "인증번호"),
+                // verifyInput(size),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    resendButton(size),
+                    SizedBox(width: size.width * 0.05),
+                    registerButton(size),
+                  ],
+                ),
               ],
             ),
           ),
