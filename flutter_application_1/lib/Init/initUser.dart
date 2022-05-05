@@ -27,7 +27,7 @@ class InitUser extends StatelessWidget {
                 if (snapshot.data) {
                   return StartScreen();
                 } else {
-                  if (FirebaseAuth.instance.currentUser!.emailVerified) {
+                  if (!FirebaseAuth.instance.currentUser!.emailVerified) {
                     return VerifyScreen();
                   } else {
                     return InputNicknameScreen();

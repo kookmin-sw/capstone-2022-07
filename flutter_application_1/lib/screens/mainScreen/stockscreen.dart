@@ -120,6 +120,9 @@ class _StockscreenState extends State<Stockscreen> {
 
       for (int i = 0; i < dayVolume!.length; i++) {
         if (dayTime!.isNotEmpty) {
+          if (dayVolume![i] == null || dayTime![i] == null) {
+            continue;
+          }
           var date =
               DateTime.fromMillisecondsSinceEpoch(dayTime![i].toInt() * 1000);
           dayData.add(_ChartData(date, dayVolume![i].toDouble()));
@@ -144,6 +147,9 @@ class _StockscreenState extends State<Stockscreen> {
 
       for (int i = 0; i < monthVolume!.length; i++) {
         if (monthTime!.isNotEmpty) {
+          if (monthVolume![i] == null || monthTime![i] == null) {
+            continue;
+          }
           var date =
               DateTime.fromMillisecondsSinceEpoch(monthTime![i].toInt() * 1000);
           monthData.add(_ChartData(date, monthVolume![i].toDouble()));
@@ -170,7 +176,7 @@ class _StockscreenState extends State<Stockscreen> {
       print(yearTime);
 
       for (int i = 0; i < yearVolume!.length; i++) {
-        if (yearVolume![i] == null) {
+        if (yearVolume![i] == null || yearTime![i] == null) {
           continue;
         }
         if (yearTime!.isNotEmpty) {
@@ -197,17 +203,8 @@ class _StockscreenState extends State<Stockscreen> {
       tenYearVolume = chart.chartQuotes!.close;
       tenYearTime = chart.chartQuotes!.timestamp;
 
-      int nullCheck = tenYearVolume!.indexWhere((element) => element == null);
-
-      print(nullCheck);
-
-      if (nullCheck != -1) {
-        tenYearVolume!.remove(nullCheck);
-        tenYearTime!.remove(nullCheck);
-      }
-
       for (int i = 0; i < tenYearVolume!.length; i++) {
-        if (tenYearVolume![i] == null) {
+        if (tenYearVolume![i] == null || tenYearTime![i] == null) {
           continue;
         }
         if (tenYearTime!.isNotEmpty) {
@@ -454,7 +451,6 @@ class _StockscreenState extends State<Stockscreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-
             children: [
               Text(
                 //Firebase 적용사항

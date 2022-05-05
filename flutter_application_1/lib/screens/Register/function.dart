@@ -203,6 +203,8 @@ Future<Map<String, dynamic>> fromMap(User firebaseUser) async {
     'lastLogin': DateTime.now().toLocal(),
     "deviceToken": deviceToken,
     'status': true,
+    "favorite": [],
+    "visited": [],
   };
   return firebaseUserdata;
 }

@@ -13,7 +13,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:contained_tab_bar_view/contained_tab_bar_view.dart';
 import 'package:flutter_application_1/Components/numFormat.dart';
 
-
 class Mainscreen extends StatefulWidget {
   Mainscreen({Key? key}) : super(key: key);
 
