@@ -1,45 +1,55 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'dart:async';
+
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_application_1/init.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_application_1/Init/initFirebase.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(MaterialApp(
+      home: SplashPage(),
+    ));
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class SplashPage extends StatefulWidget {
+  SplashPage({Key? key}) : super(key: key);
 
-  Widget initApp(BuildContext context) {
-    return FutureBuilder(
-      future: Firebase.initializeApp(),
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        if (snapshot.hasError) {
-          return Center(
-            child: Text('Firebase load fail', textDirection: TextDirection.ltr),
-          );
-        }
-        if (snapshot.connectionState == ConnectionState.done) {
-          SystemChrome.setSystemUIOverlayStyle(
-            SystemUiOverlayStyle.light.copyWith(
-              statusBarColor: Colors.black, // Color for Android
-              statusBarBrightness: Brightness.light, // for IOS.
+  @override
+  State<SplashPage> createState() => _SplashPageState();
+}
+
+class _SplashPageState extends State<SplashPage> {
+  @override
+  void initState() {
+    super.initState();
+    Timer(
+      Duration(milliseconds: 1500),
+      () {
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (BuildContext context) => (InitFirebase()),
             ),
-          );
-          return MaterialApp(
-            home: Init(),
-          );
-        } else {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        }
+            (route) => false);
       },
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return initApp(context);
+    Size size = MediaQuery.of(context).size;
+    return GetMaterialApp(
+      home: Scaffold(
+        backgroundColor: Color(0xff0039A4),
+        body: SafeArea(
+          child: Center(
+            child: Image.asset(
+              'assets/logos/main.png',
+              width: size.width * 0.5,
+              height: size.height * 0.5,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

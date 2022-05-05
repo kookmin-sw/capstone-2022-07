@@ -144,22 +144,30 @@ Future<void> authStateChanges(BuildContext context) async {
     if (firebaseUserdata != null) {
       if (firebaseUserdata.isNotEmpty) {
         updateLoginTime();
-        if (await firebaseUserdata['nickname'] == "") {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) {
-                return InputNicknameScreen();
-              },
-            ),
-          );
+        if (firebaseUser.emailVerified) {
+          if (await firebaseUserdata['nickname'] == "") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  return InputNicknameScreen();
+                },
+              ),
+            );
+          } else {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  return StartScreen();
+                },
+              ),
+            );
+          }
         } else {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) {
-                return StartScreen();
-              },
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('이메일 인증이 완료되지 않았습니다.'),
             ),
           );
         }
@@ -201,7 +209,9 @@ Future<Map<String, dynamic>> fromMap(User firebaseUser) async {
 
 Future<void> saveUserToFirebase() async {
   CollectionReference users = FirebaseFirestore.instance.collection('users');
-  users.doc(FirebaseAuth.instance.currentUser!.uid).set(await fromMap(FirebaseAuth.instance.currentUser!));
+  users
+      .doc(FirebaseAuth.instance.currentUser!.uid)
+      .set(await fromMap(FirebaseAuth.instance.currentUser!));
 }
 
 void updateLoginTime() async {
@@ -248,5 +258,8 @@ Future<bool> findNickname() async {
 
 Future signOut(BuildContext context) async {
   await FirebaseAuth.instance.signOut();
-  Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+  Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (BuildContext context) => (LoginScreen())),
+      (route) => false);
 }
