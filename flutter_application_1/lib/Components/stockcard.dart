@@ -1,14 +1,9 @@
 // ignore_for_file: prefer_const_literals_to_create_immutables, unnecessary_const, non_constant_identifier_names, prefer_typing_uninitialized_variables, prefer_const_constructors
-
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/screens/mainScreen/stockscreen.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_application_1/Color/color.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_application_1/screens/mainScreen/interestsscreen.dart';
 
 //종목을 카드로 나타냄
 Widget Stockcard(BuildContext context, Size size, String name, var price,

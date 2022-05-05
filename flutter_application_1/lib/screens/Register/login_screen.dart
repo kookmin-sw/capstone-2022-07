@@ -1,11 +1,10 @@
 // ignore_for_file: prefer_const_constructors_in_immutables, unnecessary_new, prefer_const_constructors, prefer_const_literals_to_create_immutables, prefer_final_fields
 
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_application_1/Animation/fade_animation.dart';
+import 'package:flutter_application_1/Components/willPop.dart';
 import 'package:flutter_application_1/screens/Register/function.dart';
 import 'package:flutter_application_1/screens/Register/registerComponents.dart';
-import 'package:flutter_application_1/screens/Register/signin/signin_screen.dart';
 import 'package:flutter_application_1/screens/Register/signup/register_screen.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -179,27 +178,33 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: FadeAnimation(
-          2,
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              logo(size),
-              SizedBox(
-                height: size.height * 0.07,
-              ),
-              Column(
-                children: [
-                  googleLoginButton(size),
-                  emailLoginButton(context, size)
-                ],
-              ),
-              alreadyLoginButton(context, size)
-            ],
+    return WillPopScope(
+      onWillPop: () async {
+        bool result = onWillPop();
+        return await Future.value(result);
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: SafeArea(
+          child: FadeAnimation(
+            2,
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                logo(size),
+                SizedBox(
+                  height: size.height * 0.07,
+                ),
+                Column(
+                  children: [
+                    googleLoginButton(size),
+                    emailLoginButton(context, size)
+                  ],
+                ),
+                alreadyLoginButton(context, size)
+              ],
+            ),
           ),
         ),
       ),

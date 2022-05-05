@@ -665,51 +665,50 @@ class _StockscreenState extends State<Stockscreen> {
   Widget build(BuildContext context) {
     print(widget.stockName);
     Size size = MediaQuery.of(context).size;
-    return FutureBuilder(
-      future: getStockInfo(),
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        if (snapshot.hasData) {
-          firebaseStockData = snapshot.data;
-          print(firebaseStockData);
-          if (firebaseStockData["stockPerChange"] > 0) {
-            stockColor = CHART_PLUS;
-          } else if (firebaseStockData["stockPerChange"] < 0) {
-            stockColor = CHART_MINUS;
-          } else if (firebaseStockData["stockPerChange"] == 0) {
-            stockColor = Color.fromARGB(255, 120, 119, 119);
-          }
-
-          return FutureBuilder(
-            // 종목명 - 상위 클래스에서 받아와야함
-            future: chartInit(firebaseStockData["stockCode"]),
-            builder: (BuildContext context, AsyncSnapshot snapshot) {
-              if (dayData.isNotEmpty) {
-                return Scaffold(
-                  appBar: mainAppBar(
-                    context,
-                    "종목 정보",
-                    StarButton(context),
-                  ),
-                  body: SafeArea(
-                    child: SingleChildScrollView(
+    return Scaffold(
+      appBar: mainAppBar(
+        context,
+        "종목 정보",
+        StarButton(context),
+      ),
+      body: SafeArea(
+        child: FutureBuilder(
+          future: getStockInfo(),
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            if (snapshot.hasData) {
+              firebaseStockData = snapshot.data;
+              print(firebaseStockData);
+              if (firebaseStockData["stockPerChange"] > 0) {
+                stockColor = CHART_PLUS;
+              } else if (firebaseStockData["stockPerChange"] < 0) {
+                stockColor = CHART_MINUS;
+              } else if (firebaseStockData["stockPerChange"] == 0) {
+                stockColor = Color.fromARGB(255, 120, 119, 119);
+              }
+              return FutureBuilder(
+                // 종목명 - 상위 클래스에서 받아와야함
+                future: chartInit(firebaseStockData["stockCode"]),
+                builder: (BuildContext context, AsyncSnapshot snapshot) {
+                  if (dayData.isNotEmpty) {
+                    return SingleChildScrollView(
                       child: Column(
                         children: [
                           Stockmain(size),
                           infoTab(size),
                         ],
                       ),
-                    ),
-                  ),
-                );
-              } else {
-                return Center(child: CircularProgressIndicator());
-              }
-            },
-          );
-        } else {
-          return Center(child: CircularProgressIndicator());
-        }
-      },
+                    );
+                  } else {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                },
+              );
+            } else {
+              return Center(child: CircularProgressIndicator());
+            }
+          },
+        ),
+      ),
     );
   }
 }

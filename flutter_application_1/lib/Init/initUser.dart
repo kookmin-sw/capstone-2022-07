@@ -5,10 +5,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_application_1/screens/Register/function.dart';
 import 'package:flutter_application_1/screens/Register/signup/input_nickname_screen.dart';
 import 'package:flutter_application_1/screens/Register/login_screen.dart';
+import 'package:flutter_application_1/screens/Register/signup/verify_screen.dart';
 import 'package:flutter_application_1/screens/mainScreen/start_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class Init extends StatelessWidget {
-  const Init({Key? key}) : super(key: key);
+class InitUser extends StatelessWidget {
+  const InitUser({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -25,11 +27,17 @@ class Init extends StatelessWidget {
                 if (snapshot.data) {
                   return StartScreen();
                 } else {
-                  return InputNicknameScreen();
+                  if (FirebaseAuth.instance.currentUser!.emailVerified) {
+                    return VerifyScreen();
+                  } else {
+                    return InputNicknameScreen();
+                  }
                 }
               } else {
                 return Center(
-                  child: CircularProgressIndicator(),
+                  child: CircularProgressIndicator(
+                    backgroundColor: Colors.white,
+                  ),
                 );
               }
             },
