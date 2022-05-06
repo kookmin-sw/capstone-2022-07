@@ -42,7 +42,7 @@ class _InterestScreenState extends State<InterestScreen> {
 
     for (var element in nlist) {
       var userstockinfo = await firestore
-          .collection('stock_API2')
+          .collection('stock')
           .where("stockName", isEqualTo: "${element}")
           .get();
       stockdata = userstockinfo.docs[0].data();

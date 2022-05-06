@@ -14,6 +14,7 @@ import 'package:yahoofin/yahoofin.dart';
 import 'dart:math';
 import 'package:contained_tab_bar_view/contained_tab_bar_view.dart';
 import 'package:flutter_application_1/Components/numFormat.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Stockscreen extends StatefulWidget {
   Stockscreen({
@@ -66,8 +67,7 @@ class _StockscreenState extends State<Stockscreen> {
   List<Map<String, dynamic>> newsDataList = [];
 
   Future getStockInfo() async {
-    CollectionReference stocks =
-        FirebaseFirestore.instance.collection('stock_API2');
+    CollectionReference stocks = FirebaseFirestore.instance.collection('stock');
     QuerySnapshot stockData =
         await stocks.where('stockName', isEqualTo: widget.stockName).get();
 
@@ -539,9 +539,11 @@ class _StockscreenState extends State<Stockscreen> {
                     ? stockdetail(size, stockIcon[index],
                         stockInfodetail[index], stockValue[index])
                     : stockNews(
+                        size,
                         newsDataList[index]["title"],
-                        newsDataList[index]["content"],
-                        newsDataList[index]["distinction"]));
+                        // newsDataList[index]["content"],
+                        newsDataList[index]["label"],
+                        newsDataList[index]["url"]));
               },
               separatorBuilder: (BuildContext context, int index) =>
                   const Divider(color: GREY),
@@ -596,52 +598,80 @@ class _StockscreenState extends State<Stockscreen> {
     );
   }
 
-  Widget stockNews(String title, String content, int result) {
+  Future<void> _launchInWebViewOrVC(Uri url) async {
+    if (!await launchUrl(
+      url,
+      mode: LaunchMode.inAppWebView,
+      webViewConfiguration: const WebViewConfiguration(
+          headers: <String, String>{'my_header_key': 'my_header_value'}),
+    )) {
+      throw 'Could not launch $url';
+    }
+  }
+
+  Widget stockNews(Size size, String title, String result, String url) {
     // String? 에러
     if (title == null) {
       return SizedBox();
     }
-    if (content == null) {
-      return SizedBox();
-    }
+    // if (content == null) {
+    //   return SizedBox();
+    // }
 
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              title,
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            newsResult(result),
-          ],
-        ),
-        SizedBox(
-          height: 2,
-        ),
-        Text(
-          content,
-          style: TextStyle(
-              fontWeight: FontWeight.normal, color: Color(0xff888888)),
-        )
-      ],
+    Uri uri = Uri.parse(url);
+
+    return GestureDetector(
+      onTap: () async {
+        await _launchInWebViewOrVC(uri);
+      },
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(
+                width: size.width * 0.6,
+                child: Text(
+                  title,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              newsResult(result),
+            ],
+          ),
+          SizedBox(
+            height: 2,
+          ),
+          // Text(
+          //   content,
+          //   style: TextStyle(
+          //       fontWeight: FontWeight.normal, color: Color(0xff888888)),
+          // )
+        ],
+      ),
     );
   }
 
-  Widget newsResult(int result) {
+  Widget newsResult(String result) {
     var resultColor;
     var resultBackgrouncolor;
     if (result == null) {
       return Container();
     }
-    if (result == 1) {
+    if (result == "2") {
       resultColor = Color(0xff0EBD8D);
       resultBackgrouncolor = Color(0xffE7F9F4);
-    } else if (result == 0) {
+    } else if (result == "1") {
       resultColor = Color(0xffEF3641);
       resultBackgrouncolor = Color(0xffF9E7E7);
+      resultColor = GREY;
+      resultBackgrouncolor = Color.fromARGB(255, 185, 185, 185);
+    } else {
+      resultColor = GREY;
+      resultBackgrouncolor = Color.fromARGB(255, 185, 185, 185);
     }
+
     return Container(
       padding: EdgeInsets.symmetric(vertical: 2, horizontal: 5),
       decoration: BoxDecoration(
@@ -654,7 +684,7 @@ class _StockscreenState extends State<Stockscreen> {
         color: resultBackgrouncolor,
       ),
       child: Text(
-        (result == 1) ? "호재" : "악재",
+        (result == "0" ? "중립" : (result == "2" ? "호재" : "악재")),
         style: TextStyle(
           color: resultColor,
         ),
