@@ -19,8 +19,8 @@ api_decode_key_stock = requests.utils.unquote(
 )  # api decode code
 
 # Naver client key
-client_id= "4NnYXQRzNVwTEO2_rwpd"
-client_secret = "mZP8JBDOBK"
+client_id= "UbpsmtlCKuB3eb0dxGgw"
+client_secret = "CRmEzrXlb7"
 now = datetime.now()
 
 # 시간 측정 함수
@@ -87,7 +87,7 @@ def search_crawl(tuple_list,query):
                 "다음주", "슈퍼주총", "공모주", "돋보기", "週間", "증권주"]
 
     page = 1
-    maxpage = 1
+    maxpage = 11
     # 11= 2페이지 21=3페이지 31=4페이지  ...81=9페이지 , 91=10페이지, 101=11페이지
     maxpage_t = (int(maxpage) - 1) * 10 + 1
     sort = 0 #0=관련도순 1=최신순 
@@ -1146,7 +1146,7 @@ def run():
 
 
     tuple_list.append(('title','label'))
-    for query in cospi[266:942]:
+    for query in cospi[0:600]:
         search_crawl(tuple_list, query)
 
 
