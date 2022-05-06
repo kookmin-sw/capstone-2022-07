@@ -14,6 +14,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_application_1/Components/numFormat.dart';
 
 class Searchscreen extends StatefulWidget {
   Searchscreen({Key? key}) : super(key: key);
@@ -293,7 +294,7 @@ class _SearchscreenState extends State<Searchscreen> {
     } else {
       color = GREY;
     }
-
+    stockprice = intlprice.format(stockprice);
     return GestureDetector(
       child: Container(
         width: size.width * 0.9,
