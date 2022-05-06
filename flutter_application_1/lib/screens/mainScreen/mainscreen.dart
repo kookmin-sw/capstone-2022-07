@@ -292,7 +292,7 @@ class _MainscreenState extends State<Mainscreen> {
     } else {
       color = GREY;
     }
-    stockprice = intlmarket.format(stockprice);
+    stockprice = intlprice.format(stockprice);
     stockperc = intlperc.format(stockperc) + "%";
     return GestureDetector(
       child: Container(
