@@ -10,7 +10,7 @@ IconButton SettingButton(BuildContext context) {
       // Navigator.pop(context);
       signOut(context);
     },
-    icon: Icon(Icons.settings),
+    icon: Icon(Icons.notifications_none),
     color: Colors.black,
   );
 }
