@@ -6,10 +6,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Components/setting_button.dart';
 import 'package:flutter_application_1/screens/mainScreen/stockscreen.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_application_1/Components/main_app_bar.dart';
 import 'package:flutter_application_1/Color/color.dart';
-import 'package:flutter_application_1/Components/stock_list.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -53,12 +51,14 @@ class _SearchscreenState extends State<Searchscreen> {
         top: size.width * 0.2,
         left: size.width * 0.04,
         height: size.height * 0.04,
-        // color:Colors.grey[100],
+
         child: Text('최근 조회 종목',
             style: GoogleFonts.notoSans(
                 fontSize: size.width * 0.025,
                 fontWeight: FontWeight.bold,
-                height: size.width * 0.005)));
+                height: size.width * 0.005))
+
+    );
   }
 
   //주식 정보를 가져옴
@@ -106,13 +106,19 @@ class _SearchscreenState extends State<Searchscreen> {
   Widget favoritestock(Size size, bool res) {
     String val;
     if (res == true) {
-      val = "on";
+      return Container(
+          child: Icon(
+            Icons.star_outlined,
+              color : Colors.amber
+          ));
     } else {
-      val = "off";
+      return Container(
+          child: Icon(
+            Icons.star_outline,
+            color : Colors.amber
+          ));
     }
-    return Container(
-        child: SvgPicture.asset('assets/icons/searchstar${val}.svg',
-            width: size.width * 0.05));
+
   }
 
   Widget visitedstockview(Size size, List<Map<String, dynamic>>? visitedlist,
@@ -217,11 +223,9 @@ class _SearchscreenState extends State<Searchscreen> {
                                 color: Colors.grey[200],
                                 thickness: 0.5,
                               ),
-                              SizedBox(width: size.width * 0.015),
                               InkWell(
-                                child: SvgPicture.asset(
-                                  'assets/icons/searchclose.svg',
-                                  width: size.width * 0.03,
+                                child: Icon(
+                                  Icons.close,
                                 ),
                                 onTap: () async {
                                   String useruid;

@@ -6,7 +6,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_application_1/Components/star_button.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+
 import 'package:flutter_application_1/Color/color.dart';
 import 'package:flutter_application_1/Components/main_app_bar.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -557,17 +557,17 @@ class _StockscreenState extends State<Stockscreen> {
     );
   }
 
-  Widget stockdetail(Size size, String Icon, String Infodetail, String Value) {
+  Widget stockdetail(Size size, String Iconlist, String Infodetail, String Value) {
     return Container(
       margin:
           EdgeInsets.only(bottom: size.height * 0.03, top: size.height * 0.03),
       child: Row(
         children: [
-          SizedBox(
-              width: size.width * 0.04,
-              height: size.width * 0.04,
-              child: (SvgPicture.asset('assets/icons/stock$Icon.svg',
-                  semanticsLabel: '$stockIcon', color: CHART_MINUS))),
+          
+          //Firebase 적용사항
+          Icon(
+                Icons.check_box_outlined
+              ),
           SizedBox(width: size.width * 0.02),
           Text(
             Infodetail,

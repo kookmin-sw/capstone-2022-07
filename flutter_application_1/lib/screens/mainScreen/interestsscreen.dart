@@ -14,7 +14,6 @@ import 'package:flutter_application_1/Components/setting_button.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_application_1/screens/Register/function.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_application_1/Components/numFormat.dart';
 import 'package:flutter_application_1/screens/mainScreen/stockscreen.dart';
 
@@ -84,15 +83,13 @@ class _InterestScreenState extends State<InterestScreen> {
       decoration: const BoxDecoration(
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(8),
-          topRight: const Radius.circular(8),
+          topRight:  Radius.circular(8),
           bottomLeft: Radius.circular(8),
           bottomRight: Radius.circular(8),
         ),
         boxShadow: [
           BoxShadow(
-              color: Color.fromRGBO(255, 255, 255, 0.25),
-              offset: Offset(0, 4),
-              blurRadius: 4)
+              color: Colors.grey, offset: Offset(1, 1), blurRadius: 1)
         ],
         color: Color.fromRGBO(255, 255, 255, 1),
       ),
@@ -108,8 +105,9 @@ class _InterestScreenState extends State<InterestScreen> {
               children: [
                 Container(
                   margin: EdgeInsets.only(right: size.width * 0.03),
-                  child: SvgPicture.asset('assets/icons/vectorcheckbox.svg',
-                      semanticsLabel: 'vectorcheckbox'),
+                  child: Icon(
+                    Icons.featured_play_list_outlined
+                  ),
                 ),
                 Expanded(
                   child: Text(
@@ -126,7 +124,9 @@ class _InterestScreenState extends State<InterestScreen> {
                   ),
                 ),
                 InkWell(
-                  child: SvgPicture.asset('assets/icons/vectorcross.svg'),
+                  child: Icon(
+                    Icons.close
+                  ),
                   onTap: () async {
                     setState((){});
                     await FirebaseFirestore.instance
@@ -217,7 +217,7 @@ class _InterestScreenState extends State<InterestScreen> {
                   ],
                 ),
               ),
-              SizedBox(height: size.height * 0.01),
+              SizedBox(height: size.height * 0.001),
               Container(
                 padding: EdgeInsets.only(left: size.width * 0.01),
                 child: Row(
@@ -306,9 +306,11 @@ class _InterestScreenState extends State<InterestScreen> {
                                   height: 1.2),
                             ),
                             SizedBox(width: size.width * 0.03),
-                            SvgPicture.asset(
-                                'assets/icons/vectorstroketoright.svg',
-                                semanticsLabel: 'vectorstroketoright')
+                            Icon(
+                              Icons.keyboard_arrow_right_sharp,
+                              size: size.width*0.05,
+                              color : Colors.black
+                            )
                           ],
                         ),
                       ),

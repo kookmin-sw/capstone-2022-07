@@ -7,6 +7,7 @@ import 'package:flutter_application_1/screens/mainScreen/interestsscreen.dart';
 import 'package:flutter_application_1/screens/mainScreen/mainscreen.dart';
 import 'package:flutter_application_1/screens/mainScreen/searchscreen.dart';
 import 'package:flutter_application_1/screens/mainScreen/profilescreen.dart';
+import 'package:flutter_application_1/screens/mainScreen/stockscreen.dart';
 import 'package:get/get.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:badges/badges.dart';
@@ -62,7 +63,7 @@ class _StartScreenState extends State<StartScreen> {
                     iconSize: 24,
                     padding: padding,
                     icon: Icons.home,
-                    text: 'Home',
+                    text: '홈',
                   ),
                   GButton(
                     gap: gap,
@@ -72,7 +73,7 @@ class _StartScreenState extends State<StartScreen> {
                     backgroundColor: Color(0xff0039A4).withOpacity(.2),
                     iconSize: 24,
                     padding: padding,
-                    icon: Icons.favorite,
+                    icon: Icons.star_outlined,
                     leading: selectedIndex == 1 || badge == 0
                         ? null
                         : Badge(
@@ -90,7 +91,7 @@ class _StartScreenState extends State<StartScreen> {
                                   : Colors.black,
                             ),
                           ),
-                    text: 'Likes',
+                    text: '관심종목',
                   ),
                   GButton(
                     gap: gap,
@@ -101,7 +102,7 @@ class _StartScreenState extends State<StartScreen> {
                     iconSize: 24,
                     padding: padding,
                     icon: Icons.search,
-                    text: 'Search',
+                    text: '종목 검색',
                   ),
                   GButton(
                     gap: gap,
@@ -118,7 +119,7 @@ class _StartScreenState extends State<StartScreen> {
                     //   //   'https://sooxt98.space/content/images/size/w100/2019/01/profile.png',
                     //   // ),
                     // ),
-                    text: 'User',
+                    text: '프로필',
                   ),
                 ],
                 selectedIndex: selectedIndex,
