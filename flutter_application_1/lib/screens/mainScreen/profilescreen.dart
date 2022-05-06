@@ -6,7 +6,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Components/setting_button.dart';
 import 'package:flutter_application_1/screens/Register/function.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_application_1/Components/main_app_bar.dart';
 import 'package:flutter_application_1/Color/Color.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -73,8 +72,7 @@ class _ProfilescreenState extends State<Profilescreen> {
         height: size.height * 0.07,
         child: Row(
           children: [
-            SvgPicture.asset('assets/icons/profilealarm.svg',
-                width: size.height * 0.04, color: CHART_MINUS),
+            Icon(Icons.notifications_none, color: CHART_MINUS),
             SizedBox(width: size.width * 0.04),
             Text(
               '알람 설정',
@@ -113,8 +111,7 @@ class _ProfilescreenState extends State<Profilescreen> {
           height: size.height * 0.07,
           child: Row(
             children: [
-              SvgPicture.asset('assets/icons/profilelogout.svg',
-                  width: size.height * 0.04, color: CHART_MINUS),
+              Icon(Icons.logout, color: CHART_MINUS),
               SizedBox(width: size.width * 0.04),
               Text(
                 '로그아웃',
