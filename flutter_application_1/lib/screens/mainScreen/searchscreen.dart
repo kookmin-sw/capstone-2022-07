@@ -67,7 +67,7 @@ class _SearchscreenState extends State<Searchscreen> {
 
     for (var element in list) {
       var userstockinfo = await FirebaseFirestore.instance
-          .collection('stock_API2')
+          .collection('stock')
           .where("stockName", isEqualTo: "${element}")
           .get();
       stockdata = userstockinfo.docs[0].data();
@@ -388,7 +388,7 @@ class _SearchscreenState extends State<Searchscreen> {
       builder: (context, transition) {
         return StreamBuilder(
           stream: FirebaseFirestore.instance
-              .collection('stock_API2')
+              .collection('stock')
               .where("stockName", isGreaterThanOrEqualTo: selectedTerm)
               .where("stockName", isLessThanOrEqualTo: selectedTerm + "\uF7FF")
               .snapshots(),

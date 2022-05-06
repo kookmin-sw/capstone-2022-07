@@ -29,7 +29,7 @@ class _MainscreenState extends State<Mainscreen> {
       List<Map<String, dynamic>> negativeList,
       List<Map<String, dynamic>> mainList) async {
     await firestore
-        .collection('stock_API2')
+        .collection('stock')
         .orderBy("stockPerChange",
             descending: true) // stockPerChange -> DailyNewsCount
         .limit(5)
@@ -44,7 +44,7 @@ class _MainscreenState extends State<Mainscreen> {
     );
 
     await firestore
-        .collection('stock_API2')
+        .collection('stock')
         .orderBy(
           "stockPerChange",
         )
@@ -67,7 +67,7 @@ class _MainscreenState extends State<Mainscreen> {
     );
 
     await firestore
-        .collection('stock_API2')
+        .collection('stock')
         .orderBy("TimePerPositiveNewsCount", descending: true)
         .limit(5)
         .get()
@@ -81,7 +81,7 @@ class _MainscreenState extends State<Mainscreen> {
     );
 
     await firestore
-        .collection('stock_API2')
+        .collection('stock')
         .orderBy("TimePerNegativeNewsCount", descending: true)
         .limit(5)
         .get()
@@ -98,9 +98,9 @@ class _MainscreenState extends State<Mainscreen> {
   }
 
   Future<void> _getMainList(List<Map<String, dynamic>?> list) async {
-    var docSnapshot = await firestore.collection('stock_API2').doc("코스피").get();
+    var docSnapshot = await firestore.collection('stock').doc("코스피").get();
     list.add(docSnapshot.data());
-    docSnapshot = await firestore.collection('stock_API2').doc("코스닥").get();
+    docSnapshot = await firestore.collection('stock').doc("코스닥").get();
     list.add(docSnapshot.data());
   }
 
