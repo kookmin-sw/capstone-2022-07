@@ -118,8 +118,8 @@ class _SearchscreenState extends State<Searchscreen> {
   Widget visitedstockview(Size size, List<Map<String, dynamic>>? visitedlist,
       List<dynamic> favoritelist) {
     List<Map<String, dynamic>> stocklist = visitedlist!.reversed.toList();
-    if (stocklist == null) {
-      return Text('최근 조회 목록 없음');
+    if (stocklist.isEmpty) {
+      return Container();
     } else {
       return Positioned(
           top: size.width * 0.27,
