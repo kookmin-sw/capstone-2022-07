@@ -654,6 +654,7 @@ class _StockscreenState extends State<Stockscreen> {
       url,
       mode: LaunchMode.inAppWebView,
       webViewConfiguration: const WebViewConfiguration(
+          enableJavaScript: false,
           headers: <String, String>{'my_header_key': 'my_header_value'}),
     )) {
       throw 'Could not launch $url';
@@ -713,11 +714,9 @@ class _StockscreenState extends State<Stockscreen> {
     if (result == "2") {
       resultColor = Color(0xff0EBD8D);
       resultBackgrouncolor = Color(0xffE7F9F4);
-    } else if (result == "1") {
+    } else if (result == "0") {
       resultColor = Color(0xffEF3641);
       resultBackgrouncolor = Color(0xffF9E7E7);
-      resultColor = GREY;
-      resultBackgrouncolor = Color.fromARGB(255, 185, 185, 185);
     } else {
       resultColor = GREY;
       resultBackgrouncolor = Color.fromARGB(255, 185, 185, 185);
@@ -735,7 +734,7 @@ class _StockscreenState extends State<Stockscreen> {
         color: resultBackgrouncolor,
       ),
       child: Text(
-        (result == "0" ? "중립" : (result == "2" ? "호재" : "악재")),
+        (result == "0" ? "악재" : (result == "2" ? "호재" : "중립")),
         style: TextStyle(
           color: resultColor,
         ),
