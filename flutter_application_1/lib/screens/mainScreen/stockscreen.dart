@@ -5,9 +5,8 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_constructors_in_immutables, non_constant_identifier_names, prefer_const_literals_to_create_immutables, prefer_typing_uninitialized_variables
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_application_1/Color/Color.dart';
 import 'package:flutter_application_1/Components/star_button.dart';
-
-import 'package:flutter_application_1/Color/color.dart';
 import 'package:flutter_application_1/Components/main_app_bar.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:yahoofin/yahoofin.dart';
@@ -283,7 +282,8 @@ class _StockscreenState extends State<Stockscreen> {
               firebaseStockData["stockName"],
               firebaseStockData["stockCode"],
               firebaseStockData["stockPrice"],
-              firebaseStockData["stockPerChange"]),
+              firebaseStockData["stockPerChange"],
+              firebaseStockData["stockChange"]),
           chartTab(size),
         ],
       ),
@@ -441,10 +441,10 @@ class _StockscreenState extends State<Stockscreen> {
   }
 
   Widget Stockinfo(Size size, String stockName, String stockCode,
-      var stockPrice, var stockPerc) {
+      var stockPrice, var stockPerc, var stockChange) {
     stockPrice = intlprice.format(stockPrice);
     stockPerc = intlperc.format(stockPerc) + "%";
-
+    stockChange = intlprice.format(stockChange.abs());
     return Container(
       padding: EdgeInsets.all(size.width * 0.05),
       child: Column(
@@ -474,34 +474,83 @@ class _StockscreenState extends State<Stockscreen> {
             ],
           ),
           SizedBox(height: size.height * 0.01),
-          Text(
-            //Firebase 적용사항
-            stockPrice.toString(),
-            style: TextStyle(
-              color: stockColor,
-              fontFamily: 'Content',
-              fontSize: size.width * 0.06,
-              letterSpacing: 0,
-              fontWeight: FontWeight.bold,
-              height: 1,
-            ),
-          ),
           Container(
-            margin: EdgeInsets.only(top: size.height * 0.005),
-            child: Text(
-              //Firebase 적용사항
-              stockPerc.toString(),
-              textAlign: TextAlign.left,
-              style: TextStyle(
-                color: stockColor,
-                fontFamily: 'Content',
-                fontSize: size.width * 0.04,
-                letterSpacing: 0,
-                fontWeight: FontWeight.normal,
-                height: 1,
-              ),
-            ),
+            child : Row(
+              children: [
+
+                Text(
+                  //Firebase 적용사항
+                  stockPrice.toString(),
+                  style: TextStyle(
+                    color: stockColor,
+                    fontFamily: 'Content',
+                    fontSize: size.width * 0.06,
+                    letterSpacing: 0,
+                    fontWeight: FontWeight.bold,
+                    height: 1,
+                  ),
+
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+
+                  children: [
+                    Container(
+                      height: size.width*0.047,
+                      width :size.width*0.047,
+                      // color:Colors.black,
+                          child :
+                          Icon((
+                          () {
+                          if(stockColor == CHART_PLUS){
+                            return Icons.arrow_drop_up_outlined;
+                          }else if(stockColor ==CHART_MINUS){
+                            return Icons.arrow_drop_down_outlined;
+                          }else {
+                            return Icons.remove;
+                          }
+                          })(),
+                          color : stockColor,
+                          )
+                    ),
+
+
+                    Text(
+                      //Firebase 적용사항
+
+                      stockChange.toString(),
+                      style: TextStyle(
+                        color: stockColor,
+                        fontFamily: 'Content',
+                        fontSize: size.width * 0.03,
+                        letterSpacing: 0,
+                        fontWeight: FontWeight.normal,
+                        // height: 3,
+                      ),
+
+                    ),
+                    Text(
+                      //Firebase 적용사항
+                      "(${stockPerc.toString()})",
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                        color: stockColor,
+                        fontFamily: 'Content',
+                        fontSize: size.width * 0.03,
+                        letterSpacing: 0,
+                        fontWeight: FontWeight.normal,
+                        // height: 3,
+                      ),
+                    ),
+                  ],
+                )
+
+
+              ],
+            )
           ),
+
+
         ],
       ),
     );
@@ -708,7 +757,6 @@ class _StockscreenState extends State<Stockscreen> {
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (snapshot.hasData) {
               firebaseStockData = snapshot.data;
-              print(firebaseStockData);
               if (firebaseStockData["stockPerChange"] > 0) {
                 stockColor = CHART_PLUS;
               } else if (firebaseStockData["stockPerChange"] < 0) {
