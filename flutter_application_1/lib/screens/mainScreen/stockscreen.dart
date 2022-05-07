@@ -65,6 +65,7 @@ class _StockscreenState extends State<Stockscreen> {
   Map<String, dynamic> firebaseStockData = {};
   List<Map<String, dynamic>> newsDataList = [];
 
+
   Future getStockInfo() async {
     CollectionReference stocks = FirebaseFirestore.instance.collection('stock');
     QuerySnapshot stockData =
@@ -92,6 +93,7 @@ class _StockscreenState extends State<Stockscreen> {
       return stockData.docs[0].data();
     }
   }
+
 
   //Firebase 적용사항
   List<String> stockIcon = <String>[
@@ -741,16 +743,13 @@ class _StockscreenState extends State<Stockscreen> {
     );
   }
 
+
+
   @override
   Widget build(BuildContext context) {
-    print(widget.stockName);
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: mainAppBar(
-        context,
-        "종목 정보",
-        StarButton(context),
-      ),
+      appBar: StockScreenAppBar(widget.stockName),
       body: SafeArea(
         child: FutureBuilder(
           future: getStockInfo(),

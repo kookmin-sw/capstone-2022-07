@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Components/setting_button.dart';
 import 'package:flutter_application_1/screens/mainScreen/stockscreen.dart';
 import 'package:flutter_application_1/Components/main_app_bar.dart';
-import 'package:flutter_application_1/Color/color.dart';
+import 'package:flutter_application_1/Color/Color.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -104,7 +104,7 @@ class _SearchscreenState extends State<Searchscreen> {
   }
 
   Widget favoritestock(Size size, bool res) {
-    String val;
+
     if (res == true) {
       return Container(
           child: Icon(

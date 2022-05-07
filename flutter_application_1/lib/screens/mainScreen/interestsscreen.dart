@@ -268,7 +268,7 @@ class _InterestScreenState extends State<InterestScreen> {
                               );
                             },
                           ),
-                        );
+                        ).then((_) => setState((){}));
                       },
                       child: Container(
                         padding: EdgeInsets.symmetric(
