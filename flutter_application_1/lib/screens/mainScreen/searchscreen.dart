@@ -38,8 +38,8 @@ class _SearchscreenState extends State<Searchscreen> {
           height: size.height,
           width: size.width,
           child: Stack(children: [
-            visitedstock(size),
             visitedtitle(size),
+            visitedstock(size),
             buildFloatingSearchBar(context, size),
           ])),
     );
@@ -95,8 +95,25 @@ class _SearchscreenState extends State<Searchscreen> {
         builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             List<dynamic> visitedstocklist = snapshot.data ?? [];
-            return visitedstockview(
-                size, visitedstocklist[0], visitedstocklist[1]);
+            if(visitedstocklist[0].isEmpty){
+              return Stack(
+                children: [
+                  Positioned(
+                      top: size.width * 0.2,
+                      left: size.width * 0.04,
+                      child:Container(
+                          width :size.width*0.15, height: size.height*0.03, color: Color.fromRGBO(249, 249, 249, 1))),
+                  Center(child : Text('최근 조회한 종목이 없습니다.',
+                    style: TextStyle(
+                      fontSize: size.width * 0.05,
+                      color: GREY,
+                    ),))
+                ],
+              );
+            }else{
+              return visitedstockview(
+                  size, visitedstocklist[0], visitedstocklist[1]);
+            }
           } else {
             return Center(child: CircularProgressIndicator());
           }
@@ -146,6 +163,18 @@ class _SearchscreenState extends State<Searchscreen> {
                   } else {
                     initstar = false;
                   }
+                  late Color stockColor;
+                  if(stocklist[index]['stockPerChange'] > 0){
+                    stockColor = CHART_PLUS;
+                  }else if(stocklist[index]['stockPerChange'] < 0){
+                    stockColor = CHART_MINUS;
+                  }else{
+                    stockColor = Color.fromARGB(255, 120, 119, 119);
+                  }
+                  String stockPrice = intlprice.format(stocklist[index]['stockPrice']);
+                  String stockChange = intlprice.format(stocklist[index]['stockChange'].abs()) ;
+                  String stockPerChange = intlperc.format(stocklist[index]['stockPerChange']) + "%" ;
+
                   return Column(
                     children: [
                       Container(
@@ -156,7 +185,7 @@ class _SearchscreenState extends State<Searchscreen> {
                             children: [
                               InkWell(
                                 child: Container(
-                                    width: size.width * 0.75,
+                                    width: size.width * 0.38,
                                     height: size.height * 0.06,
                                     child: Column(
                                       crossAxisAlignment:
@@ -192,6 +221,90 @@ class _SearchscreenState extends State<Searchscreen> {
                                   );
                                 },
                               ),
+
+                              Container(
+                                width: size.width *0.2,
+                                child : Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                      //stockPrice
+                                    Container(
+                                      child :Text(
+                                      stockPrice,
+                                      style: TextStyle(
+
+                                        fontFamily: 'Content',
+                                        fontSize: size.width * 0.03,
+                                        letterSpacing: 0,
+                                        fontWeight: FontWeight.bold,
+                                        height: 1.5,
+                                      ),
+                                      textAlign: TextAlign.end,
+                                    )),
+                                      //stockPerChange
+                                      Container(
+
+                                        child : Row(
+                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          children: [
+                                            Container(
+                                              child: Icon((
+                                                      () {
+                                                    if(stockColor == CHART_PLUS){
+                                                      return Icons.arrow_drop_up_outlined;
+                                                    }else if(stockColor ==CHART_MINUS){
+                                                      return Icons.arrow_drop_down_outlined;
+                                                    }else {
+                                                      return Icons.remove;
+                                                    }
+                                                  })(),
+                                                color : stockColor,
+                                                size: size.width*0.05
+                                              )
+                                            ),
+                                            Text(
+                                              stockChange,
+                                              style: TextStyle(
+                                                color: stockColor,
+                                                fontFamily: 'Content',
+                                                fontSize: size.width * 0.024,
+                                                letterSpacing: 0,
+                                                fontWeight: FontWeight.normal,
+                                                height: 1,
+                                              ),
+                                            )
+                                          ],
+                                        )
+                                      )
+                                  ],
+                                )
+                              ),
+                              Container(
+                                width : size.width*0.09,
+                                height: size.height*0.03,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(4),
+                                    topRight:  Radius.circular(4),
+                                    bottomLeft: Radius.circular(4),
+                                    bottomRight: Radius.circular(4),
+                                  ),
+                                  color: stockColor,
+                                ),
+                                margin: EdgeInsets.symmetric(vertical: size.height*0.013, horizontal: size.width*0.015),
+                                child : Text(
+                                  stockPerChange,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: size.width*0.02,
+                                    height: 2,
+                                    fontWeight: FontWeight.bold
+                                  )
+                                )
+                              ),
+                              SizedBox(width : size.width*0.05),
                               GestureDetector(
                                 child: favoritestock(size, initstar),
                                 onTap: () async {
@@ -219,10 +332,7 @@ class _SearchscreenState extends State<Searchscreen> {
                                   }
                                 },
                               ),
-                              VerticalDivider(
-                                color: Colors.grey[200],
-                                thickness: 0.5,
-                              ),
+                              SizedBox(width : size.width*0.02),
                               InkWell(
                                 child: Icon(
                                   Icons.close,
@@ -405,8 +515,6 @@ class _SearchscreenState extends State<Searchscreen> {
             } else {
               if (snapshot.data!.docs.length == 0 ||
                   snapshot.data!.docs.length > 300) {
-                print(selectedTerm);
-                print(snapshot.data.docs.length);
                 return Container();
               } else {
                 for (int i = 0; i < snapshot.data!.docs.length; i++) {
