@@ -1,5 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Init/initAlert.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
@@ -8,6 +10,9 @@ class InitDisplayMode extends StatelessWidget {
   const InitDisplayMode({Key? key}) : super(key: key);
 
   Future<bool> initialize() async {
+    if (Platform.isIOS) {
+      return true;
+    }
     final List<DisplayMode> supported = await FlutterDisplayMode.supported;
     final DisplayMode active = await FlutterDisplayMode.active;
 
