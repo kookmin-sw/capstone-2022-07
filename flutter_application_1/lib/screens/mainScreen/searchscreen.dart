@@ -51,14 +51,11 @@ class _SearchscreenState extends State<Searchscreen> {
         top: size.width * 0.2,
         left: size.width * 0.04,
         height: size.height * 0.04,
-
         child: Text('최근 조회 종목',
             style: GoogleFonts.notoSans(
                 fontSize: size.width * 0.025,
                 fontWeight: FontWeight.bold,
-                height: size.width * 0.005))
-
-    );
+                height: size.width * 0.005)));
   }
 
   //주식 정보를 가져옴
@@ -104,21 +101,11 @@ class _SearchscreenState extends State<Searchscreen> {
   }
 
   Widget favoritestock(Size size, bool res) {
-
     if (res == true) {
-      return Container(
-          child: Icon(
-            Icons.star_outlined,
-              color : Colors.amber
-          ));
+      return Container(child: Icon(Icons.star_outlined, color: Colors.amber));
     } else {
-      return Container(
-          child: Icon(
-            Icons.star_outline,
-            color : Colors.amber
-          ));
+      return Container(child: Icon(Icons.star_outline, color: Colors.amber));
     }
-
   }
 
   Widget visitedstockview(Size size, List<Map<String, dynamic>>? visitedlist,
@@ -192,7 +179,7 @@ class _SearchscreenState extends State<Searchscreen> {
                                   );
                                 },
                               ),
-                              GestureDetector(
+                              InkWell(
                                 child: favoritestock(size, initstar),
                                 onTap: () async {
                                   setState(() {

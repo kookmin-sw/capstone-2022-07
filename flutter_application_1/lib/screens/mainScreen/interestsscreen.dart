@@ -63,6 +63,7 @@ class _InterestScreenState extends State<InterestScreen> {
       return stockinfo;
     }
   }
+
   Widget Stockcard(BuildContext context, Size size, String name, var price,
       var stockperc, var volume) {
     Color color;
@@ -83,13 +84,12 @@ class _InterestScreenState extends State<InterestScreen> {
       decoration: const BoxDecoration(
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(8),
-          topRight:  Radius.circular(8),
+          topRight: Radius.circular(8),
           bottomLeft: Radius.circular(8),
           bottomRight: Radius.circular(8),
         ),
         boxShadow: [
-          BoxShadow(
-              color: Colors.grey, offset: Offset(1, 1), blurRadius: 1)
+          BoxShadow(color: Colors.grey, offset: Offset(1, 1), blurRadius: 1)
         ],
         color: Color.fromRGBO(255, 255, 255, 1),
       ),
@@ -103,12 +103,7 @@ class _InterestScreenState extends State<InterestScreen> {
             child: Row(
               mainAxisSize: MainAxisSize.max,
               children: [
-                Container(
-                  margin: EdgeInsets.only(right: size.width * 0.03),
-                  child: Icon(
-                    Icons.featured_play_list_outlined
-                  ),
-                ),
+                SizedBox(width: size.width * 0.03),
                 Expanded(
                   child: Text(
                     name,
@@ -124,19 +119,15 @@ class _InterestScreenState extends State<InterestScreen> {
                   ),
                 ),
                 InkWell(
-                  child: Icon(
-                    Icons.close
-                  ),
+                  child: Icon(Icons.close),
                   onTap: () async {
-                    setState((){});
+                    setState(() {});
                     await FirebaseFirestore.instance
                         .collection('users')
-                        .doc(FirebaseAuth
-                        .instance.currentUser!.uid)
+                        .doc(FirebaseAuth.instance.currentUser!.uid)
                         .update({
-                      "favorite": FieldValue.arrayRemove(
-                          [name])});
-
+                      "favorite": FieldValue.arrayRemove([name])
+                    });
                   },
                 )
               ],
@@ -217,7 +208,7 @@ class _InterestScreenState extends State<InterestScreen> {
                   ],
                 ),
               ),
-              SizedBox(height: size.height * 0.001),
+              SizedBox(height: size.height * 0.015),
               Container(
                 padding: EdgeInsets.only(left: size.width * 0.01),
                 child: Row(
@@ -257,8 +248,8 @@ class _InterestScreenState extends State<InterestScreen> {
                     const Expanded(
                       child: SizedBox(),
                     ),
-                    TextButton(
-                      onPressed: () {
+                    GestureDetector(
+                      onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -268,7 +259,7 @@ class _InterestScreenState extends State<InterestScreen> {
                               );
                             },
                           ),
-                        ).then((_) => setState((){}));
+                        ).then((_) => setState(() {}));
                       },
                       child: Container(
                         padding: EdgeInsets.symmetric(
@@ -276,10 +267,10 @@ class _InterestScreenState extends State<InterestScreen> {
                             vertical: size.height * 0.005),
                         decoration: BoxDecoration(
                           borderRadius: const BorderRadius.only(
-                            topLeft: const Radius.circular(16),
-                            topRight: const Radius.circular(16),
-                            bottomLeft: const Radius.circular(16),
-                            bottomRight: const Radius.circular(16),
+                            topLeft: Radius.circular(16),
+                            topRight: Radius.circular(16),
+                            bottomLeft: Radius.circular(16),
+                            bottomRight: Radius.circular(16),
                           ),
                           color: const Color.fromRGBO(249, 249, 249, 1),
                           boxShadow: [
@@ -306,11 +297,8 @@ class _InterestScreenState extends State<InterestScreen> {
                                   height: 1.2),
                             ),
                             SizedBox(width: size.width * 0.03),
-                            Icon(
-                              Icons.keyboard_arrow_right_sharp,
-                              size: size.width*0.05,
-                              color : Colors.black
-                            )
+                            Icon(Icons.keyboard_arrow_right_sharp,
+                                size: size.width * 0.05, color: Colors.black)
                           ],
                         ),
                       ),

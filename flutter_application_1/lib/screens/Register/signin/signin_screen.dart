@@ -218,7 +218,7 @@ class _SigninScreenState extends State<SigninScreen> {
     );
   }
 
-  Widget googleLoginButton(Size size) {
+  Widget googleLoginButton(BuildContext context, Size size) {
     return Center(
       child: Container(
         height: size.height * 0.06,
@@ -232,7 +232,7 @@ class _SigninScreenState extends State<SigninScreen> {
         ),
         child: TextButton(
           onPressed: () async {
-            await signInWithGoogle();
+            await signInWithGoogle(context);
           },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -290,7 +290,7 @@ class _SigninScreenState extends State<SigninScreen> {
                   passwordInput(size),
                   loginButton(size),
                   devide(size),
-                  googleLoginButton(size),
+                  googleLoginButton(context, size),
                   SizedBox(
                     height: size.height * 0.05,
                   )
