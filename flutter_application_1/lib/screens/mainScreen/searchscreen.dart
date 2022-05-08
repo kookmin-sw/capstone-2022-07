@@ -293,7 +293,7 @@ class _SearchscreenState extends State<Searchscreen> {
                                   ),
                                   color: stockColor,
                                 ),
-                                margin: EdgeInsets.symmetric(vertical: size.height*0.013, horizontal: size.width*0.015),
+                                margin: EdgeInsets.symmetric(vertical: size.height*0.013, horizontal: size.width*0.035),
                                 child : Text(
                                   stockPerChange,
                                   textAlign: TextAlign.center,
@@ -305,7 +305,7 @@ class _SearchscreenState extends State<Searchscreen> {
                                   )
                                 )
                               ),
-                              SizedBox(width : size.width*0.05),
+                              SizedBox(width : size.width*0.03),
                               GestureDetector(
                                 child: favoritestock(size, initstar),
                                 onTap: () async {
