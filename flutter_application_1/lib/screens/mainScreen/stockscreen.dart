@@ -95,18 +95,9 @@ class _StockscreenState extends State<Stockscreen> {
   }
 
 
-  //Firebase 적용사항
-  List<String> stockIcon = <String>[
-    'price',
-    'perc',
-    'eps',
-    'marketcap',
-    'dividend'
-  ];
-  List<String> stockInfodetail = <String>['주가', '주가수익률', '주당순이익', '시가총액', '배당'];
 
   //Firebase 적용사항
-  List<String> stockValue = <String>['', '', '', '', ''];
+
   Future getDayData(String ticker) async {
     var yfin = YahooFin();
     StockHistory hist = yfin.initStockHistory(ticker: ticker);
@@ -334,7 +325,7 @@ class _StockscreenState extends State<Stockscreen> {
     );
   }
 
-  Widget infoTab(Size size) {
+  Widget infoTab(Size size, Map<String, dynamic> firebaseStockData) {
     return Center(
       child: Container(
         width: size.width * 0.9,
@@ -367,8 +358,8 @@ class _StockscreenState extends State<Stockscreen> {
             ),
           ),
           views: [
-            Info(size, '종목 뉴스'),
-            Info(size, '종목 정보'),
+            Info(size, '종목 뉴스', firebaseStockData),
+            Info(size, '종목 정보', firebaseStockData),
           ],
           onChange: (index) {},
         ),
@@ -559,7 +550,23 @@ class _StockscreenState extends State<Stockscreen> {
   }
 
   // 하단 위젯 구성
-  Widget Info(Size size, String msg) {
+  Widget Info(Size size, String msg,  Map<String, dynamic> firebaseStockData ) {
+    List<String> stockIcon = <String>[
+      'stockClosingPrice',
+      'stockHighPrice',
+      'stockLowPrice',
+      'stockVolume',
+      // MUST CHANGE
+      'stockVolume'
+    ];
+    List<String> stockInfodetail = <String>['전일종가', '고가', '저가', '거래량', '시가총액'];
+    List<String> stockValue = [];
+
+    stockIcon.forEach((element) {
+      stockValue.add(intlprice.format(firebaseStockData['${element}']));
+
+    });
+
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.only(
@@ -608,7 +615,7 @@ class _StockscreenState extends State<Stockscreen> {
     );
   }
 
-  Widget stockdetail(Size size, String Iconlist, String Infodetail, String Value) {
+  Widget stockdetail(Size size, String Iconlist, String Infodetail, var Value) {
     return Container(
       margin:
           EdgeInsets.only(bottom: size.height * 0.03, top: size.height * 0.03),
@@ -633,10 +640,10 @@ class _StockscreenState extends State<Stockscreen> {
           ),
           Expanded(
             child: Text(
-              Value,
+              Value.toString(),
               textAlign: TextAlign.right,
               style: TextStyle(
-                  color: Color.fromRGBO(91, 99, 106, 1),
+                  color: Color.fromRGBO(0, 0, 0, 1.0),
                   fontFamily: 'ABeeZee',
                   fontSize: size.width * 0.036,
                   letterSpacing: 0,
@@ -748,7 +755,10 @@ class _StockscreenState extends State<Stockscreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: StockScreenAppBar(widget.stockName),
+      appBar: StockscreenBar(
+          context,
+          "관심 종목",
+          widget.stockName),
       body: SafeArea(
         child: FutureBuilder(
           future: getStockInfo(),
@@ -771,7 +781,7 @@ class _StockscreenState extends State<Stockscreen> {
                       child: Column(
                         children: [
                           Stockmain(size),
-                          infoTab(size),
+                          infoTab(size, firebaseStockData),
                         ],
                       ),
                     );
