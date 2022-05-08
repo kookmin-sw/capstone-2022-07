@@ -247,36 +247,35 @@ class _MainscreenState extends State<Mainscreen> {
   Widget Topstocklist(Size size, List<Map<String, dynamic>> list) {
     // 특정 콜렉션 참조
     return Container(
-            width: size.width * 0.9,
-            height: size.height * 0.25,
-            padding: EdgeInsets.only(top: size.height * 0.01),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(8),
-                topRight: Radius.circular(8),
-                bottomLeft: Radius.circular(8),
-                bottomRight: Radius.circular(8),
-              ),
-              color: Color.fromRGBO(255, 255, 255, 1.0),
-            ),
-            child: ListView.separated(
-              itemCount: 5,
-              physics: NeverScrollableScrollPhysics(),
-              itemBuilder: (BuildContext context, int index) {
-                return Topstock(
-                  size,
-                  list[index]['stockName'],
-                  list[index]['stockPerChange'],
-                  list[index]['stockPrice'],
-                  list[index]['DayNewsCount'],
-                  list[index]['stockCode'],
-                  list[index]['stockChange']
-                );
-              },
-              separatorBuilder: (BuildContext context, int index) =>
-                  const Divider(color: GREY),
-            ),
-          );
+      width: size.width * 0.9,
+      height: size.height * 0.25,
+      padding: EdgeInsets.only(top: size.height * 0.01),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(8),
+          topRight: Radius.circular(8),
+          bottomLeft: Radius.circular(8),
+          bottomRight: Radius.circular(8),
+        ),
+        color: Color.fromRGBO(255, 255, 255, 1.0),
+      ),
+      child: ListView.separated(
+        itemCount: 5,
+        physics: NeverScrollableScrollPhysics(),
+        itemBuilder: (BuildContext context, int index) {
+          return Topstock(
+              size,
+              list[index]['stockName'],
+              list[index]['stockPerChange'],
+              list[index]['stockPrice'],
+              list[index]['DayNewsCount'],
+              list[index]['stockCode'],
+              list[index]['stockChange']);
+        },
+        separatorBuilder: (BuildContext context, int index) =>
+            const Divider(color: GREY),
+      ),
+    );
   }
 
   Widget Topstock(Size size, String stockname, var stockperc, var stockprice,
@@ -301,32 +300,18 @@ class _MainscreenState extends State<Mainscreen> {
         child: Row(
           children: [
             Container(
-              child : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                stockname, //Firebase 적용사항
-                style: TextStyle(
-                    color: Color.fromRGBO(0, 0, 0, 1),
-                    fontFamily: 'ABeeZee',
-                    fontSize: size.width * 0.025,
-                    fontWeight: FontWeight.bold,
-                    height : size.height*0.002,
-                    overflow : TextOverflow.ellipsis)),
-              Text(
-                stockCode,
-                style: TextStyle(
-                    color: Colors.grey[600],
-                    fontFamily: 'ABeeZee',
-                    fontSize: size.width * 0.02,
-                    height : size.height*0.002,
-                    fontWeight: FontWeight.normal),
-                // textAlign: TextAlign.left,
-              ),
-
-          ],
-        )
-            ),
+                child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(stockname, //Firebase 적용사항
+                    style: TextStyle(
+                        color: Color.fromRGBO(0, 0, 0, 1),
+                        fontFamily: 'ABeeZee',
+                        fontWeight: FontWeight.bold,
+                        height: size.height * 0.002,
+                        overflow: TextOverflow.ellipsis)),
+              ],
+            )),
             Expanded(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -335,75 +320,66 @@ class _MainscreenState extends State<Mainscreen> {
                     child: Column(
                       children: [
                         Text(
-                          '$stockprice'
-                          , //Firebase 적용사항
+                          '$stockprice', //Firebase 적용사항
                           style: TextStyle(
                               color: Color.fromRGBO(0, 0, 0, 1),
                               fontFamily: 'Content',
                               fontSize: size.width * 0.025,
                               fontWeight: FontWeight.bold,
-                              height:size.height * 0.002),
+                              height: size.height * 0.002),
                         ),
                         Container(
-                          child : Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Container(
-                                  child: Icon((
-                                          () {
-                                        if(color == CHART_PLUS){
-                                          return Icons.arrow_drop_up_outlined;
-                                        }else if(color ==CHART_MINUS){
-                                          return Icons.arrow_drop_down_outlined;
-                                        }else {
-                                          return Icons.remove;
-                                        }
-                                      })(),
-                                      color : color,
-                                      size: size.width*0.02
-                                  )
+                            child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Container(
+                                child: Icon((() {
+                              if (color == CHART_PLUS) {
+                                return Icons.arrow_drop_up_outlined;
+                              } else if (color == CHART_MINUS) {
+                                return Icons.arrow_drop_down_outlined;
+                              } else {
+                                return Icons.remove;
+                              }
+                            })(), color: color, size: size.width * 0.02)),
+                            Text(
+                              '$stockperc', //Firebase 적용사항
+                              style: TextStyle(
+                                color: color,
+                                fontFamily: 'Content',
+                                fontSize: size.width * 0.02,
+                                fontWeight: FontWeight.normal,
                               ),
-                              Text(
-                                '$stockperc', //Firebase 적용사항
-                                style: TextStyle(
-                                    color: color,
-                                    fontFamily: 'Content',
-                                    fontSize: size.width * 0.02,
-                                    fontWeight: FontWeight.normal,),
-                                textAlign: TextAlign.end,
-                              ),
-                            ],
-                          )
-                        )
-
+                              textAlign: TextAlign.end,
+                            ),
+                          ],
+                        ))
                       ],
                     ),
-
-                  ),SizedBox(width: size.width*0.02),
+                  ),
+                  SizedBox(width: size.width * 0.02),
                   Container(
-                      width : size.width*0.09,
-                      height: size.height*0.03,
+                      width: size.width * 0.09,
+                      height: size.height * 0.03,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(4),
-                          topRight:  Radius.circular(4),
+                          topRight: Radius.circular(4),
                           bottomLeft: Radius.circular(4),
                           bottomRight: Radius.circular(4),
                         ),
                         color: color,
                       ),
-                      margin: EdgeInsets.symmetric(vertical: size.height*0.005, horizontal: size.width*0.015),
-                      child : Text(
-                          stockperc,
+                      margin: EdgeInsets.symmetric(
+                          vertical: size.height * 0.005,
+                          horizontal: size.width * 0.015),
+                      child: Text(stockperc,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                               color: Colors.white,
-                              fontSize: size.width*0.02,
+                              fontSize: size.width * 0.02,
                               height: 2,
-                              fontWeight: FontWeight.bold
-                          )
-                      )
-                  ),
+                              fontWeight: FontWeight.bold))),
                   Container(
                     width: size.width * 0.1,
                     child: Text(
@@ -449,7 +425,6 @@ class _MainscreenState extends State<Mainscreen> {
     return Container(
       margin: EdgeInsets.only(top: size.height * 0.01),
       width: size.width * 0.9,
-
       decoration: BoxDecoration(
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(8),
