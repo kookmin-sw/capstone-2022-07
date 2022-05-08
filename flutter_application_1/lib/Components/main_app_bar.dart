@@ -42,4 +42,25 @@ AppBar mainPageAppBar(BuildContext context, String title, IconButton button) {
   );
 }
 
-
+AppBar noneActionAppBar(BuildContext context, String title) {
+  return AppBar(
+    systemOverlayStyle: SystemUiOverlayStyle(),
+    centerTitle: true,
+    title: Text(
+      title,
+      style: TextStyle(color: Colors.black),
+    ),
+    leading: IconButton(
+      onPressed: () {
+        Navigator.pop(context);
+      },
+      icon: Icon(
+        Icons.arrow_back,
+        color: Colors.black,
+      ),
+    ),
+    leadingWidth: 70,
+    backgroundColor: Colors.transparent,
+    elevation: 0.0,
+  );
+}

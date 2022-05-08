@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_application_1/Color/Color.dart';
 import 'package:flutter_application_1/Components/star_button.dart';
-import 'package:flutter_application_1/Components/main_app_bar.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:yahoofin/yahoofin.dart';
 import 'dart:math';
@@ -31,7 +30,10 @@ class _StockscreenState extends State<Stockscreen> {
   late TooltipBehavior _tooltipBehavior;
   @override
   void initState() {
-    _tooltipBehavior = TooltipBehavior(enable: true, format: 'point.size');
+    _tooltipBehavior = TooltipBehavior(
+      enable: true, format: 'point.x: point.y', header: '',
+      // Templating the tooltip
+    );
     super.initState();
   }
 
@@ -65,7 +67,6 @@ class _StockscreenState extends State<Stockscreen> {
   Map<String, dynamic> firebaseStockData = {};
   List<Map<String, dynamic>> newsDataList = [];
 
-
   Future getStockInfo() async {
     CollectionReference stocks = FirebaseFirestore.instance.collection('stock');
     QuerySnapshot stockData =
@@ -75,7 +76,7 @@ class _StockscreenState extends State<Stockscreen> {
         stocks.doc(stockData.docs[0].id).collection("news");
 
     Future<void> _getNewsList(List<Map<String, dynamic>> list) async {
-      await news.get().then(
+      await news.orderBy("timestamp", descending: true).get().then(
         (QuerySnapshot qs) {
           for (var doc in qs.docs) {
             Map<String, dynamic> topnews = doc.data() as Map<String, dynamic>;
@@ -93,8 +94,6 @@ class _StockscreenState extends State<Stockscreen> {
       return stockData.docs[0].data();
     }
   }
-
-
 
   //Firebase 적용사항
 
@@ -165,8 +164,6 @@ class _StockscreenState extends State<Stockscreen> {
       yearVolume = chart.chartQuotes!.close;
       yearTime = chart.chartQuotes!.timestamp;
 
-      print(yearTime);
-
       for (int i = 0; i < yearVolume!.length; i++) {
         if (yearVolume![i] == null || yearTime![i] == null) {
           continue;
@@ -174,7 +171,6 @@ class _StockscreenState extends State<Stockscreen> {
         if (yearTime!.isNotEmpty) {
           var date =
               DateTime.fromMillisecondsSinceEpoch(yearTime![i].toInt() * 1000);
-          print(yearVolume);
           yearData.add(_ChartData(date, yearVolume![i].toDouble()));
         }
       }
@@ -468,89 +464,80 @@ class _StockscreenState extends State<Stockscreen> {
           ),
           SizedBox(height: size.height * 0.01),
           Container(
-            child : Row(
-              children: [
-
-                Text(
-                  //Firebase 적용사항
-                  stockPrice.toString(),
-                  style: TextStyle(
-                    color: stockColor,
-                    fontFamily: 'Content',
-                    fontSize: size.width * 0.06,
-                    letterSpacing: 0,
-                    fontWeight: FontWeight.bold,
-                    height: 1,
-                  ),
-
+              child: Row(
+            children: [
+              Text(
+                //Firebase 적용사항
+                stockPrice.toString(),
+                style: TextStyle(
+                  color: stockColor,
+                  fontFamily: 'Content',
+                  fontSize: size.width * 0.06,
+                  letterSpacing: 0,
+                  fontWeight: FontWeight.bold,
+                  height: 1,
                 ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-
-                  children: [
-                    Container(
-                      height: size.width*0.047,
-                      width :size.width*0.047,
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  SizedBox(
+                      height: size.width * 0.047,
+                      width: size.width * 0.047,
                       // color:Colors.black,
-                          child :
-                          Icon((
-                          () {
-                          if(stockColor == CHART_PLUS){
-                            return Icons.arrow_drop_up_outlined;
-                          }else if(stockColor ==CHART_MINUS){
-                            return Icons.arrow_drop_down_outlined;
-                          }else {
-                            return Icons.remove;
-                          }
-                          })(),
-                          color : stockColor,
-                          )
+                      child: ((() {
+                        if (stockColor == CHART_PLUS) {
+                          return Icon(
+                            Icons.arrow_drop_up_rounded,
+                            color: stockColor,
+                          );
+                        } else if (stockColor == CHART_MINUS) {
+                          return Icon(Icons.arrow_drop_down_rounded,
+                              color: stockColor);
+                        } else {
+                          return Icon(
+                            Icons.remove_rounded,
+                            color: stockColor,
+                            size: size.width * 0.05,
+                          );
+                        }
+                      })())),
+                  Text(
+                    //Firebase 적용사항
+                    stockChange.toString(),
+                    style: TextStyle(
+                      color: stockColor,
+                      fontFamily: 'Content',
+                      fontSize: size.width * 0.03,
+                      letterSpacing: 0,
+                      fontWeight: FontWeight.normal,
+                      // height: 3,
                     ),
-
-
-                    Text(
-                      //Firebase 적용사항
-
-                      stockChange.toString(),
-                      style: TextStyle(
-                        color: stockColor,
-                        fontFamily: 'Content',
-                        fontSize: size.width * 0.03,
-                        letterSpacing: 0,
-                        fontWeight: FontWeight.normal,
-                        // height: 3,
-                      ),
-
+                  ),
+                  Text(
+                    //Firebase 적용사항
+                    "(${stockPerc.toString()})",
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                      color: stockColor,
+                      fontFamily: 'Content',
+                      fontSize: size.width * 0.03,
+                      letterSpacing: 0,
+                      fontWeight: FontWeight.normal,
+                      // height: 3,
                     ),
-                    Text(
-                      //Firebase 적용사항
-                      "(${stockPerc.toString()})",
-                      textAlign: TextAlign.left,
-                      style: TextStyle(
-                        color: stockColor,
-                        fontFamily: 'Content',
-                        fontSize: size.width * 0.03,
-                        letterSpacing: 0,
-                        fontWeight: FontWeight.normal,
-                        // height: 3,
-                      ),
-                    ),
-                  ],
-                )
-
-
-              ],
-            )
-          ),
-
-
+                  ),
+                ],
+              )
+            ],
+          )),
         ],
       ),
     );
   }
 
   // 하단 위젯 구성
-  Widget Info(Size size, String msg,  Map<String, dynamic> firebaseStockData ) {
+  Widget Info(Size size, String msg, Map<String, dynamic> firebaseStockData) {
     List<String> stockIcon = <String>[
       'stockClosingPrice',
       'stockHighPrice',
@@ -564,7 +551,6 @@ class _StockscreenState extends State<Stockscreen> {
 
     stockIcon.forEach((element) {
       stockValue.add(intlprice.format(firebaseStockData['${element}']));
-
     });
 
     return Container(
@@ -621,11 +607,8 @@ class _StockscreenState extends State<Stockscreen> {
           EdgeInsets.only(bottom: size.height * 0.03, top: size.height * 0.03),
       child: Row(
         children: [
-          
           //Firebase 적용사항
-          Icon(
-                Icons.check_box_outlined
-              ),
+          Icon(Icons.check_box_outlined),
           SizedBox(width: size.width * 0.02),
           Text(
             Infodetail,
@@ -693,6 +676,7 @@ class _StockscreenState extends State<Stockscreen> {
                 child: Text(
                   title,
                   overflow: TextOverflow.ellipsis,
+                  maxLines: 3,
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
@@ -749,16 +733,11 @@ class _StockscreenState extends State<Stockscreen> {
     );
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: StockscreenBar(
-          context,
-          "관심 종목",
-          widget.stockName),
+      appBar: StockscreenBar(context, "관심 종목", widget.stockName),
       body: SafeArea(
         child: FutureBuilder(
           future: getStockInfo(),
