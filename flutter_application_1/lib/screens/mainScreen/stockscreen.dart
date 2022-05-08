@@ -31,17 +31,10 @@ class _StockscreenState extends State<Stockscreen> {
   @override
   void initState() {
     _tooltipBehavior = TooltipBehavior(
-        enable: true,
-        // Templating the tooltip
-        builder: (dynamic data, dynamic point, dynamic series, int pointIndex,
-            int seriesIndex) {
-          print(pointIndex);
-          return Container(
-              child: Text(
-            ' : ${pointIndex.toString()}',
-            style: TextStyle(color: Colors.white),
-          ));
-        });
+      enable: true, format: 'point.x: point.y', header: '',
+      color: Colors.transparent,
+      // Templating the tooltip
+    );
     super.initState();
   }
 
@@ -172,8 +165,6 @@ class _StockscreenState extends State<Stockscreen> {
       yearVolume = chart.chartQuotes!.close;
       yearTime = chart.chartQuotes!.timestamp;
 
-      print(yearTime);
-
       for (int i = 0; i < yearVolume!.length; i++) {
         if (yearVolume![i] == null || yearTime![i] == null) {
           continue;
@@ -181,7 +172,6 @@ class _StockscreenState extends State<Stockscreen> {
         if (yearTime!.isNotEmpty) {
           var date =
               DateTime.fromMillisecondsSinceEpoch(yearTime![i].toInt() * 1000);
-          print(yearVolume);
           yearData.add(_ChartData(date, yearVolume![i].toDouble()));
         }
       }
