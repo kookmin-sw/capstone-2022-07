@@ -238,38 +238,40 @@ class _SearchscreenState extends State<Searchscreen> {
                                       )),
                                       //stockPerChange
                                       Container(
+                                          margin: EdgeInsets.only(
+                                              bottom: size.height * 0.01),
                                           child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                        children: [
-                                          Container(
-                                              child: Icon((() {
-                                            if (stockColor == CHART_PLUS) {
-                                              return Icons
-                                                  .arrow_drop_up_outlined;
-                                            } else if (stockColor ==
-                                                CHART_MINUS) {
-                                              return Icons
-                                                  .arrow_drop_down_outlined;
-                                            } else {
-                                              return Icons.remove;
-                                            }
-                                          })(),
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            children: [
+                                              Container(
+                                                  child: Icon((() {
+                                                if (stockColor == CHART_PLUS) {
+                                                  return Icons
+                                                      .arrow_drop_up_outlined;
+                                                } else if (stockColor ==
+                                                    CHART_MINUS) {
+                                                  return Icons
+                                                      .arrow_drop_down_outlined;
+                                                } else {
+                                                  return Icons.remove;
+                                                }
+                                              })(),
+                                                      color: stockColor,
+                                                      size: size.width * 0.05)),
+                                              Text(
+                                                stockChange,
+                                                style: TextStyle(
                                                   color: stockColor,
-                                                  size: size.width * 0.05)),
-                                          Text(
-                                            stockChange,
-                                            style: TextStyle(
-                                              color: stockColor,
-                                              fontFamily: 'Content',
-                                              fontSize: size.width * 0.024,
-                                              letterSpacing: 0,
-                                              fontWeight: FontWeight.normal,
-                                              height: 1,
-                                            ),
-                                          )
-                                        ],
-                                      ))
+                                                  fontFamily: 'Content',
+                                                  fontSize: size.width * 0.024,
+                                                  letterSpacing: 0,
+                                                  fontWeight: FontWeight.normal,
+                                                  height: 1,
+                                                ),
+                                              )
+                                            ],
+                                          ))
                                     ],
                                   )),
                               Container(

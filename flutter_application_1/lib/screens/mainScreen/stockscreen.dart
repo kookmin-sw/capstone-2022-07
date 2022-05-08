@@ -32,7 +32,6 @@ class _StockscreenState extends State<Stockscreen> {
   void initState() {
     _tooltipBehavior = TooltipBehavior(
       enable: true, format: 'point.x: point.y', header: '',
-      color: Colors.transparent,
       // Templating the tooltip
     );
     super.initState();

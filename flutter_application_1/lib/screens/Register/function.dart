@@ -28,7 +28,7 @@ Future<void> signInWithGoogle(BuildContext context) async {
 
   // Once signed in, return the UserCredential
   await FirebaseAuth.instance.signInWithCredential(credential);
-
+  await FirebaseMessaging.instance.subscribeToTopic("All");
   if (FirebaseAuth.instance.currentUser != null) {
     authStateChanges(context);
   }
@@ -39,6 +39,7 @@ Future signUpWithEmail(String id, String password, BuildContext context) async {
     UserCredential credential = await FirebaseAuth.instance
         .createUserWithEmailAndPassword(email: id, password: password);
     if (credential.user != null) {
+      await FirebaseMessaging.instance.subscribeToTopic("All");
       await credential.user!.sendEmailVerification();
       Navigator.push(
         context,

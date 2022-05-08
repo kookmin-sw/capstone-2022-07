@@ -10,10 +10,12 @@ import 'package:flutter_application_1/Components/main_app_bar.dart';
 import 'package:flutter_application_1/Color/Color.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_application_1/screens/mainScreen/alertOnoffScreen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:flutter_application_1/screens/Register/login_screen.dart';
+import 'package:get/get.dart';
 
 class Profilescreen extends StatefulWidget {
   Profilescreen({Key? key}) : super(key: key);
@@ -55,40 +57,53 @@ class _ProfilescreenState extends State<Profilescreen> {
   }
 
   Widget profilealarm(size) {
-    return Container(
-        decoration: const BoxDecoration(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(8),
-              topRight: Radius.circular(8),
-              bottomLeft: Radius.circular(8),
-              bottomRight: Radius.circular(8),
-            ),
-            boxShadow: [
-              BoxShadow(color: Colors.grey, offset: Offset(0, 1), blurRadius: 1)
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) {
+              return AlertOnoffScreen();
+            },
+          ),
+        );
+      },
+      child: Container(
+          decoration: const BoxDecoration(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(8),
+                topRight: Radius.circular(8),
+                bottomLeft: Radius.circular(8),
+                bottomRight: Radius.circular(8),
+              ),
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.grey, offset: Offset(0, 1), blurRadius: 1)
+              ],
+              color: Colors.white),
+          padding: EdgeInsets.only(left: size.width * 0.04),
+          width: size.width * 0.8,
+          height: size.height * 0.07,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.notifications_none, color: CHART_MINUS),
+                  SizedBox(width: size.width * 0.04),
+                  Text(
+                    '알람 설정',
+                    style: GoogleFonts.notoSans(fontSize: size.width * 0.04),
+                  ),
+                ],
+              ),
+              Container(
+                margin: EdgeInsets.only(right: size.width * 0.05),
+                child: Icon(Icons.arrow_forward_ios),
+              )
             ],
-            color: Colors.white),
-        padding: EdgeInsets.only(left: size.width * 0.04),
-        width: size.width * 0.8,
-        height: size.height * 0.07,
-        child: Row(
-          children: [
-            Icon(Icons.notifications_none, color: CHART_MINUS),
-            SizedBox(width: size.width * 0.04),
-            Text(
-              '알람 설정',
-              style: GoogleFonts.notoSans(fontSize: size.width * 0.04),
-            ),
-            SizedBox(width: size.width * 0.35),
-            GFToggle(
-              onChanged: (val) {
-                // alarm on off구현 칸
-              },
-              value: false,
-              enabledTrackColor: CHART_MINUS,
-              type: GFToggleType.ios,
-            )
-          ],
-        ));
+          )),
+    );
   }
 
   Widget profilelogout(size) {
