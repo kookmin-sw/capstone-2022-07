@@ -38,8 +38,8 @@ class _SearchscreenState extends State<Searchscreen> {
           height: size.height,
           width: size.width,
           child: Stack(children: [
-            visitedstock(size),
             visitedtitle(size),
+            visitedstock(size),
             buildFloatingSearchBar(context, size),
           ])),
     );
@@ -95,8 +95,25 @@ class _SearchscreenState extends State<Searchscreen> {
         builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             List<dynamic> visitedstocklist = snapshot.data ?? [];
-            return visitedstockview(
-                size, visitedstocklist[0], visitedstocklist[1]);
+            if(visitedstocklist[0].isEmpty){
+              return Stack(
+                children: [
+                  Positioned(
+                      top: size.width * 0.2,
+                      left: size.width * 0.04,
+                      child:Container(
+                          width :size.width*0.15, height: size.height*0.03, color: Color.fromRGBO(249, 249, 249, 1))),
+                  Center(child : Text('최근 조회한 종목이 없습니다.',
+                    style: TextStyle(
+                      fontSize: size.width * 0.05,
+                      color: GREY,
+                    ),))
+                ],
+              );
+            }else{
+              return visitedstockview(
+                  size, visitedstocklist[0], visitedstocklist[1]);
+            }
           } else {
             return Center(child: CircularProgressIndicator());
           }
@@ -405,8 +422,6 @@ class _SearchscreenState extends State<Searchscreen> {
             } else {
               if (snapshot.data!.docs.length == 0 ||
                   snapshot.data!.docs.length > 300) {
-                print(selectedTerm);
-                print(snapshot.data.docs.length);
                 return Container();
               } else {
                 for (int i = 0; i < snapshot.data!.docs.length; i++) {
