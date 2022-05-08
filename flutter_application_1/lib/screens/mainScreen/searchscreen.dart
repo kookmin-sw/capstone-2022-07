@@ -196,7 +196,8 @@ class _SearchscreenState extends State<Searchscreen> {
                                             style: GoogleFonts.notoSans(
                                                 fontSize: size.width * 0.03,
                                                 height: size.width * 0.005,
-                                                fontWeight: FontWeight.bold)),
+                                                fontWeight: FontWeight.bold),
+                                            overflow : TextOverflow.ellipsis),
                                         Text(
                                           stocklist[index]['stockCode'],
                                           style: GoogleFonts.notoSans(
@@ -434,8 +435,10 @@ class _SearchscreenState extends State<Searchscreen> {
                       fontFamily: 'ABeeZee',
                       fontSize: size.width * 0.03,
                       fontWeight: FontWeight.bold,
-                      height: size.width*0.003
+                      height: size.width*0.003,
+                      overflow : TextOverflow.ellipsis
                   ),
+
                 ),
                 Text(
                   stockCode,
