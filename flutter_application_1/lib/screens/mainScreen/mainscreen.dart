@@ -283,7 +283,6 @@ class _MainscreenState extends State<Mainscreen> {
               list[index]['stockPerChange'],
               list[index]['stockPrice'],
               list[index]['DayNewsCount'],
-              list[index]['stockCode'],
               list[index]['stockChange']);
         },
         separatorBuilder: (BuildContext context, int index) =>
@@ -293,7 +292,7 @@ class _MainscreenState extends State<Mainscreen> {
   }
 
   Widget Topstock(Size size, String stockname, var stockperc, var stockprice,
-      var newscount, var stockCode, var stockChange) {
+      var newscount,  var stockChange) {
     Color color;
     if (stockperc > 0) {
       color = CHART_PLUS;
