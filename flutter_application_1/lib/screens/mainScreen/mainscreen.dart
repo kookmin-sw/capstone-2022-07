@@ -29,7 +29,8 @@ class _MainscreenState extends State<Mainscreen> {
       List<Map<String, dynamic>> decreaseList,
       List<Map<String, dynamic>> positiveList,
       List<Map<String, dynamic>> negativeList,
-      List<Map<String, dynamic>> mainList) async {
+      List<Map<String, dynamic>> mainList,
+      List<Map<String, dynamic>> toprateNewslist) async {
     await firestore
         .collection('stock')
         .orderBy("stockPerChange",
@@ -43,6 +44,19 @@ class _MainscreenState extends State<Mainscreen> {
           increaseList.add(increase);
         }
       },
+    );
+
+    await firestore
+    .collection('stock')
+    .orderBy("DayNewsCount",descending: true)
+    .limit(3)
+    .get()
+    .then(
+        (QuerySnapshot qs){
+          for(var doc in qs.docs){
+            toprateNewslist.add(doc.data() as Map<String,dynamic>);
+          }
+        }
     );
 
     await firestore
@@ -505,6 +519,10 @@ class _MainscreenState extends State<Mainscreen> {
     );
   }
 
+  Widget TopratenewsListTab(Size size, List<Map<String, dynamic>> topList){
+
+    return Container();
+  }
   @override
   Widget build(BuildContext context) {
     List<Map<String, dynamic>> increaseList = [];
@@ -512,6 +530,7 @@ class _MainscreenState extends State<Mainscreen> {
     List<Map<String, dynamic>> positiveList = [];
     List<Map<String, dynamic>> negativeList = [];
     List<Map<String, dynamic>> mainStocklist = [];
+    List<Map<String, dynamic>> toprateNewslist = [];
     Size size = MediaQuery.of(context).size;
 
     return Scaffold(
@@ -525,13 +544,14 @@ class _MainscreenState extends State<Mainscreen> {
           alignment: Alignment.topCenter,
           child: FutureBuilder(
             future: _getList(increaseList, decreaseList, positiveList,
-                negativeList, mainStocklist),
+                negativeList, mainStocklist, toprateNewslist),
             builder: (BuildContext context, AsyncSnapshot snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
                 return SingleChildScrollView(
                   child: Column(
                     children: [
                       mainStockList(size, mainStocklist),
+                      TopratenewsListTab(size, toprateNewslist),
                       rankingTab(size, increaseList, decreaseList, "시세 순위",
                           "상승 종목", "하락 종목"),
                       rankingTab(size, positiveList, negativeList, "뉴스 순위",
