@@ -64,3 +64,18 @@ AppBar noneActionAppBar(BuildContext context, String title) {
     elevation: 0.0,
   );
 }
+
+
+AppBar profileAppBar(BuildContext context, String title) {
+  return AppBar(
+    systemOverlayStyle: SystemUiOverlayStyle(),
+    centerTitle: true,
+    title: Text(
+      title,
+      style: TextStyle(color: Colors.black),
+    ),
+    leadingWidth: 70,
+    backgroundColor: Colors.transparent,
+    elevation: 0.0,
+  );
+}

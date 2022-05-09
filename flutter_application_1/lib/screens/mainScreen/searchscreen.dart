@@ -214,7 +214,7 @@ class _SearchscreenState extends State<Searchscreen> {
                                         );
                                       },
                                     ),
-                                  );
+                                  ).then((_) => setState(() {}));
                                 },
                               ),
                               Container(
