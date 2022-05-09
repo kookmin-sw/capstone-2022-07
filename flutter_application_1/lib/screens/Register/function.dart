@@ -11,7 +11,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
-Future<UserCredential> signInWithGoogle() async {
+Future<void> signInWithGoogle(BuildContext context) async {
+  await FirebaseAuth.instance.signOut();
   // Trigger the authentication flow
   final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
@@ -26,7 +27,11 @@ Future<UserCredential> signInWithGoogle() async {
   );
 
   // Once signed in, return the UserCredential
-  return await FirebaseAuth.instance.signInWithCredential(credential);
+  await FirebaseAuth.instance.signInWithCredential(credential);
+  await FirebaseMessaging.instance.subscribeToTopic("All");
+  if (FirebaseAuth.instance.currentUser != null) {
+    authStateChanges(context);
+  }
 }
 
 Future signUpWithEmail(String id, String password, BuildContext context) async {
@@ -34,6 +39,7 @@ Future signUpWithEmail(String id, String password, BuildContext context) async {
     UserCredential credential = await FirebaseAuth.instance
         .createUserWithEmailAndPassword(email: id, password: password);
     if (credential.user != null) {
+      await FirebaseMessaging.instance.subscribeToTopic("All");
       await credential.user!.sendEmailVerification();
       Navigator.push(
         context,

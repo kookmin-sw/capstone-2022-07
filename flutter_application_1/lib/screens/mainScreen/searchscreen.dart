@@ -51,14 +51,11 @@ class _SearchscreenState extends State<Searchscreen> {
         top: size.width * 0.2,
         left: size.width * 0.04,
         height: size.height * 0.04,
-
         child: Text('최근 조회 종목',
             style: GoogleFonts.notoSans(
                 fontSize: size.width * 0.025,
                 fontWeight: FontWeight.bold,
-                height: size.width * 0.005))
-
-    );
+                height: size.width * 0.005)));
   }
 
   //주식 정보를 가져옴
@@ -95,22 +92,27 @@ class _SearchscreenState extends State<Searchscreen> {
         builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             List<dynamic> visitedstocklist = snapshot.data ?? [];
-            if(visitedstocklist[0].isEmpty){
+            if (visitedstocklist[0].isEmpty) {
               return Stack(
                 children: [
                   Positioned(
                       top: size.width * 0.2,
                       left: size.width * 0.04,
-                      child:Container(
-                          width :size.width*0.15, height: size.height*0.03, color: Color.fromRGBO(249, 249, 249, 1))),
-                  Center(child : Text('최근 조회한 종목이 없습니다.',
+                      child: Container(
+                          width: size.width * 0.15,
+                          height: size.height * 0.03,
+                          color: Color.fromRGBO(249, 249, 249, 1))),
+                  Center(
+                      child: Text(
+                    '최근 조회한 종목이 없습니다.',
                     style: TextStyle(
                       fontSize: size.width * 0.05,
                       color: GREY,
-                    ),))
+                    ),
+                  ))
                 ],
               );
-            }else{
+            } else {
               return visitedstockview(
                   size, visitedstocklist[0], visitedstocklist[1]);
             }
@@ -121,21 +123,11 @@ class _SearchscreenState extends State<Searchscreen> {
   }
 
   Widget favoritestock(Size size, bool res) {
-
     if (res == true) {
-      return Container(
-          child: Icon(
-            Icons.star_outlined,
-              color : Colors.amber
-          ));
+      return Container(child: Icon(Icons.star_outlined, color: Colors.amber));
     } else {
-      return Container(
-          child: Icon(
-            Icons.star_outline,
-            color : Colors.amber
-          ));
+      return Container(child: Icon(Icons.star_outline, color: Colors.amber));
     }
-
   }
 
   Widget visitedstockview(Size size, List<Map<String, dynamic>>? visitedlist,
@@ -164,16 +156,19 @@ class _SearchscreenState extends State<Searchscreen> {
                     initstar = false;
                   }
                   late Color stockColor;
-                  if(stocklist[index]['stockPerChange'] > 0){
+                  if (stocklist[index]['stockPerChange'] > 0) {
                     stockColor = CHART_PLUS;
-                  }else if(stocklist[index]['stockPerChange'] < 0){
+                  } else if (stocklist[index]['stockPerChange'] < 0) {
                     stockColor = CHART_MINUS;
-                  }else{
+                  } else {
                     stockColor = Color.fromARGB(255, 120, 119, 119);
                   }
-                  String stockPrice = intlprice.format(stocklist[index]['stockPrice']);
-                  String stockChange = intlprice.format(stocklist[index]['stockChange'].abs()) ;
-                  String stockPerChange = intlperc.format(stocklist[index]['stockPerChange']) + "%" ;
+                  String stockPrice =
+                      intlprice.format(stocklist[index]['stockPrice']);
+                  String stockChange =
+                      intlprice.format(stocklist[index]['stockChange'].abs());
+                  String stockPerChange =
+                      intlperc.format(stocklist[index]['stockPerChange']) + "%";
 
                   return Column(
                     children: [
@@ -197,7 +192,7 @@ class _SearchscreenState extends State<Searchscreen> {
                                                 fontSize: size.width * 0.03,
                                                 height: size.width * 0.005,
                                                 fontWeight: FontWeight.bold),
-                                            overflow : TextOverflow.ellipsis),
+                                            overflow: TextOverflow.ellipsis),
                                         Text(
                                           stocklist[index]['stockCode'],
                                           style: GoogleFonts.notoSans(
@@ -222,90 +217,86 @@ class _SearchscreenState extends State<Searchscreen> {
                                   );
                                 },
                               ),
-
                               Container(
-                                width: size.width *0.2,
-                                child : Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
+                                  width: size.width * 0.2,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
                                       //stockPrice
-                                    Container(
-                                      child :Text(
-                                      stockPrice,
-                                      style: TextStyle(
-
-                                        fontFamily: 'Content',
-                                        fontSize: size.width * 0.03,
-                                        letterSpacing: 0,
-                                        fontWeight: FontWeight.bold,
-                                        height: 1.5,
-                                      ),
-                                      textAlign: TextAlign.end,
-                                    )),
+                                      Container(
+                                          child: Text(
+                                        stockPrice,
+                                        style: TextStyle(
+                                          fontFamily: 'Content',
+                                          fontSize: size.width * 0.03,
+                                          letterSpacing: 0,
+                                          fontWeight: FontWeight.bold,
+                                          height: 1.5,
+                                        ),
+                                        textAlign: TextAlign.end,
+                                      )),
                                       //stockPerChange
                                       Container(
-
-                                        child : Row(
-                                          mainAxisAlignment: MainAxisAlignment.end,
-                                          children: [
-                                            Container(
-                                              child: Icon((
-                                                      () {
-                                                    if(stockColor == CHART_PLUS){
-                                                      return Icons.arrow_drop_up_outlined;
-                                                    }else if(stockColor ==CHART_MINUS){
-                                                      return Icons.arrow_drop_down_outlined;
-                                                    }else {
-                                                      return Icons.remove;
-                                                    }
-                                                  })(),
-                                                color : stockColor,
-                                                size: size.width*0.05
+                                          margin: EdgeInsets.only(
+                                              bottom: size.height * 0.01),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            children: [
+                                              Container(
+                                                  child: Icon((() {
+                                                if (stockColor == CHART_PLUS) {
+                                                  return Icons
+                                                      .arrow_drop_up_outlined;
+                                                } else if (stockColor ==
+                                                    CHART_MINUS) {
+                                                  return Icons
+                                                      .arrow_drop_down_outlined;
+                                                } else {
+                                                  return Icons.remove;
+                                                }
+                                              })(),
+                                                      color: stockColor,
+                                                      size: size.width * 0.05)),
+                                              Text(
+                                                stockChange,
+                                                style: TextStyle(
+                                                  color: stockColor,
+                                                  fontFamily: 'Content',
+                                                  fontSize: size.width * 0.024,
+                                                  letterSpacing: 0,
+                                                  fontWeight: FontWeight.normal,
+                                                  height: 1,
+                                                ),
                                               )
-                                            ),
-                                            Text(
-                                              stockChange,
-                                              style: TextStyle(
-                                                color: stockColor,
-                                                fontFamily: 'Content',
-                                                fontSize: size.width * 0.024,
-                                                letterSpacing: 0,
-                                                fontWeight: FontWeight.normal,
-                                                height: 1,
-                                              ),
-                                            )
-                                          ],
-                                        )
-                                      )
-                                  ],
-                                )
-                              ),
+                                            ],
+                                          ))
+                                    ],
+                                  )),
                               Container(
-                                width : size.width*0.09,
-                                height: size.height*0.03,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(4),
-                                    topRight:  Radius.circular(4),
-                                    bottomLeft: Radius.circular(4),
-                                    bottomRight: Radius.circular(4),
+                                  width: size.width * 0.09,
+                                  height: size.height * 0.03,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(4),
+                                      topRight: Radius.circular(4),
+                                      bottomLeft: Radius.circular(4),
+                                      bottomRight: Radius.circular(4),
+                                    ),
+                                    color: stockColor,
                                   ),
-                                  color: stockColor,
-                                ),
-                                margin: EdgeInsets.symmetric(vertical: size.height*0.013, horizontal: size.width*0.035),
-                                child : Text(
-                                  stockPerChange,
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: size.width*0.02,
-                                    height: 2,
-                                    fontWeight: FontWeight.bold
-                                  )
-                                )
-                              ),
-                              SizedBox(width : size.width*0.03),
+                                  margin: EdgeInsets.symmetric(
+                                      vertical: size.height * 0.013,
+                                      horizontal: size.width * 0.015),
+                                  child: Text(stockPerChange,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: size.width * 0.02,
+                                          height: 2,
+                                          fontWeight: FontWeight.bold))),
+                              SizedBox(width: size.width * 0.05),
                               GestureDetector(
                                 child: favoritestock(size, initstar),
                                 onTap: () async {
@@ -333,7 +324,7 @@ class _SearchscreenState extends State<Searchscreen> {
                                   }
                                 },
                               ),
-                              SizedBox(width : size.width*0.02),
+                              SizedBox(width: size.width * 0.02),
                               InkWell(
                                 child: Icon(
                                   Icons.close,
@@ -386,13 +377,12 @@ class _SearchscreenState extends State<Searchscreen> {
           physics: ClampingScrollPhysics(),
           itemBuilder: (BuildContext context, int index) {
             return searchStock(
-              size,
-              list[index]['stockName'],
-              list[index]['stockCode'],
-              list[index]['stockChange'],
-              list[index]['stockPrice'],
-              list[index]['stockPerChange']
-            );
+                size,
+                list[index]['stockName'],
+                list[index]['stockCode'],
+                list[index]['stockChange'],
+                list[index]['stockPrice'],
+                list[index]['stockPerChange']);
           },
           separatorBuilder: (BuildContext context, int index) =>
               const Divider(color: GREY),
@@ -401,9 +391,8 @@ class _SearchscreenState extends State<Searchscreen> {
     );
   }
 
-  Widget searchStock(
-      Size size,  String stockname,var stockCode, var stockChange, var stockprice
-      ,var stockPerChange) {
+  Widget searchStock(Size size, String stockname, var stockCode,
+      var stockChange, var stockprice, var stockPerChange) {
     Color color;
     if (stockPerChange > 0) {
       color = CHART_PLUS;
@@ -414,7 +403,7 @@ class _SearchscreenState extends State<Searchscreen> {
     }
     stockprice = intlprice.format(stockprice);
     stockChange = intlprice.format(stockChange.abs());
-    stockPerChange = intlperc.format(stockPerChange) +"%";
+    stockPerChange = intlperc.format(stockPerChange) + "%";
 
     return GestureDetector(
       child: Container(
@@ -425,8 +414,8 @@ class _SearchscreenState extends State<Searchscreen> {
         child: Row(
           children: [
             Container(
-                child : Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   stockname, //Firebase 적용사항
@@ -435,10 +424,8 @@ class _SearchscreenState extends State<Searchscreen> {
                       fontFamily: 'ABeeZee',
                       fontSize: size.width * 0.03,
                       fontWeight: FontWeight.bold,
-                      height: size.width*0.003,
-                      overflow : TextOverflow.ellipsis
-                  ),
-
+                      height: size.width * 0.003,
+                      overflow: TextOverflow.ellipsis),
                 ),
                 Text(
                   stockCode,
@@ -471,22 +458,17 @@ class _SearchscreenState extends State<Searchscreen> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Container(
-                              child: Icon((
-                                      () {
-                                    if(color == CHART_PLUS){
-                                      return Icons.arrow_drop_up_outlined;
-                                    }else if(color ==CHART_MINUS){
-                                      return Icons.arrow_drop_down_outlined;
-                                    }else {
-                                      return Icons.remove;
-                                    }
-                                  })(),
-                                  color : color,
-                                  size: size.width*0.025
-                              )
-                          ),
+                              child: Icon((() {
+                            if (color == CHART_PLUS) {
+                              return Icons.arrow_drop_up_outlined;
+                            } else if (color == CHART_MINUS) {
+                              return Icons.arrow_drop_down_outlined;
+                            } else {
+                              return Icons.remove;
+                            }
+                          })(), color: color, size: size.width * 0.025)),
                           Text(
-                            stockChange,//Firebase 적용사항
+                            stockChange, //Firebase 적용사항
                             style: TextStyle(
                                 color: color,
                                 fontFamily: 'Content',
@@ -496,34 +478,30 @@ class _SearchscreenState extends State<Searchscreen> {
                           ),
                         ],
                       )
-
-
                     ],
                   ),
                   Container(
-                      width : size.width*0.09,
-                      height: size.height*0.06,
+                      width: size.width * 0.09,
+                      height: size.height * 0.06,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(4),
-                          topRight:  Radius.circular(4),
+                          topRight: Radius.circular(4),
                           bottomLeft: Radius.circular(4),
                           bottomRight: Radius.circular(4),
                         ),
                         color: color,
                       ),
-                      margin: EdgeInsets.symmetric(vertical: size.height*0.003, horizontal: size.width*0.015),
-                      child : Text(
-                          stockPerChange.toString(),
+                      margin: EdgeInsets.symmetric(
+                          vertical: size.height * 0.003,
+                          horizontal: size.width * 0.015),
+                      child: Text(stockPerChange.toString(),
                           textAlign: TextAlign.center,
                           style: TextStyle(
                               color: Colors.white,
-                              fontSize: size.width*0.02,
+                              fontSize: size.width * 0.02,
                               fontWeight: FontWeight.bold,
-                            height: size.width*0.005
-                          )
-                      )
-                  )
+                              height: size.width * 0.005)))
                 ],
               ),
             )

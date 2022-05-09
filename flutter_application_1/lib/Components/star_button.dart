@@ -6,7 +6,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_application_1/Color/Color.dart';
 
-
 AppBar StockscreenBar(BuildContext context, String title, String stockName) {
   return AppBar(
     systemOverlayStyle: SystemUiOverlayStyle(),
@@ -31,75 +30,83 @@ AppBar StockscreenBar(BuildContext context, String title, String stockName) {
   );
 }
 
-
 class FavoriteButton extends StatefulWidget implements PreferredSizeWidget {
-
-  FavoriteButton(this.stockName) : preferredSize = Size.fromHeight(60.0), super();
+  FavoriteButton(this.stockName)
+      : preferredSize = Size.fromHeight(60.0),
+        super();
   final Size preferredSize;
   final String stockName;
 
   @override
   _FavoriteButtonState createState() => _FavoriteButtonState();
 }
-class _FavoriteButtonState extends State<FavoriteButton> {
 
-    late bool IsFavorite;
-    Future Isstockfavorite() async {
-    var user = await FirebaseFirestore.instance.collection('users')
-        .doc(await FirebaseAuth.instance.currentUser!.uid).get();
+class _FavoriteButtonState extends State<FavoriteButton> {
+  late bool IsFavorite;
+  Future Isstockfavorite() async {
+    var user = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(await FirebaseAuth.instance.currentUser!.uid)
+        .get();
     List<dynamic> favoritelist = user['favorite'];
-    if(favoritelist.contains(widget.stockName)){
+    if (favoritelist.contains(widget.stockName)) {
       IsFavorite = true;
-    }else{
+    } else {
       IsFavorite = false;
     }
   }
+
   @override
   Widget build(BuildContext context) {
+    IconData favorite;
+    Size size = MediaQuery.of(context).size;
     return FutureBuilder(
         future: Isstockfavorite(),
-    builder: (BuildContext context, AsyncSnapshot snapshot){
-          if(snapshot.connectionState == ConnectionState.done){
-            IconData favorite;
-            if(IsFavorite == true){
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            if (IsFavorite == true) {
               favorite = Icons.star;
-            }else{
+            } else {
               favorite = Icons.star_outline;
             }
-              return GestureDetector(
-                onTap: () async {
-                  setState(() {
-                    IsFavorite = !IsFavorite;
+            return GestureDetector(
+              onTap: () async {
+                setState(() {
+                  IsFavorite = !IsFavorite;
+                });
+                if (IsFavorite == false) {
+                  await FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(FirebaseAuth.instance.currentUser!.uid)
+                      .update({
+                    "favorite": FieldValue.arrayRemove([widget.stockName])
                   });
-                  if (IsFavorite == false) {
-                    await FirebaseFirestore.instance
-                        .collection('users')
-                        .doc(FirebaseAuth
-                        .instance.currentUser!.uid)
-                        .update({
-                      "favorite": FieldValue.arrayRemove(
-                          [widget.stockName])
-                    });
-                  } else {
-                    await FirebaseFirestore.instance
-                        .collection('users')
-                        .doc(FirebaseAuth
-                        .instance.currentUser!.uid)
-                        .update({
-                      "favorite": FieldValue.arrayUnion(
-                          [widget.stockName])
-                    });
-                  }
-                },
-                child : Icon(
+                } else {
+                  await FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(FirebaseAuth.instance.currentUser!.uid)
+                      .update({
+                    "favorite": FieldValue.arrayUnion([widget.stockName])
+                  });
+                }
+              },
+              child: Container(
+                margin: EdgeInsets.only(right: size.width * 0.05),
+                child: Icon(
                   favorite,
-                  color : CHART_MINUS,
+                  color: CHART_MINUS,
                 ),
-              );
-          }else{
-            return Container();
+              ),
+            );
+          } else {
+            return Container(
+              margin: EdgeInsets.only(right: size.width * 0.05),
+              child: Icon(
+                Icons.star_border,
+                color: CHART_MINUS,
+              ),
+            );
           }
-    }
-    );
+        });
   }
 }
