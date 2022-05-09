@@ -283,7 +283,7 @@ class _StockscreenState extends State<Stockscreen> {
     return Center(
       child: SizedBox(
         width: size.width * 0.9,
-        height: size.height * 0.39,
+        height: size.height * 0.395,
         child: ContainedTabBarView(
           tabs: [
             TabContainer("1D"),
