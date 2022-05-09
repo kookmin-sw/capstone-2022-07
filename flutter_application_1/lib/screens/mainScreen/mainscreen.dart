@@ -14,6 +14,8 @@ import 'package:flutter_application_1/screens/mainScreen/stockscreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:contained_tab_bar_view/contained_tab_bar_view.dart';
 import 'package:flutter_application_1/Components/numFormat.dart';
+import 'package:flutter_link_preview/flutter_link_preview.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Mainscreen extends StatefulWidget {
   Mainscreen({Key? key}) : super(key: key);
@@ -30,7 +32,8 @@ class _MainscreenState extends State<Mainscreen> {
       List<Map<String, dynamic>> positiveList,
       List<Map<String, dynamic>> negativeList,
       List<Map<String, dynamic>> mainList,
-      List<Map<String, dynamic>> toprateNewslist) async {
+      List<Map<String, dynamic>> toprateNewslist,
+      List<String> topratestock) async {
     await firestore
         .collection('stock')
         .orderBy("stockPerChange",
@@ -52,9 +55,24 @@ class _MainscreenState extends State<Mainscreen> {
     .limit(3)
     .get()
     .then(
-        (QuerySnapshot qs){
+        (QuerySnapshot qs) async {
+          int index = 0;
           for(var doc in qs.docs){
-            toprateNewslist.add(doc.data() as Map<String,dynamic>);
+
+            topratestock.add(doc['stockName']);
+            await firestore
+            .collection('stock')
+            .doc(qs.docs[index++]['stockName'])
+            .collection('news')
+            .orderBy("date")
+            .limit(1)
+            .get()
+            .then(
+                (QuerySnapshot qs){
+                  var news = qs.docs[0];
+                  toprateNewslist.add(news.data() as Map<String,dynamic>);
+                }
+            );
           }
         }
     );
@@ -492,10 +510,181 @@ class _MainscreenState extends State<Mainscreen> {
       ),
     );
   }
+  Widget TopratenewsListTab(Size size, List<Map<String, dynamic>> topList, List<String> stockName){
+    return Column(
+      children: [
+        Container(
+            margin: EdgeInsets.only(top:size.height*0.02),
+            width: size.width * 0.9,
+            color: Color.fromRGBO(255, 255, 255, 1),
 
-  Widget TopratenewsListTab(Size size, List<Map<String, dynamic>> topList){
+            child : Column(
+              children: [
+                Container(
+                  margin: EdgeInsets.symmetric(vertical:size.height*0.01),
+                  child : Text(
+                    '이 시각 주요 뉴스',
+                    style: TextStyle(
+                      color: Color.fromRGBO(0, 0, 0, 1),
+                      fontFamily: 'Content',
+                      fontSize: size.width * 0.05,
+                      fontWeight: FontWeight.bold,
+                      height: size.height*0.002,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                Divider(height: 1)
+              ],
+            )
+        ),
+        Container(
+          width: size.width * 0.9,
+          decoration: BoxDecoration(
+          borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(8),
+          topRight: Radius.circular(8),
+          bottomLeft: Radius.circular(8),
+          bottomRight: Radius.circular(8),
 
-    return Container();
+          ),
+          color: Color.fromRGBO(255, 255, 255, 1.0),
+          ),
+          child : ListView.separated(
+            scrollDirection: Axis.vertical,
+            shrinkWrap: true,
+            padding: const EdgeInsets.all(8),
+            itemCount: topList.length,
+            itemBuilder: (BuildContext context, int index) {
+            return newsView(size, topList[index]['title'],topList[index]['date'],
+                topList[index]['url'], stockName[index]);
+            },
+            separatorBuilder: (BuildContext context, int index) => const Divider(),
+            )
+          )
+      ],
+    );
+  }
+
+  Future<void> _launchInWebViewOrVC(Uri url) async {
+    if (!await launchUrl(
+      url,
+      mode: LaunchMode.inAppWebView,
+      webViewConfiguration: const WebViewConfiguration(
+          enableJavaScript: false,
+          headers: <String, String>{'my_header_key': 'my_header_value'}),
+    )) {
+      throw 'Could not launch $url';
+    }
+  }
+
+  Widget newsView(Size size, String title, String date, String url, String stockName){
+    date = date.substring(0,16);
+    Uri uri = Uri.parse(url);
+      return GestureDetector(
+          onTap: () async {
+            await _launchInWebViewOrVC(uri);
+          },
+        child :Row(
+          children: [
+            SizedBox(
+              width : size.width*0.5,
+              height: size.height*0.1,
+              child : Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children : [
+                    Text(title,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontFamily: 'Content',
+                        fontSize: size.width * 0.03,
+                        fontWeight: FontWeight.normal,
+                        height: size.height*0.0025,
+                      ),
+                      textAlign: TextAlign.start,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,),
+                    SizedBox(height: size.height*0.005,),
+                    Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.symmetric(vertical: 3, horizontal: 2),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(4),
+                              topRight: Radius.circular(4),
+                              bottomLeft: Radius.circular(4),
+                              bottomRight: Radius.circular(4),
+                            ),
+                            color: Color.fromRGBO(240, 240, 240, 1),
+                          ),
+                          child : Text(stockName,
+                              style: TextStyle(
+                                color: Colors.grey[700],
+                                fontFamily: 'Content',
+                                fontSize: size.width * 0.02,
+                                fontWeight: FontWeight.normal,
+                                height: size.height*0.0025,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1),
+                        ),
+
+                        VerticalDivider(width: 10),
+                        Text(date,
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontFamily: 'Content',
+                              fontSize: size.width * 0.02,
+                              fontWeight: FontWeight.normal,
+                              height: size.height*0.002,
+                            )),
+                      ],
+                    )
+
+                  ]
+              ),
+            ),
+            SizedBox(width: size.height*0.1),
+            FlutterLinkPreview(
+              url: url,
+              bodyStyle: TextStyle(
+                fontSize: 18.0,
+              ),
+              titleStyle: TextStyle(
+                fontSize: 20.0,
+                fontWeight: FontWeight.bold,
+              ),
+              builder: (info) {
+                if (info is WebInfo) {
+                  return SizedBox(
+                    child: Card(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0)),
+                      clipBehavior: Clip.antiAlias,
+                      child: Column(
+                        children: [
+                          if (info.image != null)
+                            SizedBox(
+                                child: Image.network(
+                                  info.image,
+                                  width: size.height*0.09,
+                                  height: size.height*0.09,
+                                  fit: BoxFit.cover,
+                                )),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+                return Container();
+              },
+            )
+          ],
+
+        )
+      );
   }
   @override
   Widget build(BuildContext context) {
@@ -505,6 +694,7 @@ class _MainscreenState extends State<Mainscreen> {
     List<Map<String, dynamic>> negativeList = [];
     List<Map<String, dynamic>> mainStocklist = [];
     List<Map<String, dynamic>> toprateNewslist = [];
+    List<String> topratestock = [];
     Size size = MediaQuery.of(context).size;
 
     return Scaffold(
@@ -518,14 +708,14 @@ class _MainscreenState extends State<Mainscreen> {
           alignment: Alignment.topCenter,
           child: FutureBuilder(
             future: _getList(increaseList, decreaseList, positiveList,
-                negativeList, mainStocklist, toprateNewslist),
+                negativeList, mainStocklist, toprateNewslist, topratestock),
             builder: (BuildContext context, AsyncSnapshot snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
                 return SingleChildScrollView(
                   child: Column(
                     children: [
                       mainStockList(size, mainStocklist),
-                      TopratenewsListTab(size, toprateNewslist),
+                      TopratenewsListTab(size, toprateNewslist, topratestock),
                       rankingTab(size, increaseList, decreaseList, "시세 순위",
                           "상승 종목", "하락 종목"),
                       rankingTab(size, positiveList, negativeList, "뉴스 순위",
