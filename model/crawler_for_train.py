@@ -11,6 +11,7 @@ import csv
 from datetime import datetime, timedelta
 import codecs
 import re
+from tqdm import tqdm
 #########https://haries.tistory.com/4
 url = "http://api.seibro.or.kr/openapi/service/StockSvc/getKDRSecnInfo"  # 공공데이터포털 api 주소(Without param)
 api_service_key_stock = "RXhGWArdgsytKaKf0g%2FWxNuo27wXxg4iChLUs9ePc39VvneddFbQ9v9ZXCDWJkdFbhqCvbw9kdMGy%2F%2Bv3it50A%3D%3D"  # service api key
@@ -86,14 +87,14 @@ def search_crawl(tuple_list,query):
     del_list = ["오늘의", "뉴스", "급락주","마감","주요","급등주", "증시일정", "캘린더", "이번주", "[포토]", "[인사]", "상장사", "주간", "종목", "총정리", 
                 "다음주", "슈퍼주총", "공모주", "돋보기", "週間", "증권주"]
 
-    page = 1
-    maxpage = 11
+    page = 101
+    maxpage = 501
     # 11= 2페이지 21=3페이지 31=4페이지  ...81=9페이지 , 91=10페이지, 101=11페이지
     maxpage_t = (int(maxpage) - 1) * 10 + 1
     sort = 0 #0=관련도순 1=최신순 
     while page <= maxpage_t:
         url = (
-            "https://search.naver.com/search.naver?where=news&query=\""
+            "https://news.naver.com/main/main.naver?mode=LSD&mid=shm&sid1=101"
             + query
             + "\"&sort="
             + str(sort)
@@ -1146,7 +1147,7 @@ def run():
 
 
     tuple_list.append(('title','label'))
-    for query in cospi[0:600]:
+    for query in tqdm(cospi):
         search_crawl(tuple_list, query)
 
 
