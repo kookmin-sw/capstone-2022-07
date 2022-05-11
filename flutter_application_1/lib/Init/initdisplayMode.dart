@@ -3,6 +3,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/Components/indicator.dart';
 import 'package:flutter_application_1/Init/initAlert.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 
@@ -40,9 +41,10 @@ class InitDisplayMode extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.done) {
           return InitAlert();
         } else {
-          return Center(
-            child: CircularProgressIndicator(
-              backgroundColor: Colors.white,
+          return Container(
+            color: Colors.white,
+            child: Center(
+              child: indicator(),
             ),
           );
         }
