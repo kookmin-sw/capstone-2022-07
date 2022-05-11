@@ -4,8 +4,11 @@
 
 // ignore_for_file: prefer_const_constructors, prefer_const_constructors_in_immutables, non_constant_identifier_names, prefer_const_literals_to_create_immutables, prefer_typing_uninitialized_variables
 import 'package:flutter/material.dart';
+import 'dart:async';
+import 'package:async/async.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_application_1/Color/Color.dart';
+import 'package:flutter_application_1/Components/main_app_bar.dart';
 import 'package:flutter_application_1/Components/star_button.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:yahoofin/yahoofin.dart';
@@ -67,33 +70,38 @@ class _StockscreenState extends State<Stockscreen> {
   Map<String, dynamic> firebaseStockData = {};
   List<Map<String, dynamic>> newsDataList = [];
 
-  Future getStockInfo() async {
-    CollectionReference stocks = FirebaseFirestore.instance.collection('stock');
-    QuerySnapshot stockData =
-        await stocks.where('stockName', isEqualTo: widget.stockName).get();
+  Future getStockInfo() => AsyncMemoizer().runOnce(
+        () async {
+          CollectionReference stocks =
+              FirebaseFirestore.instance.collection('stock');
+          QuerySnapshot stockData = await stocks
+              .where('stockName', isEqualTo: widget.stockName)
+              .get();
 
-    CollectionReference news =
-        stocks.doc(stockData.docs[0].id).collection("news");
+          CollectionReference news =
+              stocks.doc(stockData.docs[0].id).collection("news");
 
-    Future<void> _getNewsList(List<Map<String, dynamic>> list) async {
-      await news.orderBy("timestamp", descending: true).get().then(
-        (QuerySnapshot qs) {
-          for (var doc in qs.docs) {
-            Map<String, dynamic> topnews = doc.data() as Map<String, dynamic>;
-            list.add(topnews);
+          Future<void> _getNewsList(List<Map<String, dynamic>> list) async {
+            await news.orderBy("timestamp", descending: true).get().then(
+              (QuerySnapshot qs) {
+                for (var doc in qs.docs) {
+                  Map<String, dynamic> topnews =
+                      doc.data() as Map<String, dynamic>;
+                  list.add(topnews);
+                }
+              },
+            );
+          }
+
+          _getNewsList(newsDataList);
+
+          if (stockData.size == 0) {
+            return null;
+          } else {
+            return stockData.docs[0].data();
           }
         },
       );
-    }
-
-    _getNewsList(newsDataList);
-
-    if (stockData.size == 0) {
-      return null;
-    } else {
-      return stockData.docs[0].data();
-    }
-  }
 
   //Firebase 적용사항
 
@@ -209,14 +217,16 @@ class _StockscreenState extends State<Stockscreen> {
     return "";
   }
 
-  chartInit(String ticker) async {
-    String temp = ticker;
-    if (ticker != "^KS11" && ticker != "^KQ11") temp += ".KS";
-    await getMonthData(temp);
-    await getYearData(temp);
-    await getTenYearData(temp);
-    await getDayData(temp);
-  }
+  Future chartInit(String ticker) => AsyncMemoizer().runOnce(
+        () async {
+          String temp = ticker;
+          if (ticker != "^KS11" && ticker != "^KQ11") temp += ".KS";
+          await getMonthData(temp);
+          await getYearData(temp);
+          await getTenYearData(temp);
+          await getDayData(temp);
+        },
+      );
 
   // 종목 이름,가격,대비,긍/부정, 관심
 
@@ -354,8 +364,8 @@ class _StockscreenState extends State<Stockscreen> {
             ),
           ),
           views: [
-            Info(size, '종목 뉴스', firebaseStockData),
-            Info(size, '종목 정보', firebaseStockData),
+            newsInfo(size, '종목 뉴스', firebaseStockData),
+            stockInfo(size, '종목 정보', firebaseStockData),
           ],
           onChange: (index) {},
         ),
@@ -433,7 +443,21 @@ class _StockscreenState extends State<Stockscreen> {
       var stockPrice, var stockPerc, var stockChange) {
     stockPrice = intlprice.format(stockPrice);
     stockPerc = intlperc.format(stockPerc) + "%";
-    stockChange = intlprice.format(stockChange.abs());
+
+    if (stockName != "코스피" && stockName != "코스닥") {
+      stockChange = intlprice.format(stockChange.abs());
+    } else {
+      stockChange = stockChange.abs();
+    }
+
+    String stockChangeIcon;
+    if (stockColor == CHART_PLUS) {
+      stockChangeIcon = "▲";
+    } else if (stockColor == CHART_MINUS) {
+      stockChangeIcon = "▼";
+    } else {
+      stockChangeIcon = "-";
+    }
     return Container(
       padding: EdgeInsets.all(size.width * 0.05),
       child: Column(
@@ -447,7 +471,6 @@ class _StockscreenState extends State<Stockscreen> {
                 textAlign: TextAlign.justify,
                 style: TextStyle(
                   color: Color.fromRGBO(0, 0, 0, 1),
-                  fontFamily: 'Content',
                   fontSize: size.width * 0.06,
                   fontWeight: FontWeight.bold,
                   height: 1,
@@ -463,96 +486,63 @@ class _StockscreenState extends State<Stockscreen> {
             ],
           ),
           SizedBox(height: size.height * 0.01),
-          Container(
-              child: Row(
+          Row(
             children: [
               Text(
                 //Firebase 적용사항
                 stockPrice.toString(),
                 style: TextStyle(
                   color: stockColor,
-                  fontFamily: 'Content',
                   fontSize: size.width * 0.06,
                   letterSpacing: 0,
                   fontWeight: FontWeight.bold,
                   height: 1,
                 ),
               ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  SizedBox(
-                      height: size.width * 0.047,
-                      width: size.width * 0.047,
-                      // color:Colors.black,
-                      child: ((() {
-                        if (stockColor == CHART_PLUS) {
-                          return Icon(
-                            Icons.arrow_drop_up_rounded,
-                            color: stockColor,
-                          );
-                        } else if (stockColor == CHART_MINUS) {
-                          return Icon(Icons.arrow_drop_down_rounded,
-                              color: stockColor);
-                        } else {
-                          return Icon(
-                            Icons.remove_rounded,
-                            color: stockColor,
-                            size: size.width * 0.05,
-                          );
-                        }
-                      })())),
-                  Text(
-                    //Firebase 적용사항
-                    stockChange.toString(),
-                    style: TextStyle(
-                      color: stockColor,
-                      fontFamily: 'Content',
-                      fontSize: size.width * 0.03,
-                      letterSpacing: 0,
-                      fontWeight: FontWeight.normal,
-                      // height: 3,
+              Container(
+                margin: EdgeInsets.only(left: size.width * 0.02),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      margin: EdgeInsets.only(right: size.width * 0.01),
+                      child: Text(
+                        //Firebase 적용사항
+                        stockChangeIcon,
+                        style: TextStyle(
+                          color: stockColor,
+                          fontSize: size.width * 0.03,
+                          letterSpacing: 0,
+                          fontWeight: FontWeight.normal,
+                          // height: 3,
+                        ),
+                      ),
                     ),
-                  ),
-                  Text(
-                    //Firebase 적용사항
-                    "(${stockPerc.toString()})",
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                      color: stockColor,
-                      fontFamily: 'Content',
-                      fontSize: size.width * 0.03,
-                      letterSpacing: 0,
-                      fontWeight: FontWeight.normal,
-                      // height: 3,
+                    Text(
+                      //Firebase 적용사항
+                      "${stockChange.toString()} (${stockPerc.toString()})",
+                      style: TextStyle(
+                        color: stockColor,
+                        fontSize: size.width * 0.035,
+                        letterSpacing: 0,
+                        fontWeight: FontWeight.normal,
+                        // height: 3,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               )
             ],
-          )),
+          ),
         ],
       ),
     );
   }
 
   // 하단 위젯 구성
-  Widget Info(Size size, String msg, Map<String, dynamic> firebaseStockData) {
-    List<String> stockIcon = <String>[
-      'stockClosingPrice',
-      'stockHighPrice',
-      'stockLowPrice',
-      'stockVolume',
-      // MUST CHANGE
-      'stockVolume'
-    ];
-    List<String> stockInfodetail = <String>['전일종가', '고가', '저가', '거래량', '시가총액'];
-    List<String> stockValue = [];
-
-    stockIcon.forEach((element) {
-      stockValue.add(intlprice.format(firebaseStockData['${element}']));
-    });
-
+  Widget newsInfo(
+      Size size, String msg, Map<String, dynamic> firebaseStockData) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.only(
@@ -576,18 +566,85 @@ class _StockscreenState extends State<Stockscreen> {
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
               padding: EdgeInsets.symmetric(horizontal: size.width * 0.04),
-              itemCount:
-                  (msg == '종목 정보') ? stockIcon.length : newsDataList.length,
+              itemCount: newsDataList.length,
               itemBuilder: (BuildContext context, int index) {
-                return (msg == '종목 정보'
-                    ? stockdetail(size, stockIcon[index],
-                        stockInfodetail[index], stockValue[index])
-                    : stockNews(
-                        size,
-                        newsDataList[index]["title"],
-                        // newsDataList[index]["content"],
-                        newsDataList[index]["label"],
-                        newsDataList[index]["url"]));
+                return stockNews(size, newsDataList[index]["title"],
+                    newsDataList[index]["label"], newsDataList[index]["url"]);
+              },
+              separatorBuilder: (BuildContext context, int index) =>
+                  const Divider(color: GREY),
+            ),
+            SizedBox(
+              height: size.height * 0.02,
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget stockInfo(
+      Size size, String msg, Map<String, dynamic> firebaseStockData) {
+    List<String> stockInfo = <String>[
+      'TimePerPositiveNewsCount',
+      'TimePerNegativeNewsCount',
+      'stockClosingPrice',
+      'stockHighPrice',
+      'stockLowPrice',
+      'stockVolume',
+      'marketCap',
+    ];
+    List<String> stockInfodetail = <String>[
+      '긍정 기사 개수',
+      '부정 기사 개수',
+      '전일종가',
+      '고가',
+      '저가',
+      '거래량',
+      '시가총액',
+    ];
+    if (firebaseStockData["stockName"] == "코스피" ||
+        firebaseStockData["stockName"] == "코스닥") {
+      stockInfo.removeLast();
+      stockInfodetail.removeLast();
+    }
+
+    List<String> stockValue = [];
+
+    for (var element in stockInfo) {
+      if (element == "marketCap") {
+        stockValue.add("${marketCapFormat(firebaseStockData[element])}원");
+      } else {
+        stockValue.add(intlprice.format(firebaseStockData[element]));
+      }
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(16),
+          topRight: Radius.circular(16),
+          bottomLeft: Radius.circular(16),
+          bottomRight: Radius.circular(16),
+        ),
+        color: Colors.white,
+      ),
+      width: size.width * 0.9,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Column(
+          children: [
+            SizedBox(
+              height: size.height * 0.02,
+            ),
+            ListView.separated(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              padding: EdgeInsets.symmetric(horizontal: size.width * 0.04),
+              itemCount: stockInfo.length,
+              itemBuilder: (BuildContext context, int index) {
+                return stockdetail(size, stockInfo[index],
+                    stockInfodetail[index], stockValue[index]);
               },
               separatorBuilder: (BuildContext context, int index) =>
                   const Divider(color: GREY),
@@ -603,8 +660,8 @@ class _StockscreenState extends State<Stockscreen> {
 
   Widget stockdetail(Size size, String Iconlist, String Infodetail, var Value) {
     return Container(
-      margin:
-          EdgeInsets.only(bottom: size.height * 0.03, top: size.height * 0.03),
+      margin: EdgeInsets.only(
+          bottom: size.height * 0.012, top: size.height * 0.012),
       child: Row(
         children: [
           //Firebase 적용사항
@@ -615,7 +672,6 @@ class _StockscreenState extends State<Stockscreen> {
             textAlign: TextAlign.left,
             style: TextStyle(
                 color: Color.fromRGBO(91, 99, 106, 1),
-                fontFamily: 'ABeeZee',
                 fontSize: size.width * 0.04,
                 letterSpacing: 0,
                 fontWeight: FontWeight.bold,
@@ -627,7 +683,6 @@ class _StockscreenState extends State<Stockscreen> {
               textAlign: TextAlign.right,
               style: TextStyle(
                   color: Color.fromRGBO(0, 0, 0, 1.0),
-                  fontFamily: 'ABeeZee',
                   fontSize: size.width * 0.036,
                   letterSpacing: 0,
                   fontWeight: FontWeight.normal,
@@ -737,7 +792,7 @@ class _StockscreenState extends State<Stockscreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: StockscreenBar(context, "관심 종목", widget.stockName),
+      appBar: StockscreenBar(context, widget.stockName, widget.stockName),
       body: SafeArea(
         child: FutureBuilder(
           future: getStockInfo(),
