@@ -4,6 +4,7 @@
 
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, prefer_const_constructors_in_immutables, non_constant_identifier_names
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/Components/indicator.dart';
 import 'package:flutter_application_1/Components/setting_button.dart';
 import 'package:flutter_application_1/screens/mainScreen/stockscreen.dart';
 import 'package:flutter_application_1/Components/main_app_bar.dart';
@@ -13,6 +14,8 @@ import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_application_1/Components/numFormat.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class Searchscreen extends StatefulWidget {
   Searchscreen({Key? key}) : super(key: key);
@@ -133,7 +136,7 @@ class _SearchscreenState extends State<Searchscreen> {
               );
             }
           } else {
-            return Center(child: CircularProgressIndicator());
+            return Center(child: indicator());
           }
         });
   }
@@ -309,6 +312,7 @@ class _SearchscreenState extends State<Searchscreen> {
                             builder: (context) {
                               return Stockscreen(
                                 stockName: stocklist[index]['stockName'],
+                                stockCode: stocklist[index]['stockCode'],
                               );
                             },
                           ),
@@ -334,6 +338,8 @@ class _SearchscreenState extends State<Searchscreen> {
                           "favorite": FieldValue.arrayRemove(
                               [stocklist[index]['stockName']])
                         });
+                        await FirebaseMessaging.instance.unsubscribeFromTopic(
+                            stocklist[index]['stockCode']);
                       } else {
                         await FirebaseFirestore.instance
                             .collection('users')
@@ -342,6 +348,8 @@ class _SearchscreenState extends State<Searchscreen> {
                           "favorite": FieldValue.arrayUnion(
                               [stocklist[index]['stockName']])
                         });
+                        await FirebaseMessaging.instance
+                            .subscribeToTopic(stocklist[index]['stockCode']);
                       }
                     },
                   ),
@@ -547,6 +555,7 @@ class _SearchscreenState extends State<Searchscreen> {
             builder: (context) {
               return Stockscreen(
                 stockName: stockname,
+                stockCode: stockCode,
               );
             },
           ),
@@ -584,9 +593,7 @@ class _SearchscreenState extends State<Searchscreen> {
               .snapshots(),
           builder: (context, AsyncSnapshot snapshot) {
             if (!snapshot.hasData) {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
+              return Center(child: indicator());
             } else {
               if (snapshot.data!.docs.length == 0 ||
                   snapshot.data!.docs.length > 300) {

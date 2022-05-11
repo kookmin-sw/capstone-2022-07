@@ -2,9 +2,12 @@
 
 import 'package:flutter_application_1/screens/mainScreen/notification_details_page.dart';
 import 'package:flutter_application_1/screens/mainScreen/start_screen.dart';
+import 'package:flutter_application_1/screens/mainScreen/stockscreen.dart';
+import 'package:flutter_application_1/splashPage.dart';
 import 'package:get/get.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AlertController extends GetxController {
   static AlertController get to => Get.find();
@@ -55,10 +58,7 @@ class AlertController extends GetxController {
         InitializationSettings(
             android: AndroidInitializationSettings('@mipmap/launcher_icon'),
             iOS: IOSInitializationSettings()),
-        onSelectNotification: (String? payload) async {
-      print(payload);
-      Get.to(() => StartScreen(), arguments: payload);
-    });
+        onSelectNotification: (String? payload) async {});
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       remoteMessage.value = message;
@@ -83,17 +83,29 @@ class AlertController extends GetxController {
       }
     });
 
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage rm) {
-      print(rm);
-      Get.to(() => NotificationDetailsPage(), arguments: rm.data['argument']);
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage rm) async {
+      if (rm.data['screen'] == 'Stockscreen') {
+        await Get.to(() => SplashPage());
+        if (FirebaseAuth.instance.currentUser != null) {
+          Get.to(() => Stockscreen(
+              stockName: rm.data["stockName"],
+              stockCode: rm.data["stockCode"]));
+        }
+      }
     });
 
     // Terminated 상태에서 도착한 메시지에 대한 처리
     RemoteMessage? initialMessage =
         await FirebaseMessaging.instance.getInitialMessage();
     if (initialMessage != null) {
-      Get.to(() => NotificationDetailsPage(),
-          arguments: initialMessage.data['argument']);
+      print(initialMessage.data['screen']);
+      if (initialMessage.data['screen'] == 'Stockscreen') {
+        Get.to(() => Stockscreen(
+            stockName: initialMessage.data["stockName"],
+            stockCode: initialMessage.data["stockCode"]));
+      } else {
+        Get.to(() => StartScreen(), arguments: initialMessage.data['argument']);
+      }
     }
 
     return true;

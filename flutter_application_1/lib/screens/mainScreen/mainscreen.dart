@@ -6,6 +6,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Color/Color.dart';
+import 'package:flutter_application_1/Components/indicator.dart';
 
 import 'package:flutter_application_1/Components/main_app_bar.dart';
 import 'package:flutter_application_1/Components/setting_button.dart';
@@ -14,6 +15,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:contained_tab_bar_view/contained_tab_bar_view.dart';
 import 'package:flutter_application_1/Components/numFormat.dart';
 import 'package:flutter_link_preview/flutter_link_preview.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Mainscreen extends StatefulWidget {
@@ -176,7 +178,8 @@ class _MainscreenState extends State<Mainscreen> {
                     list[index]['stockName'],
                     list[index]['stockPerChange'],
                     list[index]['stockPrice'],
-                    list[index]['stockChange']);
+                    list[index]['stockChange'],
+                    list[index]['stockCode']);
               },
               separatorBuilder: (BuildContext context, int index) =>
                   const Divider(color: GREY),
@@ -188,7 +191,7 @@ class _MainscreenState extends State<Mainscreen> {
   }
 
   Widget mainStock(Size size, String stockname, var stockperc, var stockprice,
-      var stockChange) {
+      var stockChange, var stockCode) {
     Color color;
     if (stockperc > 0) {
       color = CHART_PLUS;
@@ -307,6 +310,7 @@ class _MainscreenState extends State<Mainscreen> {
             builder: (context) {
               return Stockscreen(
                 stockName: stockname,
+                stockCode: stockCode,
               );
             },
           ),
@@ -343,7 +347,8 @@ class _MainscreenState extends State<Mainscreen> {
               list[index]['stockPerChange'],
               list[index]['stockPrice'],
               list[index]['DayNewsCount'],
-              list[index]['stockChange']);
+              list[index]['stockChange'],
+              list[index]['stockCode']);
         },
         separatorBuilder: (BuildContext context, int index) =>
             const Divider(color: GREY),
@@ -352,7 +357,7 @@ class _MainscreenState extends State<Mainscreen> {
   }
 
   Widget Topstock(Size size, String stockname, var stockperc, var stockprice,
-      var newscount, var stockChange) {
+      var newscount, var stockChange, var stockCode) {
     Color color;
     if (stockperc > 0) {
       color = CHART_PLUS;
@@ -482,9 +487,7 @@ class _MainscreenState extends State<Mainscreen> {
           context,
           MaterialPageRoute(
             builder: (context) {
-              return Stockscreen(
-                stockName: stockname,
-              );
+              return Stockscreen(stockName: stockname, stockCode: stockCode);
             },
           ),
         );
@@ -777,7 +780,7 @@ class _MainscreenState extends State<Mainscreen> {
                   ),
                 );
               } else {
-                return Center(child: CircularProgressIndicator());
+                return Center(child: indicator());
               }
             },
           ),

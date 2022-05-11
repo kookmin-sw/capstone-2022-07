@@ -8,6 +8,7 @@ import 'dart:async';
 import 'package:async/async.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_application_1/Color/Color.dart';
+import 'package:flutter_application_1/Components/indicator.dart';
 import 'package:flutter_application_1/Components/main_app_bar.dart';
 import 'package:flutter_application_1/Components/star_button.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -21,9 +22,11 @@ class Stockscreen extends StatefulWidget {
   Stockscreen({
     Key? key,
     required this.stockName,
+    required this.stockCode,
   }) : super(key: key);
 
   final String stockName;
+  final String stockCode;
 
   @override
   State<Stockscreen> createState() => _StockscreenState();
@@ -792,7 +795,8 @@ class _StockscreenState extends State<Stockscreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: StockscreenBar(context, widget.stockName, widget.stockName),
+      appBar: StockscreenBar(
+          context, widget.stockName, widget.stockName, widget.stockCode),
       body: SafeArea(
         child: FutureBuilder(
           future: getStockInfo(),
@@ -820,12 +824,12 @@ class _StockscreenState extends State<Stockscreen> {
                       ),
                     );
                   } else {
-                    return Center(child: CircularProgressIndicator());
+                    return Center(child: indicator());
                   }
                 },
               );
             } else {
-              return Center(child: CircularProgressIndicator());
+              return Center(child: indicator());
             }
           },
         ),

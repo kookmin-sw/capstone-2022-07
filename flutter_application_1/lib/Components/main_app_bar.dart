@@ -9,9 +9,9 @@ AppBar mainAppBar(
   return AppBar(
     systemOverlayStyle: SystemUiOverlayStyle(),
     title: Image.asset(
-      'assets/logos/logo_home.png',
-      width: size.width * 0.2,
-      height: size.height * 0.3,
+      'assets/logos/logo_text.png',
+      width: size.width * 0.4,
+      // height: size.height * 0.3,
     ),
     centerTitle: true,
     actions: [button],
@@ -59,7 +59,8 @@ AppBar noneActionAppBar(BuildContext context, String title) {
   );
 }
 
-AppBar StockscreenBar(BuildContext context, String title, String stockName) {
+AppBar StockscreenBar(
+    BuildContext context, String title, String stockName, String stockCode) {
   return AppBar(
     systemOverlayStyle: SystemUiOverlayStyle(),
     centerTitle: true,
@@ -76,7 +77,7 @@ AppBar StockscreenBar(BuildContext context, String title, String stockName) {
         color: Colors.black,
       ),
     ),
-    actions: [FavoriteButton(stockName)],
+    actions: [FavoriteButton(stockName, stockCode)],
     leadingWidth: 70,
     backgroundColor: Colors.transparent,
     elevation: 0.0,

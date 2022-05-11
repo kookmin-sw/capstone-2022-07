@@ -4,6 +4,7 @@
 
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, prefer_const_constructors_in_immutables, non_constant_identifier_names
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/Components/indicator.dart';
 import 'package:flutter_application_1/Components/setting_button.dart';
 import 'package:flutter_application_1/screens/Register/function.dart';
 import 'package:flutter_application_1/Components/main_app_bar.dart';
@@ -164,7 +165,7 @@ class _ProfilescreenState extends State<Profilescreen> {
                   ],
                 ));
           } else {
-            return Center(child: CircularProgressIndicator());
+            return Center(child: indicator());
           }
         });
   }

@@ -8,11 +8,12 @@ import 'package:flutter_application_1/Color/Color.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 class FavoriteButton extends StatefulWidget implements PreferredSizeWidget {
-  FavoriteButton(this.stockName)
+  FavoriteButton(this.stockName, this.stockCode)
       : preferredSize = Size.fromHeight(60.0),
         super();
   final Size preferredSize;
   final String stockName;
+  final String stockCode;
 
   @override
   _FavoriteButtonState createState() => _FavoriteButtonState();
@@ -48,6 +49,7 @@ class _FavoriteButtonState extends State<FavoriteButton> {
             }
             return GestureDetector(
               onTap: () async {
+                print(widget.stockCode);
                 setState(() {
                   IsFavorite = !IsFavorite;
                 });
@@ -59,7 +61,7 @@ class _FavoriteButtonState extends State<FavoriteButton> {
                     "favorite": FieldValue.arrayRemove([widget.stockName])
                   });
                   await FirebaseMessaging.instance
-                      .subscribeToTopic(widget.stockName);
+                      .unsubscribeFromTopic(widget.stockCode);
                 } else {
                   await FirebaseFirestore.instance
                       .collection('users')
@@ -67,8 +69,9 @@ class _FavoriteButtonState extends State<FavoriteButton> {
                       .update({
                     "favorite": FieldValue.arrayUnion([widget.stockName])
                   });
+
                   await FirebaseMessaging.instance
-                      .unsubscribeFromTopic(widget.stockName);
+                      .subscribeToTopic(widget.stockCode);
                 }
               },
               child: Container(

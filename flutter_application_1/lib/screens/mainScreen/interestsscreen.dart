@@ -8,6 +8,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Color/color.dart';
+import 'package:flutter_application_1/Components/indicator.dart';
 import 'package:flutter_application_1/Components/main_app_bar.dart';
 import 'package:flutter_application_1/Components/setting_button.dart';
 import 'package:intl/intl.dart';
@@ -48,7 +49,13 @@ class _InterestScreenState extends State<InterestScreen> {
           .collection('stock')
           .where("stockName", isEqualTo: "${element}")
           .get();
-      stockdata = userstockinfo.docs[0].data();
+
+      try {
+        stockdata = userstockinfo.docs[0].data();
+      } on RangeError {
+        return [];
+      }
+
       stockcardlist.add(stockdata);
     }
 
@@ -103,8 +110,16 @@ class _InterestScreenState extends State<InterestScreen> {
     return Container();
   }
 
-  Widget Stockcard(BuildContext context, Size size, String name, var price,
-      var stockChange, var stockperc, var volume, var marketCap) {
+  Widget Stockcard(
+      BuildContext context,
+      Size size,
+      String name,
+      var price,
+      var stockChange,
+      var stockperc,
+      var volume,
+      var marketCap,
+      String stockCode) {
     Color color;
     if (stockperc > 0) {
       color = CHART_PLUS;
@@ -342,6 +357,7 @@ class _InterestScreenState extends State<InterestScreen> {
                             builder: (context) {
                               return Stockscreen(
                                 stockName: name,
+                                stockCode: stockCode,
                               );
                             },
                           ),
@@ -409,15 +425,15 @@ class _InterestScreenState extends State<InterestScreen> {
         itemCount: stocklist.length,
         itemBuilder: (BuildContext context, int index) {
           return Stockcard(
-            context,
-            size,
-            stocklist[index]['stockName'],
-            stocklist[index]['stockPrice'],
-            stocklist[index]['stockChange'],
-            stocklist[index]['stockPerChange'],
-            stocklist[index]['stockVolume'],
-            stocklist[index]['marketCap'],
-          );
+              context,
+              size,
+              stocklist[index]['stockName'],
+              stocklist[index]['stockPrice'],
+              stocklist[index]['stockChange'],
+              stocklist[index]['stockPerChange'],
+              stocklist[index]['stockVolume'],
+              stocklist[index]['marketCap'],
+              stocklist[index]['stockCode']);
         },
       ),
     );
@@ -469,7 +485,7 @@ class _InterestScreenState extends State<InterestScreen> {
               );
             }
           } else {
-            return Center(child: CircularProgressIndicator());
+            return Center(child: indicator());
           }
         },
       ),
