@@ -141,22 +141,17 @@ def search_crawl(tuple_list,query):
             if any(keyword in news_name for keyword in del_list):
                 continue
 
-
             for i in range(len(positive)):
                 if news_name.find(positive[i]) != -1:
-                    label = 1
-                    tag = positive[i]
-                    break
+                    label +=1
             for i in range(len(negative)):
                 if news_name.find(negative[i]) != -1:
                     label = -1
-                    tag = negative[i]
-                    break
             
-            if label == 1:
+            if label >= 1:
                 pov_or_neg = 1
                 #print("positive", j)
-            elif label == -1 :
+            elif label <= -1 :
                 pov_or_neg = -1
                 #print("negative", j)
             elif label == 0:
