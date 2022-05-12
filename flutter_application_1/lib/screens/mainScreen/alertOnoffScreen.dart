@@ -1,12 +1,17 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_constructors_in_immutables
 
+import 'dart:async';
+import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_application_1/Color/color.dart';
+import 'package:flutter_application_1/Components/indicator.dart';
 import 'package:flutter_application_1/Components/main_app_bar.dart';
-import 'package:flutter_application_1/Components/setting_button.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:getwidget/getwidget.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AlertOnoffScreen extends StatefulWidget {
   AlertOnoffScreen({Key? key}) : super(key: key);
@@ -16,13 +21,32 @@ class AlertOnoffScreen extends StatefulWidget {
 }
 
 class _AlertOnoffScreenState extends State<AlertOnoffScreen> {
-  bool allAlarm = true;
-  bool interestAlarm = false;
-  late List<bool> isSelected;
+  Map<String, dynamic> firebaseUserdata = {};
+  late Future getUserData;
+  late bool allAlarm;
+  late bool interestAlarm;
+
+  Future findUserByUid(String uid) => AsyncMemoizer().runOnce(
+        () async {
+          CollectionReference users =
+              FirebaseFirestore.instance.collection('users');
+          QuerySnapshot data = await users.where('uid', isEqualTo: uid).get();
+
+          firebaseUserdata = data.docs[0].data() as Map<String, dynamic>;
+          allAlarm = firebaseUserdata["allNotification"];
+          interestAlarm = firebaseUserdata["interestNotification"];
+
+          if (data.size == 0) {
+            return null;
+          } else {
+            return data.docs[0].data();
+          }
+        },
+      );
 
   @override
   void initState() {
-    isSelected = [allAlarm, interestAlarm];
+    getUserData = findUserByUid(FirebaseAuth.instance.currentUser!.uid);
     super.initState();
   }
 
@@ -60,12 +84,25 @@ class _AlertOnoffScreenState extends State<AlertOnoffScreen> {
               child: CupertinoSwitch(
                 activeColor: CHART_MINUS,
                 value: allAlarm,
-                onChanged: (value) {
+                onChanged: (value) async {
                   setState(() {
                     allAlarm = value;
                     if (allAlarm == false) {
                       interestAlarm = false;
                     }
+                  });
+                  if (allAlarm == false) {
+                    await FirebaseMessaging.instance
+                        .unsubscribeFromTopic("All");
+                  } else {
+                    await FirebaseMessaging.instance.subscribeToTopic("All");
+                  }
+                  await FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(FirebaseAuth.instance.currentUser!.uid)
+                      .update({
+                    "allNotification": allAlarm,
+                    "interestNotification": interestAlarm,
                   });
                 },
               ),
@@ -109,7 +146,7 @@ class _AlertOnoffScreenState extends State<AlertOnoffScreen> {
               child: CupertinoSwitch(
                 activeColor: CHART_MINUS,
                 value: interestAlarm,
-                onChanged: (value) {
+                onChanged: (value) async {
                   setState(
                     () {
                       if (!allAlarm) {
@@ -119,6 +156,17 @@ class _AlertOnoffScreenState extends State<AlertOnoffScreen> {
                       }
                     },
                   );
+                  if (interestAlarm) {
+                    await FirebaseMessaging.instance
+                        .subscribeToTopic("interest");
+                  } else {
+                    await FirebaseMessaging.instance
+                        .unsubscribeFromTopic("interest");
+                  }
+                  await FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(FirebaseAuth.instance.currentUser!.uid)
+                      .update({"interestNotification": interestAlarm});
                 },
               ),
             )
@@ -134,16 +182,27 @@ class _AlertOnoffScreenState extends State<AlertOnoffScreen> {
         context,
         "푸시 알림 설정",
       ),
-      body: Column(
-        children: [
-          allAlarmTogle(size),
-          Container(
-            color: Colors.white,
-            child: Divider(),
-          ),
-          interestAlarmTogle(size),
-        ],
-      ),
+      body: FutureBuilder(
+          future: getUserData,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              firebaseUserdata = snapshot.data as Map<String, dynamic>;
+              return Column(
+                children: [
+                  allAlarmTogle(size),
+                  Container(
+                    color: Colors.white,
+                    child: Divider(),
+                  ),
+                  interestAlarmTogle(size),
+                ],
+              );
+            } else {
+              return Center(
+                child: indicator(),
+              );
+            }
+          }),
     );
   }
 }

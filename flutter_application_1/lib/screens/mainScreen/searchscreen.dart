@@ -4,6 +4,7 @@
 
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, prefer_const_constructors_in_immutables, non_constant_identifier_names
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/Components/indicator.dart';
 import 'package:flutter_application_1/Components/setting_button.dart';
 import 'package:flutter_application_1/screens/mainScreen/stockscreen.dart';
 import 'package:flutter_application_1/Components/main_app_bar.dart';
@@ -13,6 +14,8 @@ import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_application_1/Components/numFormat.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class Searchscreen extends StatefulWidget {
   Searchscreen({Key? key}) : super(key: key);
@@ -37,25 +40,29 @@ class _SearchscreenState extends State<Searchscreen> {
       body: SizedBox(
           height: size.height,
           width: size.width,
-          child: Stack(children: [
-            visitedtitle(size),
-            visitedstock(size),
-            buildFloatingSearchBar(context, size),
-          ])),
+          child: Stack(
+            children: [
+              visitedstock(size),
+              buildFloatingSearchBar(context, size),
+            ],
+            alignment: Alignment.topCenter,
+          )),
     );
   }
 
   Widget visitedtitle(size) {
-    return Positioned(
-        // padding: EdgeInsets.only(left : size.width*0.02),
-        top: size.width * 0.2,
-        left: size.width * 0.04,
-        height: size.height * 0.04,
-        child: Text('최근 조회 종목',
-            style: GoogleFonts.notoSans(
-                fontSize: size.width * 0.025,
-                fontWeight: FontWeight.bold,
-                height: size.width * 0.005)));
+    return Container(
+      alignment: Alignment.topLeft,
+      margin:
+          EdgeInsets.only(left: size.width * 0.01, bottom: size.height * 0.01),
+      child: Text(
+        '최근 조회 종목',
+        style: GoogleFonts.notoSans(
+            fontSize: size.width * 0.04,
+            fontWeight: FontWeight.bold,
+            height: size.width * 0.005),
+      ),
+    );
   }
 
   //주식 정보를 가져옴
@@ -93,40 +100,52 @@ class _SearchscreenState extends State<Searchscreen> {
           if (snapshot.connectionState == ConnectionState.done) {
             List<dynamic> visitedstocklist = snapshot.data ?? [];
             if (visitedstocklist[0].isEmpty) {
-              return Stack(
-                children: [
-                  Positioned(
-                      top: size.width * 0.2,
-                      left: size.width * 0.04,
-                      child: Container(
-                          width: size.width * 0.15,
-                          height: size.height * 0.03,
-                          color: Color.fromRGBO(249, 249, 249, 1))),
-                  Center(
-                      child: Text(
-                    '최근 조회한 종목이 없습니다.',
-                    style: TextStyle(
-                      fontSize: size.width * 0.05,
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.search,
                       color: GREY,
+                      size: size.height * 0.1,
                     ),
-                  ))
-                ],
+                    SizedBox(
+                      height: size.height * 0.05,
+                    ),
+                    Text(
+                      "최근 검색 목록이 없습니다.",
+                      style: TextStyle(
+                        fontSize: size.width * 0.07,
+                        color: GREY,
+                      ),
+                    ),
+                  ],
+                ),
               );
             } else {
-              return visitedstockview(
-                  size, visitedstocklist[0], visitedstocklist[1]);
+              return Positioned(
+                top: size.height * 0.08,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    visitedtitle(size),
+                    visitedstockview(
+                        size, visitedstocklist[0], visitedstocklist[1]),
+                  ],
+                ),
+              );
             }
           } else {
-            return Center(child: CircularProgressIndicator());
+            return Center(child: indicator());
           }
         });
   }
 
   Widget favoritestock(Size size, bool res) {
     if (res == true) {
-      return Container(child: Icon(Icons.star_outlined, color: Colors.amber));
+      return Icon(Icons.star_outlined, color: Colors.amber);
     } else {
-      return Container(child: Icon(Icons.star_outline, color: Colors.amber));
+      return Icon(Icons.star_outline, color: Colors.amber);
     }
   }
 
@@ -136,223 +155,227 @@ class _SearchscreenState extends State<Searchscreen> {
     if (stocklist.isEmpty) {
       return Container();
     } else {
-      return Positioned(
-          top: size.width * 0.27,
-          left: size.width * 0.03,
-          child: SizedBox(
-              height: size.height * 0.8,
-              width: size.width * 0.94,
-              child: ListView.builder(
-                scrollDirection: Axis.vertical,
-                itemCount: visitedlist.length,
-                itemBuilder: (BuildContext context, int index) {
-                  String name = stocklist[index]['stockName'];
+      return Container(
+        width: size.width * 0.92,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(8),
+            topRight: Radius.circular(8),
+            bottomLeft: Radius.circular(8),
+            bottomRight: Radius.circular(8),
+          ),
+          color: Color.fromRGBO(255, 255, 255, 1.0),
+        ),
+        child: ListView.separated(
+          shrinkWrap: true,
+          scrollDirection: Axis.vertical,
+          itemCount: visitedlist.length,
+          separatorBuilder: (BuildContext context, int index) =>
+              const Divider(color: GREY),
+          itemBuilder: (BuildContext context, int index) {
+            String name = stocklist[index]['stockName'];
 
-                  // index -= 1;
-                  bool initstar;
-                  if (favoritelist.contains(stocklist[index]['stockName'])) {
-                    initstar = true;
-                  } else {
-                    initstar = false;
-                  }
-                  late Color stockColor;
-                  if (stocklist[index]['stockPerChange'] > 0) {
-                    stockColor = CHART_PLUS;
-                  } else if (stocklist[index]['stockPerChange'] < 0) {
-                    stockColor = CHART_MINUS;
-                  } else {
-                    stockColor = Color.fromARGB(255, 120, 119, 119);
-                  }
-                  String stockPrice =
-                      intlprice.format(stocklist[index]['stockPrice']);
-                  String stockChange =
-                      intlprice.format(stocklist[index]['stockChange'].abs());
-                  String stockPerChange =
-                      intlperc.format(stocklist[index]['stockPerChange']) + "%";
+            // index -= 1;
+            bool initstar;
+            if (favoritelist.contains(stocklist[index]['stockName'])) {
+              initstar = true;
+            } else {
+              initstar = false;
+            }
+            late Color stockColor;
+            if (stocklist[index]['stockPerChange'] > 0) {
+              stockColor = CHART_PLUS;
+            } else if (stocklist[index]['stockPerChange'] < 0) {
+              stockColor = CHART_MINUS;
+            } else {
+              stockColor = Color.fromARGB(255, 120, 119, 119);
+            }
+            String stockPrice =
+                intlprice.format(stocklist[index]['stockPrice']);
+            String stockChange =
+                intlprice.format(stocklist[index]['stockChange'].abs());
+            String stockPerChange =
+                intlperc.format(stocklist[index]['stockPerChange']) + "%";
 
-                  return Column(
+            return Container(
+              height: size.height * 0.07,
+              padding: EdgeInsets.only(
+                  left: size.width * 0.03, right: size.width * 0.03),
+              child: Row(
+                children: [
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                          height: size.height * 0.06,
-                          color: Colors.white,
-                          padding: EdgeInsets.only(left: size.width * 0.02),
-                          child: Row(
-                            children: [
-                              InkWell(
-                                child: Container(
-                                    width: size.width * 0.38,
-                                    height: size.height * 0.06,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(stocklist[index]['stockName'],
-                                            textAlign: TextAlign.left,
-                                            style: GoogleFonts.notoSans(
-                                                fontSize: size.width * 0.03,
-                                                height: size.width * 0.005,
-                                                fontWeight: FontWeight.bold),
-                                            overflow: TextOverflow.ellipsis),
-                                        Text(
-                                          stocklist[index]['stockCode'],
-                                          style: GoogleFonts.notoSans(
-                                              fontSize: size.width * 0.025,
-                                              fontWeight: FontWeight.normal,
-                                              textStyle: TextStyle(
-                                                  color: Colors.grey[600])),
-                                        )
-                                      ],
-                                    )),
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) {
-                                        return Stockscreen(
-                                          stockName: stocklist[index]
-                                              ['stockName'],
-                                        );
-                                      },
-                                    ),
-                                  );
-                                },
-                              ),
-                              Container(
-                                  width: size.width * 0.2,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      //stockPrice
-                                      Container(
-                                          child: Text(
-                                        stockPrice,
-                                        style: TextStyle(
-                                          fontFamily: 'Content',
-                                          fontSize: size.width * 0.03,
-                                          letterSpacing: 0,
-                                          fontWeight: FontWeight.bold,
-                                          height: 1.5,
-                                        ),
-                                        textAlign: TextAlign.end,
-                                      )),
-                                      //stockPerChange
-                                      Container(
-                                          margin: EdgeInsets.only(
-                                              bottom: size.height * 0.01),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.end,
-                                            children: [
-                                              Container(
-                                                  child: Icon((() {
-                                                if (stockColor == CHART_PLUS) {
-                                                  return Icons
-                                                      .arrow_drop_up_outlined;
-                                                } else if (stockColor ==
-                                                    CHART_MINUS) {
-                                                  return Icons
-                                                      .arrow_drop_down_outlined;
-                                                } else {
-                                                  return Icons.remove;
-                                                }
-                                              })(),
-                                                      color: stockColor,
-                                                      size: size.width * 0.05)),
-                                              Text(
-                                                stockChange,
-                                                style: TextStyle(
-                                                  color: stockColor,
-                                                  fontFamily: 'Content',
-                                                  fontSize: size.width * 0.024,
-                                                  letterSpacing: 0,
-                                                  fontWeight: FontWeight.normal,
-                                                  height: 1,
-                                                ),
-                                              )
-                                            ],
-                                          ))
-                                    ],
-                                  )),
-                              Container(
-                                  width: size.width * 0.09,
-                                  height: size.height * 0.03,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(4),
-                                      topRight: Radius.circular(4),
-                                      bottomLeft: Radius.circular(4),
-                                      bottomRight: Radius.circular(4),
-                                    ),
-                                    color: stockColor,
-                                  ),
-                                  margin: EdgeInsets.symmetric(
-                                      vertical: size.height * 0.013,
-                                      horizontal: size.width * 0.015),
-                                  child: Text(stockPerChange,
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: size.width * 0.02,
-                                          height: 2,
-                                          fontWeight: FontWeight.bold))),
-                              SizedBox(width: size.width * 0.05),
-                              GestureDetector(
-                                child: favoritestock(size, initstar),
-                                onTap: () async {
-                                  setState(() {
-                                    initstar = !initstar;
-                                  });
-                                  if (initstar == false) {
-                                    await FirebaseFirestore.instance
-                                        .collection('users')
-                                        .doc(FirebaseAuth
-                                            .instance.currentUser!.uid)
-                                        .update({
-                                      "favorite": FieldValue.arrayRemove(
-                                          [stocklist[index]['stockName']])
-                                    });
-                                  } else {
-                                    await FirebaseFirestore.instance
-                                        .collection('users')
-                                        .doc(FirebaseAuth
-                                            .instance.currentUser!.uid)
-                                        .update({
-                                      "favorite": FieldValue.arrayUnion(
-                                          [stocklist[index]['stockName']])
-                                    });
-                                  }
-                                },
-                              ),
-                              SizedBox(width: size.width * 0.02),
-                              InkWell(
-                                child: Icon(
-                                  Icons.close,
-                                ),
-                                onTap: () async {
-                                  String useruid;
-                                  useruid = await FirebaseAuth
-                                      .instance.currentUser!.uid;
-                                  await FirebaseFirestore.instance
-                                      .collection('users')
-                                      .doc(useruid)
-                                      .update({
-                                    "visited": FieldValue.arrayRemove([name])
-                                  });
-                                  setState(() {});
-                                },
-                              )
-                            ],
-                          )),
-                      Container(
-                        height: 1.0,
-                        width: size.width,
-                        color: Colors.grey[200],
+                      Text(
+                        name, //Firebase 적용사항
+                        style: TextStyle(
+                            color: Color.fromRGBO(0, 0, 0, 1),
+                            fontSize: size.width * 0.04,
+                            fontWeight: FontWeight.normal,
+                            overflow: TextOverflow.ellipsis),
+                      ),
+                      SizedBox(
+                        height: size.height * 0.01,
+                      ),
+                      Text(
+                        stocklist[index]["stockCode"],
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: size.width * 0.03,
+                          fontWeight: FontWeight.normal,
+                        ),
                       )
                     ],
-                  );
-                },
-              )));
+                  ),
+                  Expanded(
+                    child: GestureDetector(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                stockPrice, //Firebase 적용사항
+                                style: TextStyle(
+                                    color: Color.fromRGBO(0, 0, 0, 1),
+                                    fontSize: size.width * 0.035,
+                                    height: size.height * 0.002),
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Icon((() {
+                                    if (stockColor == CHART_PLUS) {
+                                      return Icons.arrow_drop_up_outlined;
+                                    } else if (stockColor == CHART_MINUS) {
+                                      return Icons.arrow_drop_down_outlined;
+                                    } else {
+                                      return Icons.remove;
+                                    }
+                                  })(),
+                                      color: stockColor,
+                                      size: size.width * 0.05),
+                                  Text(
+                                    stockChange, //Firebase 적용사항
+                                    style: TextStyle(
+                                      color: stockColor,
+                                      fontSize: size.width * 0.03,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
+                          SizedBox(width: size.width * 0.02),
+                          Container(
+                            width: size.width * 0.13,
+                            height: size.height * 0.035,
+                            padding: EdgeInsets.only(
+                              bottom: size.height * 0.005,
+                            ),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(4),
+                                topRight: Radius.circular(4),
+                                bottomLeft: Radius.circular(4),
+                                bottomRight: Radius.circular(4),
+                              ),
+                              color: stockColor,
+                            ),
+                            margin: EdgeInsets.symmetric(
+                                vertical: size.height * 0.005,
+                                horizontal: size.width * 0.015),
+                            child: Center(
+                              child: FittedBox(
+                                child: Text(stockPerChange,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: size.height * 0.015,
+                                      height: 2,
+                                    )),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return Stockscreen(
+                                stockName: stocklist[index]['stockName'],
+                                stockCode: stocklist[index]['stockCode'],
+                              );
+                            },
+                          ),
+                        );
+                      },
+                      behavior: HitTestBehavior.opaque,
+                    ),
+                  ),
+                  SizedBox(
+                    width: size.width * 0.03,
+                  ),
+                  GestureDetector(
+                    child: favoritestock(size, initstar),
+                    onTap: () async {
+                      setState(() {
+                        initstar = !initstar;
+                      });
+                      if (initstar == false) {
+                        await FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(FirebaseAuth.instance.currentUser!.uid)
+                            .update({
+                          "favorite": FieldValue.arrayRemove(
+                              [stocklist[index]['stockName']])
+                        });
+                        await FirebaseMessaging.instance.unsubscribeFromTopic(
+                            stocklist[index]['stockCode']);
+                      } else {
+                        await FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(FirebaseAuth.instance.currentUser!.uid)
+                            .update({
+                          "favorite": FieldValue.arrayUnion(
+                              [stocklist[index]['stockName']])
+                        });
+                        await FirebaseMessaging.instance
+                            .subscribeToTopic(stocklist[index]['stockCode']);
+                      }
+                    },
+                  ),
+                  SizedBox(width: size.width * 0.02),
+                  InkWell(
+                    child: Icon(
+                      Icons.close,
+                    ),
+                    onTap: () async {
+                      String useruid;
+                      useruid = await FirebaseAuth.instance.currentUser!.uid;
+                      await FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(useruid)
+                          .update({
+                        "visited": FieldValue.arrayRemove([name])
+                      });
+                      setState(() {});
+                    },
+                  )
+                ],
+              ),
+            );
+          },
+        ),
+      );
     }
   }
 
@@ -408,57 +431,59 @@ class _SearchscreenState extends State<Searchscreen> {
     return GestureDetector(
       child: Container(
         width: size.width * 0.9,
-        height: size.height * 0.37 * 0.1,
+        height: size.height * 0.4 * 0.15,
         margin:
             EdgeInsets.only(left: size.width * 0.05, right: size.width * 0.03),
         child: Row(
           children: [
             Container(
-                child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  stockname, //Firebase 적용사항
-                  style: TextStyle(
-                      color: Color.fromRGBO(0, 0, 0, 1),
-                      fontFamily: 'ABeeZee',
-                      fontSize: size.width * 0.03,
-                      fontWeight: FontWeight.bold,
-                      height: size.width * 0.003,
-                      overflow: TextOverflow.ellipsis),
-                ),
-                Text(
-                  stockCode,
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontFamily: 'ABeeZee',
-                    fontSize: size.width * 0.021,
-                    fontWeight: FontWeight.normal,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    stockname, //Firebase 적용사항
+                    style: TextStyle(
+                        color: Color.fromRGBO(0, 0, 0, 1),
+                        fontSize: size.width * 0.04,
+                        fontWeight: FontWeight.normal,
+                        overflow: TextOverflow.ellipsis),
                   ),
-                )
-              ],
-            )),
+                  SizedBox(
+                    height: size.height * 0.01,
+                  ),
+                  Text(
+                    stockCode,
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: size.width * 0.03,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  )
+                ],
+              ),
+            ),
             Expanded(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
                         '$stockprice', //Firebase 적용사항
                         style: TextStyle(
                             color: Color.fromRGBO(0, 0, 0, 1),
-                            fontFamily: 'Content',
-                            fontSize: size.width * 0.03,
-                            fontWeight: FontWeight.normal,
-                            height: 1.2),
+                            fontSize: size.width * 0.035,
+                            height: size.height * 0.002),
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          Container(
-                              child: Icon((() {
+                          Icon((() {
                             if (color == CHART_PLUS) {
                               return Icons.arrow_drop_up_outlined;
                             } else if (color == CHART_MINUS) {
@@ -466,42 +491,50 @@ class _SearchscreenState extends State<Searchscreen> {
                             } else {
                               return Icons.remove;
                             }
-                          })(), color: color, size: size.width * 0.025)),
+                          })(), color: color, size: size.width * 0.05),
                           Text(
-                            stockChange, //Firebase 적용사항
+                            '$stockChange', //Firebase 적용사항
                             style: TextStyle(
-                                color: color,
-                                fontFamily: 'Content',
-                                fontSize: size.width * 0.02,
-                                fontWeight: FontWeight.normal,
-                                height: 1.2),
+                              color: color,
+                              fontSize: size.width * 0.03,
+                              fontWeight: FontWeight.normal,
+                            ),
                           ),
                         ],
                       )
                     ],
                   ),
+                  SizedBox(width: size.width * 0.02),
                   Container(
-                      width: size.width * 0.09,
-                      height: size.height * 0.06,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(4),
-                          topRight: Radius.circular(4),
-                          bottomLeft: Radius.circular(4),
-                          bottomRight: Radius.circular(4),
-                        ),
-                        color: color,
+                    width: size.width * 0.13,
+                    height: size.height * 0.035,
+                    padding: EdgeInsets.only(
+                      bottom: size.height * 0.005,
+                    ),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(4),
+                        topRight: Radius.circular(4),
+                        bottomLeft: Radius.circular(4),
+                        bottomRight: Radius.circular(4),
                       ),
-                      margin: EdgeInsets.symmetric(
-                          vertical: size.height * 0.003,
-                          horizontal: size.width * 0.015),
-                      child: Text(stockPerChange.toString(),
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
+                      color: color,
+                    ),
+                    margin: EdgeInsets.symmetric(
+                        vertical: size.height * 0.005,
+                        horizontal: size.width * 0.015),
+                    child: Center(
+                      child: FittedBox(
+                        child: Text(stockPerChange,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
                               color: Colors.white,
-                              fontSize: size.width * 0.02,
-                              fontWeight: FontWeight.bold,
-                              height: size.width * 0.005)))
+                              fontSize: size.height * 0.015,
+                              height: 2,
+                            )),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             )
@@ -522,6 +555,7 @@ class _SearchscreenState extends State<Searchscreen> {
             builder: (context) {
               return Stockscreen(
                 stockName: stockname,
+                stockCode: stockCode,
               );
             },
           ),
@@ -559,9 +593,7 @@ class _SearchscreenState extends State<Searchscreen> {
               .snapshots(),
           builder: (context, AsyncSnapshot snapshot) {
             if (!snapshot.hasData) {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
+              return Center(child: indicator());
             } else {
               if (snapshot.data!.docs.length == 0 ||
                   snapshot.data!.docs.length > 300) {
