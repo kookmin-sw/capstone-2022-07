@@ -26,7 +26,7 @@ class _StartScreenState extends State<StartScreen> {
 
   int selectedIndex = 0;
   int badge = 0;
-  final padding = EdgeInsets.symmetric(horizontal: 18, vertical: 8);
+  final padding = EdgeInsets.symmetric(horizontal: 18, vertical: 10);
   double gap = 10;
 
   PageController controller = PageController();

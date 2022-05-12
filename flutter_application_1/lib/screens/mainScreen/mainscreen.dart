@@ -699,7 +699,7 @@ class _MainscreenState extends State<Mainscreen> {
                         Text(date,
                             style: TextStyle(
                               color: Colors.grey[600],
-                              fontSize: size.width * 0.02,
+                              fontSize: size.width * 0.03,
                               fontWeight: FontWeight.normal,
                               height: size.height * 0.002,
                             )),

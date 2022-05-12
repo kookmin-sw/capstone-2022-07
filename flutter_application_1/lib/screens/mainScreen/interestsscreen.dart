@@ -34,8 +34,6 @@ class _InterestScreenState extends State<InterestScreen> {
         await findUserByUid(FirebaseAuth.instance.currentUser!.uid)
             as Map<String, dynamic>;
 
-    // user의 device token
-
     List<dynamic> nlist = userdocdata['favorite'];
     return nlist;
   }
@@ -47,15 +45,10 @@ class _InterestScreenState extends State<InterestScreen> {
     for (var element in nlist) {
       var userstockinfo = await firestore
           .collection('stock')
-          .where("stockName", isEqualTo: "${element}")
+          .where("stockName", isEqualTo: "$element")
           .get();
 
-      try {
-        stockdata = userstockinfo.docs[0].data();
-      } on RangeError {
-        return [];
-      }
-
+      stockdata = userstockinfo.docs[0].data();
       stockcardlist.add(stockdata);
     }
 
@@ -64,6 +57,7 @@ class _InterestScreenState extends State<InterestScreen> {
 
   Future<List<Map<String, dynamic>>> customFuture() async {
     var userstockinfo = await _getstockList();
+    print(userstockinfo);
     if (userstockinfo == null) {
       return [];
     } else {
@@ -312,6 +306,7 @@ class _InterestScreenState extends State<InterestScreen> {
               Container(
                 padding: EdgeInsets.only(left: size.width * 0.01),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
                       decoration: const BoxDecoration(
@@ -344,11 +339,7 @@ class _InterestScreenState extends State<InterestScreen> {
                         ),
                       ),
                     ),
-                    SizedBox(width: size.width * 0.03),
                     exceptCospiCosdaq(size, name, marketCapKor, color),
-                    const Expanded(
-                      child: SizedBox(),
-                    ),
                     GestureDetector(
                       onTap: () {
                         Navigator.push(
@@ -364,6 +355,7 @@ class _InterestScreenState extends State<InterestScreen> {
                         ).then((_) => setState(() {}));
                       },
                       child: Container(
+                        width: size.width * 0.2,
                         padding: EdgeInsets.symmetric(
                             horizontal: size.width * 0.03,
                             vertical: size.height * 0.005),
@@ -388,6 +380,7 @@ class _InterestScreenState extends State<InterestScreen> {
                         ),
                         child: Center(
                           child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               // Firebase 적용 사항
                               Text(
@@ -398,7 +391,6 @@ class _InterestScreenState extends State<InterestScreen> {
                                     fontWeight: FontWeight.normal,
                                     height: 1.2),
                               ),
-                              SizedBox(width: size.width * 0.03),
                               Icon(Icons.keyboard_arrow_right_sharp,
                                   size: size.width * 0.05, color: Colors.black)
                             ],

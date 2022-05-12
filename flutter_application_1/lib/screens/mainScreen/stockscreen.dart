@@ -157,7 +157,6 @@ class _StockscreenState extends State<Stockscreen> {
           monthData.add(_ChartData(date, monthVolume![i].toDouble()));
         }
       }
-      monthMinimum = monthVolume!.cast<num>().reduce(min);
     }
 
     return "";
@@ -212,10 +211,8 @@ class _StockscreenState extends State<Stockscreen> {
           tenYearData.add(_ChartData(date, tenYearVolume![i].toDouble()));
         }
       }
-
-      tenYearVolume!.removeWhere((element) => element == null);
-      tenYearMinimum = tenYearVolume!.cast<num>().reduce(min);
     }
+    print(tenYearData);
 
     return "";
   }
@@ -814,7 +811,7 @@ class _StockscreenState extends State<Stockscreen> {
                 // 종목명 - 상위 클래스에서 받아와야함
                 future: chartInit(firebaseStockData["stockCode"]),
                 builder: (BuildContext context, AsyncSnapshot snapshot) {
-                  if (dayData.isNotEmpty) {
+                  if (snapshot.connectionState == ConnectionState.done) {
                     return SingleChildScrollView(
                       child: Column(
                         children: [
