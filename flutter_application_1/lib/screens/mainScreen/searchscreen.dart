@@ -93,9 +93,13 @@ class _SearchscreenState extends State<Searchscreen> {
     return [data, favoritelist];
   }
 
+  Future<List<dynamic>> getvisited() {
+    return _getvisitedstockanddata();
+  }
+
   Widget visitedstock(Size size) {
     return FutureBuilder<List<dynamic>>(
-        future: _getvisitedstockanddata(),
+        future: getvisited(),
         builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             List<dynamic> visitedstocklist = snapshot.data ?? [];
@@ -155,225 +159,229 @@ class _SearchscreenState extends State<Searchscreen> {
     if (stocklist.isEmpty) {
       return Container();
     } else {
-      return Container(
-        width: size.width * 0.92,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(8),
-            topRight: Radius.circular(8),
-            bottomLeft: Radius.circular(8),
-            bottomRight: Radius.circular(8),
+      return SingleChildScrollView(
+        child: Container(
+          width: size.width * 0.92,
+          height: size.height * 0.8,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(8),
+              topRight: Radius.circular(8),
+              bottomLeft: Radius.circular(8),
+              bottomRight: Radius.circular(8),
+            ),
+            color: Color.fromRGBO(255, 255, 255, 1.0),
           ),
-          color: Color.fromRGBO(255, 255, 255, 1.0),
-        ),
-        child: ListView.separated(
-          shrinkWrap: true,
-          scrollDirection: Axis.vertical,
-          itemCount: visitedlist.length,
-          separatorBuilder: (BuildContext context, int index) =>
-              const Divider(color: GREY),
-          itemBuilder: (BuildContext context, int index) {
-            String name = stocklist[index]['stockName'];
+          child: ListView.separated(
+            shrinkWrap: true,
+            scrollDirection: Axis.vertical,
+            physics: AlwaysScrollableScrollPhysics(),
+            itemCount: visitedlist.length,
+            separatorBuilder: (BuildContext context, int index) =>
+                const Divider(color: GREY),
+            itemBuilder: (BuildContext context, int index) {
+              String name = stocklist[index]['stockName'];
 
-            // index -= 1;
-            bool initstar;
-            if (favoritelist.contains(stocklist[index]['stockName'])) {
-              initstar = true;
-            } else {
-              initstar = false;
-            }
-            late Color stockColor;
-            if (stocklist[index]['stockPerChange'] > 0) {
-              stockColor = CHART_PLUS;
-            } else if (stocklist[index]['stockPerChange'] < 0) {
-              stockColor = CHART_MINUS;
-            } else {
-              stockColor = Color.fromARGB(255, 120, 119, 119);
-            }
-            String stockPrice =
-                intlprice.format(stocklist[index]['stockPrice']);
-            String stockChange =
-                intlprice.format(stocklist[index]['stockChange'].abs());
-            String stockPerChange =
-                intlperc.format(stocklist[index]['stockPerChange']) + "%";
+              // index -= 1;
+              bool initstar;
+              if (favoritelist.contains(stocklist[index]['stockName'])) {
+                initstar = true;
+              } else {
+                initstar = false;
+              }
+              late Color stockColor;
+              if (stocklist[index]['stockPerChange'] > 0) {
+                stockColor = CHART_PLUS;
+              } else if (stocklist[index]['stockPerChange'] < 0) {
+                stockColor = CHART_MINUS;
+              } else {
+                stockColor = Color.fromARGB(255, 120, 119, 119);
+              }
+              String stockPrice =
+                  intlprice.format(stocklist[index]['stockPrice']);
+              String stockChange =
+                  intlprice.format(stocklist[index]['stockChange'].abs());
+              String stockPerChange =
+                  intlperc.format(stocklist[index]['stockPerChange']) + "%";
 
-            return Container(
-              height: size.height * 0.07,
-              padding: EdgeInsets.only(
-                  left: size.width * 0.03, right: size.width * 0.03),
-              child: Row(
-                children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        name, //Firebase 적용사항
-                        style: TextStyle(
-                            color: Color.fromRGBO(0, 0, 0, 1),
-                            fontSize: size.width * 0.04,
-                            fontWeight: FontWeight.normal,
-                            overflow: TextOverflow.ellipsis),
-                      ),
-                      SizedBox(
-                        height: size.height * 0.01,
-                      ),
-                      Text(
-                        stocklist[index]["stockCode"],
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: size.width * 0.03,
-                          fontWeight: FontWeight.normal,
+              return Container(
+                height: size.height * 0.07,
+                padding: EdgeInsets.only(
+                    left: size.width * 0.03, right: size.width * 0.03),
+                child: Row(
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          name, //Firebase 적용사항
+                          style: TextStyle(
+                              color: Color.fromRGBO(0, 0, 0, 1),
+                              fontSize: size.width * 0.04,
+                              fontWeight: FontWeight.normal,
+                              overflow: TextOverflow.ellipsis),
                         ),
-                      )
-                    ],
-                  ),
-                  Expanded(
-                    child: GestureDetector(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                stockPrice, //Firebase 적용사항
-                                style: TextStyle(
-                                    color: Color.fromRGBO(0, 0, 0, 1),
-                                    fontSize: size.width * 0.035,
-                                    height: size.height * 0.002),
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Icon((() {
-                                    if (stockColor == CHART_PLUS) {
-                                      return Icons.arrow_drop_up_outlined;
-                                    } else if (stockColor == CHART_MINUS) {
-                                      return Icons.arrow_drop_down_outlined;
-                                    } else {
-                                      return Icons.remove;
-                                    }
-                                  })(),
-                                      color: stockColor,
-                                      size: size.width * 0.05),
-                                  Text(
-                                    stockChange, //Firebase 적용사항
-                                    style: TextStyle(
-                                      color: stockColor,
-                                      fontSize: size.width * 0.03,
-                                      fontWeight: FontWeight.normal,
+                        SizedBox(
+                          height: size.height * 0.01,
+                        ),
+                        Text(
+                          stocklist[index]["stockCode"],
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: size.width * 0.03,
+                            fontWeight: FontWeight.normal,
+                          ),
+                        )
+                      ],
+                    ),
+                    Expanded(
+                      child: GestureDetector(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  stockPrice, //Firebase 적용사항
+                                  style: TextStyle(
+                                      color: Color.fromRGBO(0, 0, 0, 1),
+                                      fontSize: size.width * 0.035,
+                                      height: size.height * 0.002),
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Icon((() {
+                                      if (stockColor == CHART_PLUS) {
+                                        return Icons.arrow_drop_up_outlined;
+                                      } else if (stockColor == CHART_MINUS) {
+                                        return Icons.arrow_drop_down_outlined;
+                                      } else {
+                                        return Icons.remove;
+                                      }
+                                    })(),
+                                        color: stockColor,
+                                        size: size.width * 0.05),
+                                    Text(
+                                      stockChange, //Firebase 적용사항
+                                      style: TextStyle(
+                                        color: stockColor,
+                                        fontSize: size.width * 0.03,
+                                        fontWeight: FontWeight.normal,
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              )
-                            ],
-                          ),
-                          SizedBox(width: size.width * 0.02),
-                          Container(
-                            width: size.width * 0.13,
-                            height: size.height * 0.035,
-                            padding: EdgeInsets.only(
-                              bottom: size.height * 0.005,
+                                  ],
+                                )
+                              ],
                             ),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(4),
-                                topRight: Radius.circular(4),
-                                bottomLeft: Radius.circular(4),
-                                bottomRight: Radius.circular(4),
+                            SizedBox(width: size.width * 0.02),
+                            Container(
+                              width: size.width * 0.13,
+                              height: size.height * 0.035,
+                              padding: EdgeInsets.only(
+                                bottom: size.height * 0.005,
                               ),
-                              color: stockColor,
-                            ),
-                            margin: EdgeInsets.symmetric(
-                                vertical: size.height * 0.005,
-                                horizontal: size.width * 0.015),
-                            child: Center(
-                              child: FittedBox(
-                                child: Text(stockPerChange,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: size.height * 0.015,
-                                      height: 2,
-                                    )),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(4),
+                                  topRight: Radius.circular(4),
+                                  bottomLeft: Radius.circular(4),
+                                  bottomRight: Radius.circular(4),
+                                ),
+                                color: stockColor,
+                              ),
+                              margin: EdgeInsets.symmetric(
+                                  vertical: size.height * 0.005,
+                                  horizontal: size.width * 0.015),
+                              child: Center(
+                                child: FittedBox(
+                                  child: Text(stockPerChange,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: size.height * 0.015,
+                                        height: 2,
+                                      )),
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return Stockscreen(
+                                  stockName: stocklist[index]['stockName'],
+                                  stockCode: stocklist[index]['stockCode'],
+                                );
+                              },
+                            ),
+                          );
+                        },
+                        behavior: HitTestBehavior.opaque,
                       ),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return Stockscreen(
-                                stockName: stocklist[index]['stockName'],
-                                stockCode: stocklist[index]['stockCode'],
-                              );
-                            },
-                          ),
-                        );
+                    ),
+                    SizedBox(
+                      width: size.width * 0.03,
+                    ),
+                    GestureDetector(
+                      child: favoritestock(size, initstar),
+                      onTap: () async {
+                        setState(() {
+                          initstar = !initstar;
+                        });
+                        if (initstar == false) {
+                          await FirebaseFirestore.instance
+                              .collection('users')
+                              .doc(FirebaseAuth.instance.currentUser!.uid)
+                              .update({
+                            "favorite": FieldValue.arrayRemove(
+                                [stocklist[index]['stockName']])
+                          });
+                          await FirebaseMessaging.instance.unsubscribeFromTopic(
+                              stocklist[index]['stockCode']);
+                        } else {
+                          await FirebaseFirestore.instance
+                              .collection('users')
+                              .doc(FirebaseAuth.instance.currentUser!.uid)
+                              .update({
+                            "favorite": FieldValue.arrayUnion(
+                                [stocklist[index]['stockName']])
+                          });
+                          await FirebaseMessaging.instance
+                              .subscribeToTopic(stocklist[index]['stockCode']);
+                        }
                       },
-                      behavior: HitTestBehavior.opaque,
                     ),
-                  ),
-                  SizedBox(
-                    width: size.width * 0.03,
-                  ),
-                  GestureDetector(
-                    child: favoritestock(size, initstar),
-                    onTap: () async {
-                      setState(() {
-                        initstar = !initstar;
-                      });
-                      if (initstar == false) {
+                    SizedBox(width: size.width * 0.02),
+                    InkWell(
+                      child: Icon(
+                        Icons.close,
+                      ),
+                      onTap: () async {
+                        String useruid;
+                        useruid = await FirebaseAuth.instance.currentUser!.uid;
                         await FirebaseFirestore.instance
                             .collection('users')
-                            .doc(FirebaseAuth.instance.currentUser!.uid)
+                            .doc(useruid)
                             .update({
-                          "favorite": FieldValue.arrayRemove(
-                              [stocklist[index]['stockName']])
+                          "visited": FieldValue.arrayRemove([name])
                         });
-                        await FirebaseMessaging.instance.unsubscribeFromTopic(
-                            stocklist[index]['stockCode']);
-                      } else {
-                        await FirebaseFirestore.instance
-                            .collection('users')
-                            .doc(FirebaseAuth.instance.currentUser!.uid)
-                            .update({
-                          "favorite": FieldValue.arrayUnion(
-                              [stocklist[index]['stockName']])
-                        });
-                        await FirebaseMessaging.instance
-                            .subscribeToTopic(stocklist[index]['stockCode']);
-                      }
-                    },
-                  ),
-                  SizedBox(width: size.width * 0.02),
-                  InkWell(
-                    child: Icon(
-                      Icons.close,
-                    ),
-                    onTap: () async {
-                      String useruid;
-                      useruid = await FirebaseAuth.instance.currentUser!.uid;
-                      await FirebaseFirestore.instance
-                          .collection('users')
-                          .doc(useruid)
-                          .update({
-                        "visited": FieldValue.arrayRemove([name])
-                      });
-                      setState(() {});
-                    },
-                  )
-                ],
-              ),
-            );
-          },
+                        setState(() {});
+                      },
+                    )
+                  ],
+                ),
+              );
+            },
+          ),
         ),
       );
     }
@@ -593,7 +601,7 @@ class _SearchscreenState extends State<Searchscreen> {
               .snapshots(),
           builder: (context, AsyncSnapshot snapshot) {
             if (!snapshot.hasData) {
-              return Center(child: indicator());
+              return Center(child: CircularProgressIndicator());
             } else {
               if (snapshot.data!.docs.length == 0 ||
                   snapshot.data!.docs.length > 300) {
@@ -603,10 +611,8 @@ class _SearchscreenState extends State<Searchscreen> {
                   increaseList.add(
                       snapshot.data.docs[i].data() as Map<String, dynamic>);
                 }
-                print(increaseList);
                 return searchStockList(size, increaseList);
               }
-              // return _buildList(context, snapshot.data);
             }
           },
         );
