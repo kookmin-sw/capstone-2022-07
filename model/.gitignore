@@ -3,3 +3,6 @@
 *.xlsx
 *.env
 *.h5
+*.log
+*.txt
+firebase_key.json
