@@ -73,3 +73,28 @@ AppBar profileAppBar(BuildContext context, String title) {
     elevation: 0.0,
   );
 }
+
+AppBar StockscreenBar(
+    BuildContext context, String title, String stockName, String stockCode) {
+  return AppBar(
+    systemOverlayStyle: SystemUiOverlayStyle(),
+    centerTitle: true,
+    title: Text(
+      title,
+      style: TextStyle(color: Colors.black),
+    ),
+    leading: IconButton(
+      onPressed: () {
+        Navigator.pop(context);
+      },
+      icon: Icon(
+        Icons.arrow_back,
+        color: Colors.black,
+      ),
+    ),
+    actions: [FavoriteButton(stockName, stockCode)],
+    leadingWidth: 70,
+    backgroundColor: Colors.transparent,
+    elevation: 0.0,
+  );
+}
