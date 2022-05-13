@@ -59,6 +59,21 @@ AppBar noneActionAppBar(BuildContext context, String title) {
   );
 }
 
+
+AppBar profileAppBar(BuildContext context, String title) {
+  return AppBar(
+    systemOverlayStyle: SystemUiOverlayStyle(),
+    centerTitle: true,
+    title: Text(
+      title,
+      style: TextStyle(color: Colors.black),
+    ),
+    leadingWidth: 70,
+    backgroundColor: Colors.transparent,
+    elevation: 0.0,
+  );
+}
+
 AppBar StockscreenBar(
     BuildContext context, String title, String stockName, String stockCode) {
   return AppBar(

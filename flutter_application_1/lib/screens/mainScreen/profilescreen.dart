@@ -174,10 +174,9 @@ class _ProfilescreenState extends State<Profilescreen> {
   Widget build(BuildContext context) {
     _getuserdata();
     return Scaffold(
-      appBar: mainPageAppBar(
+      appBar:profileAppBar(
         context,
         "프로필",
-        SettingButton(context),
       ),
       body: SettingPage(context),
     );
