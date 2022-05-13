@@ -8,8 +8,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Color/color.dart';
+import 'package:flutter_application_1/Components/indicator.dart';
 import 'package:flutter_application_1/Components/main_app_bar.dart';
 import 'package:flutter_application_1/Components/setting_button.dart';
+import 'package:intl/intl.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -32,8 +34,6 @@ class _InterestScreenState extends State<InterestScreen> {
         await findUserByUid(FirebaseAuth.instance.currentUser!.uid)
             as Map<String, dynamic>;
 
-    // user의 device token
-
     List<dynamic> nlist = userdocdata['favorite'];
     return nlist;
   }
@@ -45,8 +45,9 @@ class _InterestScreenState extends State<InterestScreen> {
     for (var element in nlist) {
       var userstockinfo = await firestore
           .collection('stock')
-          .where("stockName", isEqualTo: "${element}")
+          .where("stockName", isEqualTo: "$element")
           .get();
+
       stockdata = userstockinfo.docs[0].data();
       stockcardlist.add(stockdata);
     }
@@ -56,6 +57,7 @@ class _InterestScreenState extends State<InterestScreen> {
 
   Future<List<Map<String, dynamic>>> customFuture() async {
     var userstockinfo = await _getstockList();
+    print(userstockinfo);
     if (userstockinfo == null) {
       return [];
     } else {
@@ -64,8 +66,54 @@ class _InterestScreenState extends State<InterestScreen> {
     }
   }
 
-  Widget Stockcard(BuildContext context, Size size, String name, var price,
-      var stockperc, var volume) {
+  Widget exceptCospiCosdaq(
+      Size size, String stockName, String marketCapKor, Color color) {
+    if (stockName != "코스피" && stockName != "코스닥") {
+      return Container(
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(4),
+            topRight: Radius.circular(4),
+            bottomLeft: Radius.circular(4),
+            bottomRight: Radius.circular(4),
+          ),
+          boxShadow: [
+            BoxShadow(
+                color: Color.fromRGBO(255, 255, 255, 0.25),
+                offset: Offset(0, 4),
+                blurRadius: 4)
+          ],
+          color: Color.fromRGBO(249, 249, 249, 1),
+        ),
+        padding: EdgeInsets.symmetric(
+            horizontal: size.width * 0.03, vertical: size.height * 0.01),
+        child: Text(
+          '시가총액 : $marketCapKor',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: color,
+            fontSize: size.width * 0.03,
+            letterSpacing: 0,
+            fontWeight: FontWeight.normal,
+            height: 1,
+          ),
+        ),
+      );
+    }
+
+    return Container();
+  }
+
+  Widget Stockcard(
+      BuildContext context,
+      Size size,
+      String name,
+      var price,
+      var stockChange,
+      var stockperc,
+      var volume,
+      var marketCap,
+      String stockCode) {
     Color color;
     if (stockperc > 0) {
       color = CHART_PLUS;
@@ -75,9 +123,26 @@ class _InterestScreenState extends State<InterestScreen> {
       color = GREY;
     }
 
-    price = intlprice.format(price);
+    if (name != "코스피" && name != "코스닥") {
+      price = intlprice.format(price);
+      stockChange = intlchange.format(stockChange);
+    }
     stockperc = intlperc.format(stockperc) + "%";
     volume = intlvol.format(volume);
+    String marketCapKor = marketCapFormat(marketCap);
+
+    if (marketCapKor.length > 16) {
+      marketCapKor = marketCapKor.split('').reversed.join();
+      marketCapKor = marketCapKor.substring(
+          marketCapKor.indexOf('억'), marketCapKor.length);
+      marketCapKor = marketCapKor.split('').reversed.join();
+    } else if (marketCapKor.length <= 16 && marketCapKor.length > 5) {
+      marketCapKor = marketCapKor.split('').reversed.join();
+      marketCapKor = marketCapKor.substring(
+          marketCapKor.indexOf('만'), marketCapKor.length);
+      marketCapKor = marketCapKor.split('').reversed.join();
+    }
+
     return Container(
       height: size.height * 0.185,
       width: size.width * 0.9,
@@ -110,7 +175,6 @@ class _InterestScreenState extends State<InterestScreen> {
                     textAlign: TextAlign.left,
                     style: TextStyle(
                       color: const Color.fromRGBO(0, 0, 0, 1),
-                      fontFamily: 'Content',
                       fontSize: size.width * 0.035,
                       letterSpacing: 0,
                       fontWeight: FontWeight.normal,
@@ -164,7 +228,38 @@ class _InterestScreenState extends State<InterestScreen> {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: color,
-                          fontFamily: 'Content',
+                          fontSize: size.width * 0.03,
+                          letterSpacing: 0,
+                          fontWeight: FontWeight.normal,
+                          height: 1,
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: size.width * 0.03),
+                    Container(
+                      decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(4),
+                          topRight: Radius.circular(4),
+                          bottomLeft: Radius.circular(4),
+                          bottomRight: Radius.circular(4),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                              color: Color.fromRGBO(255, 255, 255, 0.25),
+                              offset: Offset(0, 4),
+                              blurRadius: 4)
+                        ],
+                        color: Color.fromRGBO(249, 249, 249, 1),
+                      ),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: size.width * 0.03,
+                          vertical: size.height * 0.01),
+                      child: Text(
+                        '등락 : ' + stockChange.toString(),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: color,
                           fontSize: size.width * 0.03,
                           letterSpacing: 0,
                           fontWeight: FontWeight.normal,
@@ -197,7 +292,6 @@ class _InterestScreenState extends State<InterestScreen> {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: color,
-                          fontFamily: 'Content',
                           fontSize: size.width * 0.03,
                           letterSpacing: 0,
                           fontWeight: FontWeight.normal,
@@ -212,6 +306,7 @@ class _InterestScreenState extends State<InterestScreen> {
               Container(
                 padding: EdgeInsets.only(left: size.width * 0.01),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
                       decoration: const BoxDecoration(
@@ -237,7 +332,6 @@ class _InterestScreenState extends State<InterestScreen> {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: color,
-                          fontFamily: 'Content',
                           fontSize: size.width * 0.03,
                           letterSpacing: 0,
                           fontWeight: FontWeight.normal,
@@ -245,9 +339,7 @@ class _InterestScreenState extends State<InterestScreen> {
                         ),
                       ),
                     ),
-                    const Expanded(
-                      child: SizedBox(),
-                    ),
+                    exceptCospiCosdaq(size, name, marketCapKor, color),
                     GestureDetector(
                       onTap: () {
                         Navigator.push(
@@ -256,12 +348,14 @@ class _InterestScreenState extends State<InterestScreen> {
                             builder: (context) {
                               return Stockscreen(
                                 stockName: name,
+                                stockCode: stockCode,
                               );
                             },
                           ),
                         ).then((_) => setState(() {}));
                       },
                       child: Container(
+                        width: size.width * 0.2,
                         padding: EdgeInsets.symmetric(
                             horizontal: size.width * 0.03,
                             vertical: size.height * 0.005),
@@ -284,22 +378,23 @@ class _InterestScreenState extends State<InterestScreen> {
                             width: 1,
                           ),
                         ),
-                        child: Row(
-                          children: [
-                            // Firebase 적용 사항
-                            Text(
-                              '자세히',
-                              style: TextStyle(
-                                  color: const Color.fromRGBO(0, 0, 0, 1),
-                                  fontFamily: 'ABeeZee',
-                                  fontSize: size.width * 0.036,
-                                  fontWeight: FontWeight.normal,
-                                  height: 1.2),
-                            ),
-                            SizedBox(width: size.width * 0.03),
-                            Icon(Icons.keyboard_arrow_right_sharp,
-                                size: size.width * 0.05, color: Colors.black)
-                          ],
+                        child: Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              // Firebase 적용 사항
+                              Text(
+                                '자세히',
+                                style: TextStyle(
+                                    color: const Color.fromRGBO(0, 0, 0, 1),
+                                    fontSize: size.width * 0.036,
+                                    fontWeight: FontWeight.normal,
+                                    height: 1.2),
+                              ),
+                              Icon(Icons.keyboard_arrow_right_sharp,
+                                  size: size.width * 0.05, color: Colors.black)
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -326,8 +421,11 @@ class _InterestScreenState extends State<InterestScreen> {
               size,
               stocklist[index]['stockName'],
               stocklist[index]['stockPrice'],
+              stocklist[index]['stockChange'],
               stocklist[index]['stockPerChange'],
-              stocklist[index]['stockVolume']);
+              stocklist[index]['stockVolume'],
+              stocklist[index]['marketCap'],
+              stocklist[index]['stockCode']);
         },
       ),
     );
@@ -354,7 +452,7 @@ class _InterestScreenState extends State<InterestScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
-                      Icons.favorite,
+                      Icons.star,
                       color: GREY,
                       size: size.height * 0.1,
                     ),
@@ -379,7 +477,7 @@ class _InterestScreenState extends State<InterestScreen> {
               );
             }
           } else {
-            return Center(child: CircularProgressIndicator());
+            return Center(child: indicator());
           }
         },
       ),

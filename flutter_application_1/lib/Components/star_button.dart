@@ -5,37 +5,15 @@ import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_application_1/Color/Color.dart';
-
-AppBar StockscreenBar(BuildContext context, String title, String stockName) {
-  return AppBar(
-    systemOverlayStyle: SystemUiOverlayStyle(),
-    centerTitle: true,
-    title: Text(
-      title,
-      style: TextStyle(color: Colors.black),
-    ),
-    leading: IconButton(
-      onPressed: () {
-        Navigator.pop(context);
-      },
-      icon: Icon(
-        Icons.arrow_back,
-        color: Colors.black,
-      ),
-    ),
-    actions: [FavoriteButton(stockName)],
-    leadingWidth: 70,
-    backgroundColor: Colors.transparent,
-    elevation: 0.0,
-  );
-}
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class FavoriteButton extends StatefulWidget implements PreferredSizeWidget {
-  FavoriteButton(this.stockName)
+  FavoriteButton(this.stockName, this.stockCode)
       : preferredSize = Size.fromHeight(60.0),
         super();
   final Size preferredSize;
   final String stockName;
+  final String stockCode;
 
   @override
   _FavoriteButtonState createState() => _FavoriteButtonState();
@@ -71,6 +49,7 @@ class _FavoriteButtonState extends State<FavoriteButton> {
             }
             return GestureDetector(
               onTap: () async {
+                print(widget.stockCode);
                 setState(() {
                   IsFavorite = !IsFavorite;
                 });
@@ -81,6 +60,8 @@ class _FavoriteButtonState extends State<FavoriteButton> {
                       .update({
                     "favorite": FieldValue.arrayRemove([widget.stockName])
                   });
+                  await FirebaseMessaging.instance
+                      .unsubscribeFromTopic(widget.stockCode);
                 } else {
                   await FirebaseFirestore.instance
                       .collection('users')
@@ -88,6 +69,9 @@ class _FavoriteButtonState extends State<FavoriteButton> {
                       .update({
                     "favorite": FieldValue.arrayUnion([widget.stockName])
                   });
+
+                  await FirebaseMessaging.instance
+                      .subscribeToTopic(widget.stockCode);
                 }
               },
               child: Container(

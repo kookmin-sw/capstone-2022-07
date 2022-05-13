@@ -2,13 +2,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Components/willPop.dart';
-import 'package:flutter_application_1/Controller/notification_details_page_controller.dart';
 import 'package:flutter_application_1/screens/mainScreen/interestsscreen.dart';
 import 'package:flutter_application_1/screens/mainScreen/mainscreen.dart';
 import 'package:flutter_application_1/screens/mainScreen/searchscreen.dart';
 import 'package:flutter_application_1/screens/mainScreen/profilescreen.dart';
-import 'package:flutter_application_1/screens/mainScreen/stockscreen.dart';
-import 'package:get/get.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:badges/badges.dart';
 
@@ -29,7 +26,7 @@ class _StartScreenState extends State<StartScreen> {
 
   int selectedIndex = 0;
   int badge = 0;
-  final padding = EdgeInsets.symmetric(horizontal: 18, vertical: 12);
+  final padding = EdgeInsets.symmetric(horizontal: 18, vertical: 10);
   double gap = 10;
 
   PageController controller = PageController();
@@ -113,12 +110,6 @@ class _StartScreenState extends State<StartScreen> {
                     iconSize: 24,
                     padding: padding,
                     icon: Icons.person,
-                    // leading: CircleAvatar(
-                    //   radius: 12,
-                    //   // backgroundImage: NetworkImage(
-                    //   //   'https://sooxt98.space/content/images/size/w100/2019/01/profile.png',
-                    //   // ),
-                    // ),
                     text: '프로필',
                   ),
                 ],

@@ -1,6 +1,8 @@
 # ignore data file
 *.csv
 *.xlsx
-
-# except train file
-!train.csv
+*.env
+*.h5
+*.log
+*.txt
+firebase_key.json
