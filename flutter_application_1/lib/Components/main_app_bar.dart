@@ -2,24 +2,18 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_application_1/Components/star_button.dart';
 
-AppBar mainAppBar(BuildContext context, String title, IconButton button) {
+AppBar mainAppBar(
+    BuildContext context, String title, IconButton button, Size size) {
   return AppBar(
     systemOverlayStyle: SystemUiOverlayStyle(),
+    title: Image.asset(
+      'assets/logos/logo_text.png',
+      width: size.width * 0.4,
+      // height: size.height * 0.3,
+    ),
     centerTitle: true,
-    title: Text(
-      title,
-      style: TextStyle(color: Colors.black),
-    ),
-    leading: IconButton(
-      onPressed: () {
-        Navigator.pop(context);
-      },
-      icon: Icon(
-        Icons.arrow_back,
-        color: Colors.black,
-      ),
-    ),
     actions: [button],
     leadingWidth: 70,
     backgroundColor: Colors.transparent,

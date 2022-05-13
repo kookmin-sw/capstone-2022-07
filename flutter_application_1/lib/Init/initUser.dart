@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_application_1/Components/indicator.dart';
 import 'package:flutter_application_1/screens/Register/function.dart';
 import 'package:flutter_application_1/screens/Register/signup/input_nickname_screen.dart';
 import 'package:flutter_application_1/screens/Register/login_screen.dart';
@@ -34,9 +35,10 @@ class InitUser extends StatelessWidget {
                   }
                 }
               } else {
-                return Center(
-                  child: CircularProgressIndicator(
-                    backgroundColor: Colors.white,
+                return Container(
+                  color: Colors.white,
+                  child: Center(
+                    child: indicator(),
                   ),
                 );
               }

@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/Components/indicator.dart';
 import 'package:flutter_application_1/Controller/alertController.dart';
 import 'package:flutter_application_1/Init/initUser.dart';
 import 'package:get/get.dart';
@@ -17,9 +18,10 @@ class InitAlert extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.done) {
           return InitUser();
         } else {
-          return Center(
-            child: CircularProgressIndicator(
-              backgroundColor: Colors.white,
+          return Container(
+            color: Colors.white,
+            child: Center(
+              child: indicator(),
             ),
           );
         }

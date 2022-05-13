@@ -12,7 +12,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 Future<void> signInWithGoogle(BuildContext context) async {
-  await FirebaseAuth.instance.signOut();
   // Trigger the authentication flow
   final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
@@ -28,7 +27,6 @@ Future<void> signInWithGoogle(BuildContext context) async {
 
   // Once signed in, return the UserCredential
   await FirebaseAuth.instance.signInWithCredential(credential);
-  await FirebaseMessaging.instance.subscribeToTopic("All");
   if (FirebaseAuth.instance.currentUser != null) {
     authStateChanges(context);
   }
@@ -39,7 +37,6 @@ Future signUpWithEmail(String id, String password, BuildContext context) async {
     UserCredential credential = await FirebaseAuth.instance
         .createUserWithEmailAndPassword(email: id, password: password);
     if (credential.user != null) {
-      await FirebaseMessaging.instance.subscribeToTopic("All");
       await credential.user!.sendEmailVerification();
       Navigator.push(
         context,
@@ -161,6 +158,12 @@ Future<void> authStateChanges(BuildContext context) async {
               ),
             );
           } else {
+            if (await firebaseUserdata['allNotification'] == true) {
+              await FirebaseMessaging.instance.subscribeToTopic("All");
+              if (await firebaseUserdata['interestNotification'] == true) {
+                await FirebaseMessaging.instance.subscribeToTopic("interest");
+              }
+            }
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -211,6 +214,8 @@ Future<Map<String, dynamic>> fromMap(User firebaseUser) async {
     'status': true,
     "favorite": [],
     "visited": [],
+    "allNotification": true,
+    "interestNotification": true,
   };
   return firebaseUserdata;
 }
@@ -220,6 +225,9 @@ Future<void> saveUserToFirebase() async {
   users
       .doc(FirebaseAuth.instance.currentUser!.uid)
       .set(await fromMap(FirebaseAuth.instance.currentUser!));
+
+  await FirebaseMessaging.instance.subscribeToTopic("All");
+  await FirebaseMessaging.instance.subscribeToTopic("interest");
 }
 
 void updateLoginTime() async {
@@ -255,6 +263,12 @@ Future<bool> findNickname() async {
   if (firebaseUserdata != null) {
     if (firebaseUserdata.isNotEmpty) {
       if (firebaseUserdata['nickname'] != "") {
+        if (await firebaseUserdata['allNotification'] == true) {
+          await FirebaseMessaging.instance.subscribeToTopic("All");
+          if (await firebaseUserdata['interestNotification'] == true) {
+            await FirebaseMessaging.instance.subscribeToTopic("interest");
+          }
+        }
         return true;
       } else {
         return false;
@@ -265,6 +279,8 @@ Future<bool> findNickname() async {
 }
 
 Future signOut(BuildContext context) async {
+  await FirebaseMessaging.instance.unsubscribeFromTopic("All");
+  await FirebaseMessaging.instance.unsubscribeFromTopic("interest");
   await FirebaseAuth.instance.signOut();
   Navigator.pushAndRemoveUntil(
       context,
