@@ -20,6 +20,7 @@ from keras.preprocessing.sequence import pad_sequences
 from keras.preprocessing.text import Tokenizer
 from dotenv import load_dotenv
 import os
+from dateutil import parser
 
 # firebase 관련
 import firebase_admin
@@ -32,10 +33,17 @@ from pyfcm import FCMNotification
 # 멀티프로세싱
 from multiprocessing import Manager, Pool, freeze_support
 
+import tensorflow as tf
+
+physical_devices = tf.config.list_physical_devices("GPU")
+tf.config.experimental.set_memory_growth(physical_devices[0], enable=True)
+# tf.config.experimental.set_visible_devices(physical_devices[0], device_type="GPU")
+
 # warning 문자 무시
 import warnings
 
 warnings.filterwarnings("ignore")
+
 import keras
 
 stopwords = [
@@ -154,28 +162,27 @@ desc_del_list = [
 ]
 
 # 형태소분석
-JVM_PATH = "/Library/Java/JavaVirtualMachines/zulu-15.jdk/Contents/Home/bin/java"
-okt = Okt(jvmpath=JVM_PATH)
-# okt = Okt()
+# JVM_PATH = "/Library/Java/JavaVirtualMachines/zulu-15.jdk/Contents/Home/bin/java"
+# okt = Okt(jvmpath=JVM_PATH)
+okt = Okt()
 tokenizer = Tokenizer(num_words=35000)
 max_len = 20
 
 train_data = pd.read_csv("./train.csv", names=["title", "label"])
 
 X_train = []
-for sentence in train_data["title"]:
+for sentence in tqdm(train_data["title"]):
     temp_X = []
     temp_X = okt.morphs(str(sentence), stem=True)  # 토큰화
     temp_X = [word for word in temp_X if not word in stopwords]  # 안쓰는 말 제거
     X_train.append(temp_X)
 max_words = 35000
-# 토큰화
 tokenizer = Tokenizer(num_words=max_words)
 tokenizer.fit_on_texts(X_train)
 X_train = tokenizer.texts_to_sequences(X_train)
 # 정규화
 y_train = []
-for i in range(len(train_data["label"])):
+for i in tqdm(range(len(train_data["label"]))):
     if train_data["label"].iloc[i] == 1:
         y_train.append([0, 0, 1])
     elif train_data["label"].iloc[i] == 0:
@@ -196,9 +203,6 @@ if not firebase_admin._apps:
 
 db = firestore.client()
 
-load_dotenv()
-registration_token = os.environ.get("registration_token")
-
 
 def send_messaging_increase(stockName, stockCode, stockPerChange):
     # Define a condition which will send to devices which are subscribed
@@ -211,6 +215,12 @@ def send_messaging_increase(stockName, stockCode, stockPerChange):
             title=f"종목 급등 알림",
             body=f"{stockName} 종목의 주가가 {stockPerChange}% 상승했습니다!",
         ),
+        data={
+            "click_action": "FLUTTER_NOTIFICATION_CLICK",
+            "screen": "Stockscreen",
+            "stockName": stockName,
+            "stockCode": stockCode,
+        },
         condition=condition,
     )
 
@@ -232,6 +242,12 @@ def send_messaging_decrease(stockName, stockCode, stockPerChange):
             title=f"종목 급락 알림",
             body=f"{stockName} 종목의 주가가 {stockPerChange}% 하락했습니다.",
         ),
+        data={
+            "click_action": "FLUTTER_NOTIFICATION_CLICK",
+            "screen": "Stockscreen",
+            "stockName": stockName,
+            "stockCode": stockCode,
+        },
         condition=condition,
     )
 
@@ -277,7 +293,7 @@ def getStockCode(market, code_list):
     market: 상장구분 (11=유가증권, 12=코스닥, 13=K-OTC, 14=코넥스, 50=기타비상장)
     """
     url = f"https://api.odcloud.kr/api/GetStockSecuritiesInfoService/v1/getStockPriceInfo?"
-    stock_code = 0
+    stock_code = reset % 4
     while True:
         api_decode_key_stock = requests.utils.unquote(
             api_service_key_stock[stock_code], encoding="utf-8"
@@ -349,8 +365,7 @@ def text_clean_origin(inputString):
 
 # 기사 날짜 전처리 함수
 def formatting_date(date):
-    format = "%a, %d %b %Y %H:%M:%S %z"
-    date = datetime.datetime.strptime(date, format)  # str to datetime
+    date = parser.parse(date)  # str to datetime
     date = date.strftime("%Y-%m-%d %H:%M:%S")  # changing datetime format
 
     return date
@@ -359,8 +374,7 @@ def formatting_date(date):
 # 날짜 -> timestamp = 뉴스의 중복 제거를 위함
 def time_to_stamp(date):
     date = date.replace("0900", "0000")
-    format = "%a, %d %b %Y %H:%M:%S %z"
-    date = datetime.datetime.strptime(date, format)  # str to datetime
+    date = parser.parse(date)  # str to datetime
 
     return date
 
@@ -374,9 +388,8 @@ Naver_client_id = [
 ]
 Naver_client_secret = ["mZP8JBDOBK", "HPqxX8HZfG", "ugLCC3LW85", "CRmEzrXlb7"]
 
-temp_dt = "Thu, 01 Mar 2022 06:02:00 +0900"
-format = "%a, %d %b %Y %H:%M:%S %z"
-temp_dt = datetime.datetime.strptime(temp_dt, format)  # str to datetime
+temp_dt = parser.parse("Thu, 01 Mar 2022 06:02:00 +0900")
+print(temp_dt)
 
 # 네이버 api 함수
 def api_search(tuple_list, stock, id_key):
@@ -411,6 +424,7 @@ def api_search(tuple_list, stock, id_key):
             bb = doc.to_dict()
         endPoint = bb["timestamp"] if len(bb) > 0 else temp_dt
 
+        global stock_news_list
         stock_news_list = []
 
         for dict in temp["items"]:
@@ -474,6 +488,9 @@ def api_search(tuple_list, stock, id_key):
 
     for _ in pool.imap_unordered(AddFirebaseToNews, stock_news_list):
         pass
+
+    pool.close()
+    pool.join()
 
     ## 개수 카운트
     time_hour = datetime.datetime.now() - datetime.timedelta(hours=1)
@@ -578,6 +595,14 @@ def stock_information_getTime():
         time_previous = str(time_previous.strftime("%Y-%m-%d %H:%M"))
         flag = False
 
+    print(pre_previous)
+    data = yf.download(["^KS11", "^KQ11"], start=pre_previous)
+    print(data["Close"]["^KS11"][-1])
+    try:
+        float(data["Close"]["^KS11"][1])
+    except:
+        pre_previous = XKRX.previous_session(pre_previous).strftime("%Y-%m-%d")
+
     return flag
 
 
@@ -589,18 +614,18 @@ def stock_pretreatment():
         if j["stockCode"] != "^KS11" and j["stockCode"] != "^KQ11":
             stockCode += ".KS"
 
-        j["stockPrice"] = float(data["Close"][stockCode][1])
-        j["stockLowPrice"] = float(data["Low"][stockCode][1])
-        j["stockHighPrice"] = float(data["High"][stockCode][1])
-        j["stockVolume"] = float(data["Volume"][stockCode][1])
-        j["stockOpenPrice"] = float(data["Open"][stockCode][1])
-        j["stockClosingPrice"] = float(data["Close"][stockCode][0])
+        j["stockPrice"] = float(data["Close"][stockCode][-1])
+        j["stockLowPrice"] = float(data["Low"][stockCode][-1])
+        j["stockHighPrice"] = float(data["High"][stockCode][-1])
+        j["stockVolume"] = float(data["Volume"][stockCode][-1])
+        j["stockOpenPrice"] = float(data["Open"][stockCode][-1])
+        j["stockClosingPrice"] = float(data["Close"][stockCode][-2])
         j["stockChange"] = float(
-            data["Close"][stockCode][1] - data["Close"][stockCode][0]
+            data["Close"][stockCode][-1] - data["Close"][stockCode][-2]
         )
         j["stockPerChange"] = float(
-            (data["Close"][stockCode][1] - data["Close"][stockCode][0])
-            / data["Close"][stockCode][0]
+            (data["Close"][stockCode][-1] - data["Close"][stockCode][-2])
+            / data["Close"][stockCode][-2]
             * 100
         )
 
@@ -624,19 +649,19 @@ def stock_pretreatment():
         stockCode = j["stockCode"]
         if j["stockCode"] != "^KS11" and j["stockCode"] != "^KQ11":
             stockCode += ".KS"
-        j["stockPrice"] = float(round(data["Close"][stockCode][1], 2))
-        j["stockLowPrice"] = float(round(data["Low"][stockCode][1], 2))
-        j["stockHighPrice"] = float(round(data["High"][stockCode][1], 2))
-        j["stockVolume"] = float(round(data["Volume"][stockCode][1], 2))
-        j["stockOpenPrice"] = float(round(data["Open"][stockCode][1], 2))
-        j["stockClosingPrice"] = float(round(data["Close"][stockCode][0], 2))
+        j["stockPrice"] = float(round(data["Close"][stockCode][-1], 2))
+        j["stockLowPrice"] = float(round(data["Low"][stockCode][-1], 2))
+        j["stockHighPrice"] = float(round(data["High"][stockCode][-1], 2))
+        j["stockVolume"] = float(round(data["Volume"][stockCode][-1], 2))
+        j["stockOpenPrice"] = float(round(data["Open"][stockCode][-1], 2))
+        j["stockClosingPrice"] = float(round(data["Close"][stockCode][-2], 2))
         j["stockChange"] = float(
-            round(data["Close"][stockCode][1] - data["Close"][stockCode][0], 2)
+            round(data["Close"][stockCode][-1] - data["Close"][stockCode][-2], 2)
         )
         j["stockPerChange"] = float(
             round(
-                (data["Close"][stockCode][1] - data["Close"][stockCode][0])
-                / data["Close"][stockCode][0]
+                (data["Close"][stockCode][-1] - data["Close"][stockCode][-2])
+                / data["Close"][stockCode][-2]
                 * 100,
                 2,
             )
@@ -647,9 +672,7 @@ def stock_pretreatment():
         j["TimePerNegativeNewsCount"] = 0
 
 
-def firebase_transaction():
-    db = firestore.client()
-
+def firebase_transaction_messaging():
     def AddFirebase(item):
         db.collection("stock").document(item["stockName"]).set(item)
         if item["stockPerChange"] >= 5:
@@ -670,8 +693,22 @@ def firebase_transaction():
     pool.join()
 
 
-def run(reset):
-    print("run")
+def firebase_transaction():
+    def AddFirebase(item):
+        db.collection("stock").document(item["stockName"]).set(item)
+
+    pool = ThreadPool(10)
+
+    for _ in tqdm(pool.imap_unordered(AddFirebase, company), total=len(company)):
+        pass
+
+    pool.close()
+    pool.join()
+
+
+def run():
+    global reset
+    print(f"run, {reset}")
     if stock_information_getTime():
         stock_pretreatment()
         firebase_transaction()
@@ -698,18 +735,21 @@ def run(reset):
     reset += 1
 
 
-global reset
 reset = 0
 
 # 8시 20분에 주식가져옴
 schedule.every().day.at("08:20").do(get_companylist)
-schedule.every(15).minutes.do(run, reset)
+schedule.every().day.at("13:30").do(firebase_transaction_messaging)
+schedule.every(15).minutes.do(run)
 
 
 if __name__ == "__main__":
     print("start")
     get_companylist()
-    run(reset)
+    stock_information_getTime()
+    stock_pretreatment()
+    firebase_transaction()
+    run()
     while True:
         schedule.run_pending()
         time.sleep(1)
