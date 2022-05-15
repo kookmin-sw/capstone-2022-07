@@ -9,6 +9,7 @@ var intlchange = NumberFormat.currency(locale: "ko_KR", symbol: "");
 var intlvol = NumberFormat.currency(locale: "ko_KR", symbol: "");
 
 String marketCapFormat(var marketCap) {
+  marketCap = int.parse(marketCap);
   String stringMarketCap = marketCap.toString();
   stringMarketCap = stringMarketCap.split('').reversed.join();
   print(marketCap);
