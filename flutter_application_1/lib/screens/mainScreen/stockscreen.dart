@@ -220,7 +220,11 @@ class _StockscreenState extends State<Stockscreen> {
   Future chartInit(String ticker) => AsyncMemoizer().runOnce(
         () async {
           String temp = ticker;
-          if (ticker != "^KS11" && ticker != "^KQ11") temp += ".KS";
+          if (ticker != "^KS11" &&
+              ticker != "^KQ11" &&
+              ticker != "^DJI" &&
+              ticker != "^IXIC" &&
+              ticker != "^N225") temp += ".KS";
           await getMonthData(temp);
           await getYearData(temp);
           await getTenYearData(temp);
@@ -444,7 +448,11 @@ class _StockscreenState extends State<Stockscreen> {
     stockPrice = intlprice.format(stockPrice);
     stockPerc = intlperc.format(stockPerc) + "%";
 
-    if (stockName != "코스피" && stockName != "코스닥") {
+    if (stockName != "코스피" &&
+        stockName != "코스닥" &&
+        stockName != "다우존스" &&
+        stockName != "나스닥" &&
+        stockName != "닛케이") {
       stockChange = intlprice.format(stockChange.abs());
     } else {
       stockChange = stockChange.abs();
@@ -568,8 +576,12 @@ class _StockscreenState extends State<Stockscreen> {
               padding: EdgeInsets.symmetric(horizontal: size.width * 0.04),
               itemCount: newsDataList.length,
               itemBuilder: (BuildContext context, int index) {
-                return stockNews(size, newsDataList[index]["title"],
-                    newsDataList[index]["label"], newsDataList[index]["url"]);
+                return stockNews(
+                    size,
+                    newsDataList[index]["title"],
+                    newsDataList[index]["context"],
+                    newsDataList[index]["label"],
+                    newsDataList[index]["url"]);
               },
               separatorBuilder: (BuildContext context, int index) =>
                   const Divider(color: GREY),
@@ -604,7 +616,10 @@ class _StockscreenState extends State<Stockscreen> {
       '시가총액',
     ];
     if (firebaseStockData["stockName"] == "코스피" ||
-        firebaseStockData["stockName"] == "코스닥") {
+        firebaseStockData["stockName"] == "코스닥" ||
+        firebaseStockData["stockName"] == "다우존스" ||
+        firebaseStockData["stockName"] == "나스닥" ||
+        firebaseStockData["stockName"] == "닛케이") {
       stockInfo.removeLast();
       stockInfodetail.removeLast();
     }
@@ -706,14 +721,12 @@ class _StockscreenState extends State<Stockscreen> {
     }
   }
 
-  Widget stockNews(Size size, String title, String result, String url) {
+  Widget stockNews(
+      Size size, String title, String content, String result, String url) {
     // String? 에러
     if (title == null) {
       return SizedBox();
     }
-    // if (content == null) {
-    //   return SizedBox();
-    // }
 
     Uri uri = Uri.parse(url);
 
@@ -727,11 +740,10 @@ class _StockscreenState extends State<Stockscreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               SizedBox(
-                width: size.width * 0.6,
+                width: size.width * 0.7,
                 child: Text(
                   title,
                   overflow: TextOverflow.ellipsis,
-                  maxLines: 3,
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
@@ -739,13 +751,13 @@ class _StockscreenState extends State<Stockscreen> {
             ],
           ),
           SizedBox(
-            height: 2,
+            height: size.height * 0.005,
           ),
-          // Text(
-          //   content,
-          //   style: TextStyle(
-          //       fontWeight: FontWeight.normal, color: Color(0xff888888)),
-          // )
+          Text(
+            content,
+            style: TextStyle(
+                fontWeight: FontWeight.normal, color: Color(0xff888888)),
+          )
         ],
       ),
     );
