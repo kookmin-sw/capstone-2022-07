@@ -14,9 +14,9 @@ from multiprocessing.dummy import Pool as ThreadPool
 import schedule
 from konlpy.tag import Okt
 import numpy as np
-from keras.layers import Embedding, Dense, LSTM
-from keras.models import Sequential
-from keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.layers import Embedding, Dense, LSTM
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.preprocessing.sequence import pad_sequences
 from keras.preprocessing.text import Tokenizer
 from dotenv import load_dotenv
 import os
@@ -171,11 +171,23 @@ max_len = 20
 train_data = pd.read_csv("./train.csv", names=["title", "label"])
 
 X_train = []
-for sentence in tqdm(train_data["title"]):
+
+
+def train(sentence):
     temp_X = []
     temp_X = okt.morphs(str(sentence), stem=True)  # 토큰화
     temp_X = [word for word in temp_X if not word in stopwords]  # 안쓰는 말 제거
     X_train.append(temp_X)
+
+
+pool = ThreadPool(10)
+
+for _ in tqdm(pool.imap_unordered(train, train_data["title"]), total=len(train_data)):
+    pass
+
+pool.close()
+pool.join()
+
 max_words = 35000
 tokenizer = Tokenizer(num_words=max_words)
 tokenizer.fit_on_texts(X_train)
@@ -258,26 +270,6 @@ def send_messaging_decrease(stockName, stockCode, stockPerChange):
     print("Successfully sent message:", response)
 
 
-XKRX = ecals.get_calendar("XKRX")  # 한국 코드
-current = datetime.datetime.now()
-corr_current = current - datetime.timedelta(hours=9)
-global pre_previous
-global time_previous
-global previous
-if XKRX.is_trading_minute(corr_current.strftime("%Y-%m-%d %H:%M")):
-    previous = datetime.date.today().strftime("%Y-%m-%d")
-    time_previous = datetime.date.today().strftime("%Y-%m-%d %H:%M")
-    pre_previous = XKRX.previous_session(previous).strftime("%Y-%m-%d")
-else:
-    previous = XKRX.previous_minute(corr_current.strftime("%Y-%m-%d %H:%M")).strftime(
-        "%Y-%m-%d"
-    )
-    time_previous = XKRX.previous_minute(
-        corr_current.strftime("%Y-%m-%d %H:%M")
-    ) + datetime.timedelta(hours=9)
-    pre_previous = XKRX.previous_session(previous).strftime("%Y-%m-%d")
-    time_previous = str(time_previous.strftime("%Y-%m-%d %H:%M"))
-
 # 공공데이터포털 api 주소(Without param)
 url_stock = "http://api.seibro.or.kr/openapi/service/StockSvc/getKDRSecnInfo"
 api_service_key_stock = [
@@ -303,7 +295,7 @@ def getStockCode(market, code_list):
             "serviceKey": api_decode_key_stock,
             "mrktCls": market,
             "numOfRows": 1000,
-            "beginBasDt": pre_previous.replace("-", ""),
+            "beginBasDt": pre_pre_previous.replace("-", ""),
         }
 
         response = requests.get(url, params=params)
@@ -389,16 +381,18 @@ Naver_client_id = [
 Naver_client_secret = ["mZP8JBDOBK", "HPqxX8HZfG", "ugLCC3LW85", "CRmEzrXlb7"]
 
 temp_dt = parser.parse("Thu, 01 Mar 2022 06:02:00 +0900")
-print(temp_dt)
 
 # 네이버 api 함수
 def api_search(tuple_list, stock, id_key):
+    if stock in ["남성", "대상", "보령"]:
+        return
+
     url = "https://openapi.naver.com/v1/search/news.json"
     header = {
         "X-Naver-Client-Id": Naver_client_id[id_key],
         "X-Naver-Client-Secret": Naver_client_secret[id_key],
     }
-    param = {"query": stock, "display": 100, "start": 1, "sort": "date"}
+    param = {"query": stock, "display": 10, "start": 1, "sort": "date"}
     # query     : 검색할 단어
     # display   : 검색 출력 건수 (기본 10 / 최대 100)
     # start     : 검색 시작 위치 (기본 1  / 최대 1000)
@@ -409,20 +403,26 @@ def api_search(tuple_list, stock, id_key):
     if res.status_code == 200:
         temp = res.json()
 
-        ## 파베에서 제일 최근 기사 time stamp 불러오기
-        docs = (
-            db.collection("stock")
-            .document(stock)
-            .collection("news")
-            .where("timestamp", ">", temp_dt)
-            .order_by("timestamp", direction=firestore.Query.DESCENDING)
-            .limit(1)
-            .stream()
-        )
-        bb = {}
-        for doc in docs:
-            bb = doc.to_dict()
-        endPoint = bb["timestamp"] if len(bb) > 0 else temp_dt
+        # ## 파베에서 제일 최근 기사 time stamp 불러오기
+        # docs = (
+        #     db.collection("stock")
+        #     .document(stock)
+        #     .collection("news")
+        #     .where("timestamp", ">", temp_dt)
+        #     .order_by("timestamp", direction=firestore.Query.DESCENDING)
+        #     .limit(1)
+        #     .stream()
+        # )
+        # bb = {}
+        # for doc in docs:
+        #     bb = doc.to_dict()
+        # endPoint = bb["timestamp"] if len(bb) > 0 else temp_dt
+
+        ## 종목별 endPoint 추가
+        global endPoint_dict
+        endPoint = endPoint_dict[stock]
+
+        tmp_endPoint = temp["items"][0]["pubDate"]
 
         global stock_news_list
         stock_news_list = []
@@ -430,7 +430,7 @@ def api_search(tuple_list, stock, id_key):
         for dict in temp["items"]:
             news_timestamp = time_to_stamp(dict["pubDate"])
 
-            if endPoint > news_timestamp:
+            if endPoint >= news_timestamp:
                 break
             # if dict['title'].find(stock) == -1:
             #     continue
@@ -477,7 +477,8 @@ def api_search(tuple_list, stock, id_key):
 
             tuple_list.append((stock, title, dict["originallink"], date, pov_or_neg))
 
-            # print(stock ,title ,dict['originallink'] ,date ,pov_or_neg)
+        endPoint_dict[stock] = time_to_stamp(tmp_endPoint)
+
     else:
         print("Error Code:" + str(res.status_code) + " Stock name is " + str(stock))
 
@@ -562,10 +563,39 @@ def get_companylist():
             "stockName": "코스닥",
             "stockCode": "^KQ11",
             "marketCap": 0,
+            "updatedTime": time_previous,
         }
     )
+    item_list.append(
+        {
+            "stockName": "다우존스",
+            "stockCode": "^DJI",
+            "marketCap": 0,
+            "updatedTime": time_previous,
+        }
+    )
+    item_list.append(
+        {
+            "stockName": "나스닥",
+            "stockCode": "^IXIC",
+            "marketCap": 0,
+            "updatedTime": time_previous,
+        }
+    )
+    item_list.append(
+        {
+            "stockName": "닛케이",
+            "stockCode": "^N225",
+            "marketCap": 0,
+            "updatedTime": time_previous,
+        }
+    )
+
     code_list.append("^KS11")
     code_list.append("^KQ11")
+    code_list.append("^DJI")
+    code_list.append("^IXIC")
+    code_list.append("^N225")
     global company
     company = item_list
 
@@ -578,12 +608,15 @@ def stock_information_getTime():
     corr_current = current - datetime.timedelta(hours=9)
     global pre_previous
     global time_previous
+    global pre_pre_previous
     global previous
+    global is_trading
     if XKRX.is_trading_minute(corr_current.strftime("%Y-%m-%d %H:%M")):
         previous = datetime.date.today().strftime("%Y-%m-%d")
         time_previous = datetime.date.today().strftime("%Y-%m-%d %H:%M")
         pre_previous = XKRX.previous_session(previous).strftime("%Y-%m-%d")
-        flag = True
+        pre_pre_previous = XKRX.previous_session(pre_previous).strftime("%Y-%m-%d")
+        is_trading = True
     else:
         previous = XKRX.previous_minute(
             corr_current.strftime("%Y-%m-%d %H:%M")
@@ -592,84 +625,100 @@ def stock_information_getTime():
             corr_current.strftime("%Y-%m-%d %H:%M")
         ) + datetime.timedelta(hours=9)
         pre_previous = XKRX.previous_session(previous).strftime("%Y-%m-%d")
+        pre_pre_previous = XKRX.previous_session(pre_previous).strftime("%Y-%m-%d")
         time_previous = str(time_previous.strftime("%Y-%m-%d %H:%M"))
-        flag = False
-
-    print(pre_previous)
-    data = yf.download(["^KS11", "^KQ11"], start=pre_previous)
-    print(data["Close"]["^KS11"][-1])
-    try:
-        float(data["Close"]["^KS11"][1])
-    except:
-        pre_previous = XKRX.previous_session(pre_previous).strftime("%Y-%m-%d")
-
-    return flag
+        is_trading = False
+    print(pre_pre_previous)
+    return is_trading
 
 
 def stock_pretreatment():
-    data = yf.download(code_list, start=pre_previous)
+    data = yf.download(code_list, start=pre_pre_previous)
+    pre = parser.parse(previous)
+    pre_pre = parser.parse(pre_previous)
     # item_list에 각 필드들 쿼링
     for j in tqdm(company):
         stockCode = j["stockCode"]
-        if j["stockCode"] != "^KS11" and j["stockCode"] != "^KQ11":
+        if (
+            j["stockCode"] != "^KS11"
+            and j["stockCode"] != "^KQ11"
+            and j["stockCode"] != "^DJI"
+            and j["stockCode"] != "^IXIC"
+            and j["stockCode"] != "^N225"
+        ):
             stockCode += ".KS"
-
-        j["stockPrice"] = float(data["Close"][stockCode][-1])
-        j["stockLowPrice"] = float(data["Low"][stockCode][-1])
-        j["stockHighPrice"] = float(data["High"][stockCode][-1])
-        j["stockVolume"] = float(data["Volume"][stockCode][-1])
-        j["stockOpenPrice"] = float(data["Open"][stockCode][-1])
-        j["stockClosingPrice"] = float(data["Close"][stockCode][-2])
-        j["stockChange"] = float(
-            data["Close"][stockCode][-1] - data["Close"][stockCode][-2]
-        )
-        j["stockPerChange"] = float(
-            (data["Close"][stockCode][-1] - data["Close"][stockCode][-2])
-            / data["Close"][stockCode][-2]
-            * 100
-        )
+        try:
+            j["stockPrice"] = float(data["Close"][stockCode][pre])
+            j["stockLowPrice"] = float(data["Low"][stockCode][pre])
+            j["stockHighPrice"] = float(data["High"][stockCode][pre])
+            j["stockVolume"] = int(data["Volume"][stockCode][pre])
+            j["stockOpenPrice"] = float(data["Open"][stockCode][pre])
+            j["stockClosingPrice"] = float(data["Close"][stockCode][pre_pre])
+            j["stockChange"] = float(
+                data["Close"][stockCode][pre] - data["Close"][stockCode][pre_pre]
+            )
+            j["stockPerChange"] = float(
+                (data["Close"][stockCode][pre] - data["Close"][stockCode][pre_pre])
+                / data["Close"][stockCode][pre_pre]
+                * 100
+            )
+        except:
+            company.remove(j)
 
     # 상장폐지 / 거래중지 종목 리스트에서 제거
-    for i in company:
-        if (
-            math.isnan(i["stockPrice"])
-            or math.isnan(i["stockLowPrice"])
-            or math.isnan(i["stockHighPrice"])
-            or math.isnan(i["stockVolume"])
-            or math.isnan(i["stockOpenPrice"])
-            or math.isnan(i["stockClosingPrice"])
-            or math.isnan(i["stockChange"])
-            or math.isnan(i["stockPerChange"])
-        ):
-            company.remove(i)
+    # for i in company:
+    #     if (
+    #         math.isnan(i["stockPrice"])
+    #         or math.isnan(i["stockLowPrice"])
+    #         or math.isnan(i["stockHighPrice"])
+    #         or math.isnan(i["stockVolume"])
+    #         or math.isnan(i["stockOpenPrice"])
+    #         or math.isnan(i["stockClosingPrice"])
+    #         or math.isnan(i["stockChange"])
+    #         or math.isnan(i["stockPerChange"])
+    #     ):
+    #         company.remove(i)
 
     # round 처리로 2자리수까지 보여짐
     # nan 처리 해주고 나서 돌려야해서 필요한 코드
     for j in tqdm(company):
         stockCode = j["stockCode"]
-        if j["stockCode"] != "^KS11" and j["stockCode"] != "^KQ11":
+        if (
+            j["stockCode"] != "^KS11"
+            and j["stockCode"] != "^KQ11"
+            and j["stockCode"] != "^DJI"
+            and j["stockCode"] != "^IXIC"
+            and j["stockCode"] != "^N225"
+        ):
             stockCode += ".KS"
-        j["stockPrice"] = float(round(data["Close"][stockCode][-1], 2))
-        j["stockLowPrice"] = float(round(data["Low"][stockCode][-1], 2))
-        j["stockHighPrice"] = float(round(data["High"][stockCode][-1], 2))
-        j["stockVolume"] = float(round(data["Volume"][stockCode][-1], 2))
-        j["stockOpenPrice"] = float(round(data["Open"][stockCode][-1], 2))
-        j["stockClosingPrice"] = float(round(data["Close"][stockCode][-2], 2))
-        j["stockChange"] = float(
-            round(data["Close"][stockCode][-1] - data["Close"][stockCode][-2], 2)
-        )
-        j["stockPerChange"] = float(
-            round(
-                (data["Close"][stockCode][-1] - data["Close"][stockCode][-2])
-                / data["Close"][stockCode][-2]
-                * 100,
-                2,
+
+        try:
+            j["stockPrice"] = float(round(data["Close"][stockCode][pre], 2))
+            j["stockLowPrice"] = float(round(data["Low"][stockCode][pre], 2))
+            j["stockHighPrice"] = float(round(data["High"][stockCode][pre], 2))
+            j["stockOpenPrice"] = float(round(data["Open"][stockCode][pre], 2))
+            j["stockClosingPrice"] = float(round(data["Close"][stockCode][pre_pre], 2))
+            j["stockChange"] = float(
+                round(
+                    data["Close"][stockCode][pre] - data["Close"][stockCode][pre_pre], 2
+                )
             )
-        )
+            j["stockPerChange"] = float(
+                round(
+                    (data["Close"][stockCode][pre] - data["Close"][stockCode][pre_pre])
+                    / data["Close"][stockCode][pre_pre]
+                    * 100,
+                    2,
+                )
+            )
+        except:
+            company.remove(j)
+
         j["DayNewsCount"] = 0
         j["TimeNewsCount"] = 0
         j["TimePerPositiveNewsCount"] = 0
         j["TimePerNegativeNewsCount"] = 0
+        j["updatedTime"] = time_previous
 
 
 def firebase_transaction_messaging():
@@ -745,8 +794,14 @@ schedule.every(15).minutes.do(run)
 
 if __name__ == "__main__":
     print("start")
-    get_companylist()
     stock_information_getTime()
+    get_companylist()
+
+    endPoint_dict = {}
+
+    for i in company:
+        endPoint_dict[i["stockName"]] = temp_dt
+
     stock_pretreatment()
     firebase_transaction()
     run()

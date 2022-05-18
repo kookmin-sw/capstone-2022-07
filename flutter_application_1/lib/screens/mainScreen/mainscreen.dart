@@ -63,7 +63,7 @@ class _MainscreenState extends State<Mainscreen> {
             .collection('stock')
             .doc(qs.docs[index++]['stockName'])
             .collection('news')
-            .orderBy("date")
+            .orderBy("date", descending: true)
             .limit(1)
             .get()
             .then((QuerySnapshot qs) {
@@ -132,6 +132,12 @@ class _MainscreenState extends State<Mainscreen> {
     list.add(docSnapshot.data());
     docSnapshot = await firestore.collection('stock').doc("코스닥").get();
     list.add(docSnapshot.data());
+    docSnapshot = await firestore.collection('stock').doc("다우존스").get();
+    list.add(docSnapshot.data());
+    docSnapshot = await firestore.collection('stock').doc("나스닥").get();
+    list.add(docSnapshot.data());
+    docSnapshot = await firestore.collection('stock').doc("닛케이").get();
+    list.add(docSnapshot.data());
   }
 
   Widget mainStockList(Size size, List<Map<String, dynamic>> list) {
@@ -158,7 +164,7 @@ class _MainscreenState extends State<Mainscreen> {
           ,
           Container(
             width: size.width * 0.9,
-            height: size.height * 0.15,
+            height: size.height * 0.375,
             padding: EdgeInsets.symmetric(vertical: size.height * 0.01),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.only(
@@ -170,7 +176,7 @@ class _MainscreenState extends State<Mainscreen> {
               color: Color.fromRGBO(255, 255, 255, 1),
             ),
             child: ListView.separated(
-              itemCount: 2,
+              itemCount: 5,
               physics: NeverScrollableScrollPhysics(),
               itemBuilder: (BuildContext context, int index) {
                 return mainStock(
