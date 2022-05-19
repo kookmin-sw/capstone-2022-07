@@ -36,7 +36,8 @@ from multiprocessing import Manager, Pool, freeze_support
 import tensorflow as tf
 
 physical_devices = tf.config.list_physical_devices("GPU")
-tf.config.experimental.set_memory_growth(physical_devices[0], enable=True)
+print(physical_devices)
+# tf.config.experimental.set_memory_growth(physical_devices[0], enable=True)
 # tf.config.experimental.set_visible_devices(physical_devices[0], device_type="GPU")
 
 # warning 문자 무시
@@ -392,7 +393,7 @@ def api_search(tuple_list, stock, id_key):
         "X-Naver-Client-Id": Naver_client_id[id_key],
         "X-Naver-Client-Secret": Naver_client_secret[id_key],
     }
-    param = {"query": stock, "display": 10, "start": 1, "sort": "date"}
+    param = {"query": stock, "display": 100, "start": 1, "sort": "date"}
     # query     : 검색할 단어
     # display   : 검색 출력 건수 (기본 10 / 최대 100)
     # start     : 검색 시작 위치 (기본 1  / 최대 1000)
@@ -424,7 +425,6 @@ def api_search(tuple_list, stock, id_key):
 
         tmp_endPoint = temp["items"][0]["pubDate"]
 
-        global stock_news_list
         stock_news_list = []
 
         for dict in temp["items"]:
@@ -605,15 +605,15 @@ def stock_information_getTime():
     # 날짜반영
     XKRX = ecals.get_calendar("XKRX")  # 한국 코드
     current = datetime.datetime.now()
-    corr_current = current - datetime.timedelta(hours=9)
+    corr_current = current
     global pre_previous
     global time_previous
     global pre_pre_previous
     global previous
     global is_trading
     if XKRX.is_trading_minute(corr_current.strftime("%Y-%m-%d %H:%M")):
-        previous = datetime.date.today().strftime("%Y-%m-%d")
-        time_previous = datetime.date.today().strftime("%Y-%m-%d %H:%M")
+        previous = datetime.datetime.now().strftime("%Y-%m-%d")
+        time_previous = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
         pre_previous = XKRX.previous_session(previous).strftime("%Y-%m-%d")
         pre_pre_previous = XKRX.previous_session(pre_previous).strftime("%Y-%m-%d")
         is_trading = True
@@ -626,7 +626,7 @@ def stock_information_getTime():
         ) + datetime.timedelta(hours=9)
         pre_previous = XKRX.previous_session(previous).strftime("%Y-%m-%d")
         pre_pre_previous = XKRX.previous_session(pre_previous).strftime("%Y-%m-%d")
-        time_previous = str(time_previous.strftime("%Y-%m-%d %H:%M"))
+        time_previous = time_previous.strftime("%Y-%m-%d %H:%M")
         is_trading = False
     print(pre_pre_previous)
     return is_trading

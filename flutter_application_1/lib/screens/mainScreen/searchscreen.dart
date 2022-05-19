@@ -35,7 +35,6 @@ class _SearchscreenState extends State<Searchscreen> {
       appBar: mainPageAppBar(
         context,
         "검색",
-        SettingButton(context),
       ),
       body: SizedBox(
           height: size.height,

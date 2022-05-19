@@ -90,7 +90,9 @@ class _StockscreenState extends State<Stockscreen> {
                 for (var doc in qs.docs) {
                   Map<String, dynamic> topnews =
                       doc.data() as Map<String, dynamic>;
-                  list.add(topnews);
+                  if (topnews["label"] != "1" && topnews["label"] != 1) {
+                    list.add(topnews);
+                  }
                 }
               },
             );
@@ -280,13 +282,43 @@ class _StockscreenState extends State<Stockscreen> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Stockinfo(
-              size,
-              firebaseStockData["stockName"],
-              firebaseStockData["stockCode"],
-              firebaseStockData["stockPrice"],
-              firebaseStockData["stockPerChange"],
-              firebaseStockData["stockChange"]),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Stockinfo(
+                  size,
+                  firebaseStockData["stockName"],
+                  firebaseStockData["stockCode"],
+                  firebaseStockData["stockPrice"],
+                  firebaseStockData["stockPerChange"],
+                  firebaseStockData["stockChange"]),
+              Container(
+                padding: EdgeInsets.all(size.width * 0.01),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Color.fromRGBO(240, 240, 240, 1),
+                  ),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(4),
+                    topRight: Radius.circular(4),
+                    bottomLeft: Radius.circular(4),
+                    bottomRight: Radius.circular(4),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                        "시간당 호재 기사 개수: ${firebaseStockData["TimePerPositiveNewsCount"]}"),
+                    SizedBox(
+                      height: size.height * 0.005,
+                    ),
+                    Text(
+                        "시간당 악재 기사 개수: ${firebaseStockData["TimePerNegativeNewsCount"]}"),
+                  ],
+                ),
+              )
+            ],
+          ),
           chartTab(size),
         ],
       ),
@@ -579,7 +611,7 @@ class _StockscreenState extends State<Stockscreen> {
                 return stockNews(
                     size,
                     newsDataList[index]["title"],
-                    newsDataList[index]["context"],
+                    newsDataList[index]["date"].substring(0, 16),
                     newsDataList[index]["label"],
                     newsDataList[index]["url"]);
               },
@@ -607,8 +639,8 @@ class _StockscreenState extends State<Stockscreen> {
       'marketCap',
     ];
     List<String> stockInfodetail = <String>[
-      '긍정 기사 개수',
-      '부정 기사 개수',
+      '시간당 긍정 기사 개수',
+      '시간당 부정 기사 개수',
       '전일종가',
       '고가',
       '저가',
@@ -735,29 +767,39 @@ class _StockscreenState extends State<Stockscreen> {
         await _launchInWebViewOrVC(uri);
       },
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              SizedBox(
+              Container(
+                padding: EdgeInsets.only(top: size.height * 0.004),
                 width: size.width * 0.7,
                 child: Text(
                   title,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  maxLines: 2,
+                  // style: TextStyle(
+                  //     // fontWeight: FontWeight.bold,
+                  //     fontSize: size.height * 0.02),
                 ),
               ),
               newsResult(result),
             ],
           ),
           SizedBox(
-            height: size.height * 0.005,
+            height: size.height * 0.03,
           ),
           Text(
             content,
+            maxLines: 2,
+            textAlign: TextAlign.start,
             style: TextStyle(
                 fontWeight: FontWeight.normal, color: Color(0xff888888)),
-          )
+          ),
+          SizedBox(
+            height: size.height * 0.004,
+          ),
         ],
       ),
     );

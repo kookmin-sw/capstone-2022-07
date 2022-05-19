@@ -144,7 +144,7 @@ class _InterestScreenState extends State<InterestScreen> {
     }
 
     return Container(
-      height: size.height * 0.185,
+      height: size.height * 0.21,
       width: size.width * 0.9,
       decoration: const BoxDecoration(
         borderRadius: BorderRadius.only(
@@ -306,7 +306,6 @@ class _InterestScreenState extends State<InterestScreen> {
               Container(
                 padding: EdgeInsets.only(left: size.width * 0.01),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
                       decoration: const BoxDecoration(
@@ -339,70 +338,79 @@ class _InterestScreenState extends State<InterestScreen> {
                         ),
                       ),
                     ),
-                    exceptCospiCosdaq(size, name, marketCapKor, color),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return Stockscreen(
-                                stockName: name,
-                                stockCode: stockCode,
-                              );
-                            },
-                          ),
-                        ).then((_) => setState(() {}));
-                      },
-                      child: Container(
-                        width: size.width * 0.2,
-                        padding: EdgeInsets.symmetric(
-                            horizontal: size.width * 0.03,
-                            vertical: size.height * 0.005),
-                        decoration: BoxDecoration(
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(16),
-                            topRight: Radius.circular(16),
-                            bottomLeft: Radius.circular(16),
-                            bottomRight: Radius.circular(16),
-                          ),
-                          color: const Color.fromRGBO(249, 249, 249, 1),
-                          boxShadow: [
-                            const BoxShadow(
-                                color: Color.fromRGBO(0, 0, 0, 0.25),
-                                offset: Offset(0, 4),
-                                blurRadius: 4)
-                          ],
-                          border: Border.all(
-                            color: const Color.fromRGBO(25, 25, 25, 1),
-                            width: 1,
-                          ),
-                        ),
-                        child: Center(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              // Firebase 적용 사항
-                              Text(
-                                '자세히',
-                                style: TextStyle(
-                                    color: const Color.fromRGBO(0, 0, 0, 1),
-                                    fontSize: size.width * 0.036,
-                                    fontWeight: FontWeight.normal,
-                                    height: 1.2),
-                              ),
-                              Icon(Icons.keyboard_arrow_right_sharp,
-                                  size: size.width * 0.05, color: Colors.black)
-                            ],
-                          ),
-                        ),
-                      ),
+                    SizedBox(
+                      width: size.width * 0.015,
                     ),
+                    exceptCospiCosdaq(size, name, marketCapKor, color),
                   ],
                 ),
               ),
             ],
-          )
+          ),
+          SizedBox(
+            height: size.height * 0.01,
+          ),
+          Container(
+            alignment: Alignment.topRight,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return Stockscreen(
+                        stockName: name,
+                        stockCode: stockCode,
+                      );
+                    },
+                  ),
+                ).then((_) => setState(() {}));
+              },
+              child: Container(
+                width: size.width * 0.2,
+                padding: EdgeInsets.symmetric(
+                    horizontal: size.width * 0.03,
+                    vertical: size.height * 0.005),
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    topRight: Radius.circular(16),
+                    bottomLeft: Radius.circular(16),
+                    bottomRight: Radius.circular(16),
+                  ),
+                  color: const Color.fromRGBO(249, 249, 249, 1),
+                  boxShadow: [
+                    const BoxShadow(
+                        color: Color.fromRGBO(0, 0, 0, 0.25),
+                        offset: Offset(0, 4),
+                        blurRadius: 4)
+                  ],
+                  border: Border.all(
+                    color: const Color.fromRGBO(25, 25, 25, 1),
+                    width: 1,
+                  ),
+                ),
+                child: Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Firebase 적용 사항
+                      Text(
+                        '자세히',
+                        style: TextStyle(
+                            color: const Color.fromRGBO(0, 0, 0, 1),
+                            fontSize: size.width * 0.036,
+                            fontWeight: FontWeight.normal,
+                            height: 1.2),
+                      ),
+                      Icon(Icons.keyboard_arrow_right_sharp,
+                          size: size.width * 0.05, color: Colors.black)
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -438,7 +446,6 @@ class _InterestScreenState extends State<InterestScreen> {
       appBar: mainPageAppBar(
         context,
         "관심 종목",
-        SettingButton(context),
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
         future: customFuture(),
