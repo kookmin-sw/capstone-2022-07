@@ -34,6 +34,7 @@ class _MainscreenState extends State<Mainscreen> {
       List<Map<String, dynamic>> negativeList,
       List<Map<String, dynamic>> mainList,
       List<Map<String, dynamic>> toprateNewslist,
+      List<Map<String, dynamic>> countNewsList,
       List<String> topratestock) async {
     await firestore
         .collection('stock')
@@ -92,6 +93,20 @@ class _MainscreenState extends State<Mainscreen> {
             }
             // decreaseList.add(decrease);
           });
+        }
+      },
+    );
+
+    await firestore
+        .collection('stock')
+        .orderBy("DayNewsCount", descending: true)
+        .limit(5)
+        .get()
+        .then(
+      (QuerySnapshot qs) {
+        for (var doc in qs.docs) {
+          Map<String, dynamic> positive = doc.data() as Map<String, dynamic>;
+          countNewsList.add(positive);
         }
       },
     );
@@ -226,6 +241,18 @@ class _MainscreenState extends State<Mainscreen> {
                         fontSize: size.width * 0.04,
                         height: size.height * 0.002,
                         overflow: TextOverflow.ellipsis)),
+                SizedBox(
+                  height: size.height * 0.005,
+                ),
+                Text(
+                  stockCode,
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: size.width * 0.03,
+                    fontWeight: FontWeight.normal,
+                  ),
+                )
               ],
             )),
             Expanded(
@@ -362,6 +389,41 @@ class _MainscreenState extends State<Mainscreen> {
     );
   }
 
+  Widget TopstocklistCount(
+      Size size, List<Map<String, dynamic>> list, String countName) {
+    // 특정 콜렉션 참조
+    return Container(
+      width: size.width * 0.9,
+      height: size.height * 0.25,
+      padding: EdgeInsets.only(top: size.height * 0.01),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(8),
+          topRight: Radius.circular(8),
+          bottomLeft: Radius.circular(8),
+          bottomRight: Radius.circular(8),
+        ),
+        color: Color.fromRGBO(255, 255, 255, 1.0),
+      ),
+      child: ListView.separated(
+        itemCount: 5,
+        physics: NeverScrollableScrollPhysics(),
+        itemBuilder: (BuildContext context, int index) {
+          return TopstockCount(
+              size,
+              list[index]['stockName'],
+              list[index]['stockPerChange'],
+              list[index]['stockPrice'],
+              list[index][countName],
+              list[index]['stockChange'],
+              list[index]['stockCode']);
+        },
+        separatorBuilder: (BuildContext context, int index) =>
+            const Divider(color: GREY),
+      ),
+    );
+  }
+
   Widget Topstock(Size size, String stockname, var stockperc, var stockprice,
       var newscount, var stockChange, var stockCode) {
     Color color;
@@ -384,18 +446,168 @@ class _MainscreenState extends State<Mainscreen> {
         child: Row(
           children: [
             Container(
-                child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(stockname, //Firebase 적용사항
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(stockname, //Firebase 적용사항
+                      style: TextStyle(
+                          color: Color.fromRGBO(0, 0, 0, 1),
+                          fontSize: size.width * 0.04,
+                          height: size.height * 0.002,
+                          overflow: TextOverflow.ellipsis)),
+                  SizedBox(height: size.height * 0.005),
+                  Text(
+                    stockCode,
+                    textAlign: TextAlign.left,
                     style: TextStyle(
-                        color: Color.fromRGBO(0, 0, 0, 1),
-                        fontSize: size.width * 0.04,
-                        height: size.height * 0.002,
-                        overflow: TextOverflow.ellipsis)),
-              ],
-            )),
+                      color: Colors.grey[600],
+                      fontSize: size.width * 0.03,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  )
+                ],
+              ),
+            ),
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          '$stockprice', //Firebase 적용사항
+                          style: TextStyle(
+                              color: Color.fromRGBO(0, 0, 0, 1),
+                              fontSize: size.width * 0.035,
+                              height: size.height * 0.002),
+                        ),
+                        Container(
+                            child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Container(
+                                child: Icon((() {
+                              if (color == CHART_PLUS) {
+                                return Icons.arrow_drop_up_outlined;
+                              } else if (color == CHART_MINUS) {
+                                return Icons.arrow_drop_down_outlined;
+                              } else {
+                                return Icons.remove;
+                              }
+                            })(), color: color, size: size.width * 0.05)),
+                            Text(
+                              '$stockChange', //Firebase 적용사항
+                              style: TextStyle(
+                                color: color,
+                                fontSize: size.width * 0.03,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                          ],
+                        ))
+                      ],
+                    ),
+                  ),
+                  SizedBox(width: size.width * 0.02),
+                  Container(
+                    width: size.width * 0.13,
+                    height: size.height * 0.035,
+                    padding: EdgeInsets.only(
+                      bottom: size.height * 0.005,
+                    ),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(4),
+                        topRight: Radius.circular(4),
+                        bottomLeft: Radius.circular(4),
+                        bottomRight: Radius.circular(4),
+                      ),
+                      color: color,
+                    ),
+                    margin: EdgeInsets.symmetric(
+                        vertical: size.height * 0.005,
+                        horizontal: size.width * 0.015),
+                    child: Center(
+                      child: FittedBox(
+                        child: Text(stockperc,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: size.height * 0.015,
+                              height: 2,
+                            )),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
+      ),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) {
+              return Stockscreen(stockName: stockname, stockCode: stockCode);
+            },
+          ),
+        );
+      },
+      behavior: HitTestBehavior.opaque,
+    );
+  }
+
+  Widget TopstockCount(Size size, String stockname, var stockperc,
+      var stockprice, var newscount, var stockChange, var stockCode) {
+    Color color;
+    if (stockperc > 0) {
+      color = CHART_PLUS;
+    } else if (stockperc < 0) {
+      color = CHART_MINUS;
+    } else {
+      color = GREY;
+    }
+    stockprice = intlprice.format(stockprice);
+    stockperc = intlperc.format(stockperc) + "%";
+    stockChange = intlprice.format(stockChange);
+    return GestureDetector(
+      child: Container(
+        width: size.width * 0.9,
+        height: size.height * 0.37 * 0.15,
+        margin:
+            EdgeInsets.only(left: size.width * 0.05, right: size.width * 0.03),
+        child: Row(
+          children: [
+            Container(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(stockname, //Firebase 적용사항
+                      style: TextStyle(
+                          color: Color.fromRGBO(0, 0, 0, 1),
+                          fontSize: size.width * 0.04,
+                          height: size.height * 0.002,
+                          overflow: TextOverflow.ellipsis)),
+                  SizedBox(height: size.height * 0.005),
+                  Text(
+                    stockCode,
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: size.width * 0.03,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  )
+                ],
+              ),
+            ),
             Expanded(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -568,6 +780,78 @@ class _MainscreenState extends State<Mainscreen> {
     );
   }
 
+  Widget rankingTab_3(
+      Size size,
+      List<Map<String, dynamic>> newsCountList,
+      List<Map<String, dynamic>> increaseList,
+      List<Map<String, dynamic>> decreaseList,
+      String title,
+      String menu1,
+      String menu2,
+      String menu3) {
+    return Container(
+      margin: EdgeInsets.only(top: size.height * 0.01),
+      width: size.width * 0.9,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(8),
+          topRight: Radius.circular(8),
+          bottomLeft: Radius.circular(8),
+          bottomRight: Radius.circular(8),
+        ),
+        color: Color.fromRGBO(255, 255, 255, 1),
+      ),
+      child: Column(
+        children: [
+          Container(
+            margin: EdgeInsets.all(size.width * 0.01),
+            padding: EdgeInsets.only(
+                left: size.width * 0.03, top: size.height * 0.01),
+            // alignment: Alignment.topLeft,
+            child: Text(
+              title,
+              style: TextStyle(
+                color: Color.fromRGBO(0, 0, 0, 1),
+                fontSize: size.width * 0.05,
+                fontWeight: FontWeight.bold,
+                height: 1,
+              ),
+            ),
+          ),
+          Divider(),
+          Container(
+            height: size.height * 0.42,
+            child: ContainedTabBarView(
+              tabBarProperties: TabBarProperties(
+                height: size.height * 0.04,
+                labelStyle: TextStyle(
+                    color: Color(0xff0039A4),
+                    fontWeight: FontWeight.bold,
+                    fontSize: size.width * 0.1 * 0.35),
+                labelColor: Color(0xff0039A4),
+                unselectedLabelColor: Colors.grey[400],
+                indicatorColor: Color(0xff0039A4),
+              ),
+              tabs: [
+                Text(menu1),
+                Text(menu2),
+                Text(menu3),
+              ],
+              views: [
+                TopstocklistCount(size, newsCountList, "DayNewsCount"),
+                TopstocklistCount(
+                    size, increaseList, "TimePerPositiveNewsCount"),
+                TopstocklistCount(
+                    size, decreaseList, "TimePerNegativeNewsCount")
+              ],
+              onChange: (index) => print(index),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget TopratenewsListTab(
       Size size, List<Map<String, dynamic>> topList, List<String> stockName) {
     return Column(
@@ -731,14 +1015,15 @@ class _MainscreenState extends State<Mainscreen> {
                       clipBehavior: Clip.antiAlias,
                       child: Column(
                         children: [
-                          if (info.image != null)
-                            SizedBox(
-                                child: Image.network(
-                              info.image,
-                              width: size.height * 0.09,
-                              height: size.height * 0.09,
-                              fit: BoxFit.cover,
-                            )),
+                          info.image != null && info.image != ""
+                              ? SizedBox(
+                                  child: Image.network(
+                                  info.image,
+                                  width: size.height * 0.09,
+                                  height: size.height * 0.09,
+                                  fit: BoxFit.cover,
+                                ))
+                              : Container()
                         ],
                       ),
                     ),
@@ -756,19 +1041,27 @@ class _MainscreenState extends State<Mainscreen> {
     Size size = MediaQuery.of(context).size;
     List<Map<String, dynamic>> increaseList = [];
     List<Map<String, dynamic>> decreaseList = [];
+    List<Map<String, dynamic>> countNewsList = [];
     List<Map<String, dynamic>> positiveList = [];
     List<Map<String, dynamic>> negativeList = [];
     List<Map<String, dynamic>> mainStocklist = [];
     List<Map<String, dynamic>> toprateNewslist = [];
     List<String> topratestock = [];
     return Scaffold(
-      appBar: mainAppBar(context, "홈", SettingButton(context), size),
+      appBar: mainAppBar(context, "홈", size),
       body: SafeArea(
         child: Container(
           alignment: Alignment.topCenter,
           child: FutureBuilder(
-            future: _getList(increaseList, decreaseList, positiveList,
-                negativeList, mainStocklist, toprateNewslist, topratestock),
+            future: _getList(
+                increaseList,
+                decreaseList,
+                positiveList,
+                negativeList,
+                mainStocklist,
+                toprateNewslist,
+                countNewsList,
+                topratestock),
             builder: (BuildContext context, AsyncSnapshot snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
                 return SingleChildScrollView(
@@ -778,8 +1071,15 @@ class _MainscreenState extends State<Mainscreen> {
                       TopratenewsListTab(size, toprateNewslist, topratestock),
                       rankingTab(size, increaseList, decreaseList, "시세 순위",
                           "상승 종목", "하락 종목"),
-                      rankingTab(size, positiveList, negativeList, "뉴스 순위",
-                          "호재 순위", "악재 순위"),
+                      rankingTab_3(
+                          size,
+                          countNewsList,
+                          positiveList,
+                          negativeList,
+                          "뉴스 순위",
+                          "일일 기사",
+                          "시간당 호재 기사",
+                          "시간당 악재 기사"),
                       SizedBox(height: size.height * 0.03),
                       // Stockindex(size),
                     ],
