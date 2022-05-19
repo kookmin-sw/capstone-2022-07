@@ -177,7 +177,6 @@ class _ProfilescreenState extends State<Profilescreen> {
       appBar: mainPageAppBar(
         context,
         "프로필",
-        SettingButton(context),
       ),
       body: SettingPage(context),
     );

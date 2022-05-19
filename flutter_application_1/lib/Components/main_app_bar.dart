@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application_1/Components/star_button.dart';
 
-AppBar mainAppBar(
-    BuildContext context, String title, IconButton button, Size size) {
+AppBar mainAppBar(BuildContext context, String title, Size size) {
   return AppBar(
     systemOverlayStyle: SystemUiOverlayStyle(),
     title: Image.asset(
@@ -14,14 +13,13 @@ AppBar mainAppBar(
       // height: size.height * 0.3,
     ),
     centerTitle: true,
-    actions: [button],
     leadingWidth: 70,
     backgroundColor: Colors.transparent,
     elevation: 0.0,
   );
 }
 
-AppBar mainPageAppBar(BuildContext context, String title, IconButton button) {
+AppBar mainPageAppBar(BuildContext context, String title) {
   return AppBar(
     systemOverlayStyle: SystemUiOverlayStyle(),
     centerTitle: true,
@@ -29,7 +27,6 @@ AppBar mainPageAppBar(BuildContext context, String title, IconButton button) {
       title,
       style: TextStyle(color: Colors.black),
     ),
-    actions: [button],
     leadingWidth: 70,
     backgroundColor: Colors.transparent,
     elevation: 0.0,
