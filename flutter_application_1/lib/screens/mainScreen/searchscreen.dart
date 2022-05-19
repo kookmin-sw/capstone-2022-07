@@ -15,46 +15,21 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_application_1/Components/numFormat.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 
-class Searchscreen extends StatefulWidget {
-  Searchscreen({Key? key}) : super(key: key);
+
+class visitedstock extends StatefulWidget {
+  const visitedstock(this.parentSize,{Key? key }) : super(key: key);
+  final Size parentSize;
   @override
-  State<Searchscreen> createState() => _SearchscreenState();
+  State<visitedstock> createState() => _visitedstockState();
 }
 
-class _SearchscreenState extends State<Searchscreen> {
-  FloatingSearchBarController? controller;
-
-  String selectedTerm = "";
-
-  @override
-  Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-    return Scaffold(
-      appBar: mainPageAppBar(
-        context,
-        "검색",
-        SettingButton(context),
-      ),
-      body: SizedBox(
-          height: size.height,
-          width: size.width,
-          child: Stack(
-            children: [
-              visitedstock(size),
-              buildFloatingSearchBar(context, size),
-            ],
-            alignment: Alignment.topCenter,
-          )),
-    );
-  }
-
+class _visitedstockState extends State<visitedstock> {
   Widget visitedtitle(size) {
     return Container(
       alignment: Alignment.topLeft,
       margin:
-          EdgeInsets.only(left: size.width * 0.01, bottom: size.height * 0.01),
+      EdgeInsets.only(left: size.width * 0.01, bottom: size.height * 0.01),
       child: Text(
         '최근 조회 종목',
         style: GoogleFonts.notoSans(
@@ -65,6 +40,15 @@ class _SearchscreenState extends State<Searchscreen> {
     );
   }
 
+
+
+  Widget favoritestock(Size size, bool res) {
+    if (res == true) {
+      return Icon(Icons.star_outlined, color: Colors.amber);
+    } else {
+      return Icon(Icons.star_outline, color: Colors.amber);
+    }
+  }
   //주식 정보를 가져옴
   Future<List<Map<String, dynamic>>> _getstockInfo(List<dynamic> list) async {
     List<Map<String, dynamic>> stockcardlist = [];
@@ -81,77 +65,7 @@ class _SearchscreenState extends State<Searchscreen> {
     return stockcardlist;
   }
 
-  //사용자의 visited와 favorite 정보를 가져옴
-  Future<List<dynamic>> _getvisitedstockanddata() async {
-    String useruid = FirebaseAuth.instance.currentUser!.uid;
-    var user =
-        await FirebaseFirestore.instance.collection('users').doc(useruid).get();
-    List<dynamic> visitedlist = user['visited'];
-    List<dynamic> favoritelist = user['favorite'];
 
-    var data = await _getstockInfo(visitedlist);
-    return [data, favoritelist];
-  }
-
-  Future<List<dynamic>> getvisited() {
-    return _getvisitedstockanddata();
-  }
-
-  Widget visitedstock(Size size) {
-    return FutureBuilder<List<dynamic>>(
-        future: getvisited(),
-        builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            List<dynamic> visitedstocklist = snapshot.data ?? [];
-            if (visitedstocklist[0].isEmpty) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.search,
-                      color: GREY,
-                      size: size.height * 0.1,
-                    ),
-                    SizedBox(
-                      height: size.height * 0.05,
-                    ),
-                    Text(
-                      "최근 검색 목록이 없습니다.",
-                      style: TextStyle(
-                        fontSize: size.width * 0.07,
-                        color: GREY,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            } else {
-              return Positioned(
-                top: size.height * 0.08,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    visitedtitle(size),
-                    visitedstockview(
-                        size, visitedstocklist[0], visitedstocklist[1]),
-                  ],
-                ),
-              );
-            }
-          } else {
-            return Center(child: indicator());
-          }
-        });
-  }
-
-  Widget favoritestock(Size size, bool res) {
-    if (res == true) {
-      return Icon(Icons.star_outlined, color: Colors.amber);
-    } else {
-      return Icon(Icons.star_outline, color: Colors.amber);
-    }
-  }
 
   Widget visitedstockview(Size size, List<Map<String, dynamic>>? visitedlist,
       List<dynamic> favoritelist) {
@@ -178,7 +92,7 @@ class _SearchscreenState extends State<Searchscreen> {
             physics: AlwaysScrollableScrollPhysics(),
             itemCount: visitedlist.length,
             separatorBuilder: (BuildContext context, int index) =>
-                const Divider(color: GREY),
+            const Divider(color: GREY),
             itemBuilder: (BuildContext context, int index) {
               String name = stocklist[index]['stockName'];
 
@@ -198,9 +112,9 @@ class _SearchscreenState extends State<Searchscreen> {
                 stockColor = Color.fromARGB(255, 120, 119, 119);
               }
               String stockPrice =
-                  intlprice.format(stocklist[index]['stockPrice']);
+              intlprice.format(stocklist[index]['stockPrice']);
               String stockChange =
-                  intlprice.format(stocklist[index]['stockChange'].abs());
+              intlprice.format(stocklist[index]['stockChange'].abs());
               String stockPerChange =
                   intlperc.format(stocklist[index]['stockPerChange']) + "%";
 
@@ -386,6 +300,107 @@ class _SearchscreenState extends State<Searchscreen> {
       );
     }
   }
+  //사용자의 visited와 favorite 정보를 가져옴
+  Future<List<dynamic>> _getvisitedstockanddata() async {
+    String useruid = FirebaseAuth.instance.currentUser!.uid;
+    var user =
+    await FirebaseFirestore.instance.collection('users').doc(useruid).get();
+    List<dynamic> visitedlist = user['visited'];
+    List<dynamic> favoritelist = user['favorite'];
+
+    var data = await _getstockInfo(visitedlist);
+    return [data, favoritelist];
+  }
+
+  Future<List<dynamic>> getvisited() {
+    return _getvisitedstockanddata();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return  FutureBuilder<List<dynamic>>(
+        future: getvisited(),
+        builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            List<dynamic> visitedstocklist = snapshot.data ?? [];
+            if (visitedstocklist[0].isEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.search,
+                      color: GREY,
+                      size: widget.parentSize.height * 0.1,
+                    ),
+                    SizedBox(
+                      height: widget.parentSize.height * 0.05,
+                    ),
+                    Text(
+                      "최근 검색 목록이 없습니다.",
+                      style: TextStyle(
+                        fontSize: widget.parentSize.width * 0.07,
+                        color: GREY,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            } else {
+              return Positioned(
+                top: widget.parentSize.height * 0.08,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    visitedtitle(widget.parentSize),
+                    visitedstockview(
+                        widget.parentSize, visitedstocklist[0], visitedstocklist[1]),
+                  ],
+                ),
+              );
+            }
+          } else {
+            return Center(child: indicator());
+          }
+        });
+  }
+}
+
+
+class Searchscreen extends StatefulWidget {
+  Searchscreen({Key? key}) : super(key: key);
+  @override
+  State<Searchscreen> createState() => _SearchscreenState();
+}
+
+class _SearchscreenState extends State<Searchscreen> {
+  FloatingSearchBarController? controller;
+
+  String selectedTerm = "";
+
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    return Scaffold(
+      appBar: mainPageAppBar(
+        context,
+        "검색",
+        SettingButton(context),
+      ),
+      body: SizedBox(
+          height: size.height,
+          width: size.width,
+          child: Stack(
+            children: [
+              visitedstock(size),
+              buildFloatingSearchBar(context, size),
+            ],
+            alignment: Alignment.topCenter,
+          )),
+    );
+  }
+
+
 
   Widget searchStockList(Size size, List<Map<String, dynamic>> list) {
     return SingleChildScrollView(
@@ -620,3 +635,4 @@ class _SearchscreenState extends State<Searchscreen> {
     );
   }
 }
+
