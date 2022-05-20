@@ -2,15 +2,13 @@
 
 import 'dart:async';
 
+import 'package:argon_buttons_flutter/argon_buttons_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application_1/Animation/fade_animation.dart';
 import 'package:flutter_application_1/screens/Register/function.dart';
-import 'package:flutter_application_1/screens/Register/registerComponents.dart';
-import 'package:flutter_application_1/screens/Register/signup/register_screen.dart';
 import 'package:flutter_application_1/tool/validator.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:argon_buttons_flutter/argon_buttons_flutter.dart';
 
 class VerifyScreen extends StatefulWidget {
   VerifyScreen({Key? key}) : super(key: key);

@@ -2,21 +2,20 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-// ignore_for_file: prefer_const_constructors, prefer_const_constructors_in_immutables, non_constant_identifier_names, prefer_const_literals_to_create_immutables, prefer_typing_uninitialized_variables
-import 'package:flutter/material.dart';
 import 'dart:async';
+
 import 'package:async/async.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:contained_tab_bar_view/contained_tab_bar_view.dart';
+// ignore_for_file: prefer_const_constructors, prefer_const_constructors_in_immutables, non_constant_identifier_names, prefer_const_literals_to_create_immutables, prefer_typing_uninitialized_variables
+import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Color/Color.dart';
 import 'package:flutter_application_1/Components/indicator.dart';
 import 'package:flutter_application_1/Components/main_app_bar.dart';
-import 'package:flutter_application_1/Components/star_button.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:yahoofin/yahoofin.dart';
-import 'dart:math';
-import 'package:contained_tab_bar_view/contained_tab_bar_view.dart';
 import 'package:flutter_application_1/Components/numFormat.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:yahoofin/yahoofin.dart';
 
 class Stockscreen extends StatefulWidget {
   Stockscreen({

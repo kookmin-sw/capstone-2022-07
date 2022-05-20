@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_application_1/Animation/fade_animation.dart';
 import 'package:flutter_application_1/screens/Register/function.dart';
 import 'package:flutter_application_1/screens/Register/registerComponents.dart';
-import 'package:flutter_application_1/screens/mainScreen/start_screen.dart';
 import 'package:flutter_application_1/tool/validator.dart';
 
 class InputNicknameScreen extends StatefulWidget {
