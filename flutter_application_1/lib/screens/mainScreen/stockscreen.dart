@@ -2,21 +2,20 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-// ignore_for_file: prefer_const_constructors, prefer_const_constructors_in_immutables, non_constant_identifier_names, prefer_const_literals_to_create_immutables, prefer_typing_uninitialized_variables
-import 'package:flutter/material.dart';
 import 'dart:async';
+
 import 'package:async/async.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:contained_tab_bar_view/contained_tab_bar_view.dart';
+// ignore_for_file: prefer_const_constructors, prefer_const_constructors_in_immutables, non_constant_identifier_names, prefer_const_literals_to_create_immutables, prefer_typing_uninitialized_variables
+import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Color/Color.dart';
 import 'package:flutter_application_1/Components/indicator.dart';
 import 'package:flutter_application_1/Components/main_app_bar.dart';
-import 'package:flutter_application_1/Components/star_button.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:yahoofin/yahoofin.dart';
-import 'dart:math';
-import 'package:contained_tab_bar_view/contained_tab_bar_view.dart';
 import 'package:flutter_application_1/Components/numFormat.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:yahoofin/yahoofin.dart';
 
 class Stockscreen extends StatefulWidget {
   Stockscreen({
@@ -72,7 +71,7 @@ class _StockscreenState extends State<Stockscreen> {
 
   Map<String, dynamic> firebaseStockData = {};
   List<Map<String, dynamic>> newsDataList = [];
-
+  String updatedTime = "";
   Future getStockInfo() => AsyncMemoizer().runOnce(
         () async {
           CollectionReference stocks =
@@ -80,6 +79,16 @@ class _StockscreenState extends State<Stockscreen> {
           QuerySnapshot stockData = await stocks
               .where('stockName', isEqualTo: widget.stockName)
               .get();
+
+          
+          await FirebaseFirestore.instance.collection('stock')
+            .where('stockName', isEqualTo: '코스피')
+            .get()
+            .then((QuerySnapshot qs){
+              Map<String, dynamic> marketdata = qs.docs[0].data() as Map<String, dynamic>;
+              updatedTime = marketdata['updatedTime'];
+            }
+            );
 
           CollectionReference news =
               stocks.doc(stockData.docs[0].id).collection("news");
@@ -214,7 +223,7 @@ class _StockscreenState extends State<Stockscreen> {
         }
       }
     }
-    print(tenYearData);
+    // print(tenYearData);
 
     return "";
   }
@@ -264,64 +273,84 @@ class _StockscreenState extends State<Stockscreen> {
   }
 
   Widget Stockmain(Size size) {
-    return Container(
-      margin: EdgeInsets.symmetric(
-          vertical: size.height * 0.02, horizontal: size.width * 0.05),
-      padding: EdgeInsets.all(size.width * 0.01),
-      width: size.width * 0.9,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(8),
-          topRight: Radius.circular(8),
-          bottomLeft: Radius.circular(8),
-          bottomRight: Radius.circular(8),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          margin: EdgeInsets.only(left: size.width * 0.06,
+              top: size.height * 0.01),
+          child: Text(
+             updatedTime + " 기준",
+            style: TextStyle(
+              color: Color.fromRGBO(0, 0, 0, 0.7),
+              fontSize: size.width * 0.025,
+              fontWeight: FontWeight.normal,
+              height: 1,
+            ),
+          textAlign: TextAlign.center,
+          ),
         ),
-        color: Colors.white,
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        Container(
+          margin: EdgeInsets.only(
+              bottom: size.height * 0.02, left: size.width * 0.05,
+              right: size.width * 0.05, top: size.height * 0.01),
+          padding: EdgeInsets.all(size.width * 0.01),
+          width: size.width * 0.9,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(8),
+              topRight: Radius.circular(8),
+              bottomLeft: Radius.circular(8),
+              bottomRight: Radius.circular(8),
+            ),
+            color: Colors.white,
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Stockinfo(
-                  size,
-                  firebaseStockData["stockName"],
-                  firebaseStockData["stockCode"],
-                  firebaseStockData["stockPrice"],
-                  firebaseStockData["stockPerChange"],
-                  firebaseStockData["stockChange"]),
-              Container(
-                padding: EdgeInsets.all(size.width * 0.01),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Color.fromRGBO(240, 240, 240, 1),
-                  ),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(4),
-                    topRight: Radius.circular(4),
-                    bottomLeft: Radius.circular(4),
-                    bottomRight: Radius.circular(4),
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                        "시간당 호재 기사 개수: ${firebaseStockData["TimePerPositiveNewsCount"]}"),
-                    SizedBox(
-                      height: size.height * 0.005,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Stockinfo(
+                      size,
+                      firebaseStockData["stockName"],
+                      firebaseStockData["stockCode"],
+                      firebaseStockData["stockPrice"],
+                      firebaseStockData["stockPerChange"],
+                      firebaseStockData["stockChange"]),
+                  Container(
+                    padding: EdgeInsets.all(size.width * 0.01),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Color.fromRGBO(240, 240, 240, 1),
+                      ),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(4),
+                        topRight: Radius.circular(4),
+                        bottomLeft: Radius.circular(4),
+                        bottomRight: Radius.circular(4),
+                      ),
                     ),
-                    Text(
-                        "시간당 악재 기사 개수: ${firebaseStockData["TimePerNegativeNewsCount"]}"),
-                  ],
-                ),
-              )
+                    child: Column(
+                      children: [
+                        Text(
+                            "시간당 호재 기사 개수: ${firebaseStockData["TimePerPositiveNewsCount"]}"),
+                        SizedBox(
+                          height: size.height * 0.005,
+                        ),
+                        Text(
+                            "시간당 악재 기사 개수: ${firebaseStockData["TimePerNegativeNewsCount"]}"),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+              chartTab(size),
             ],
           ),
-          chartTab(size),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

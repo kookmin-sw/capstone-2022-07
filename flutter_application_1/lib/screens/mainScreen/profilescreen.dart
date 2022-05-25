@@ -2,21 +2,18 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, prefer_const_constructors_in_immutables, non_constant_identifier_names
-import 'package:flutter/material.dart';
-import 'package:flutter_application_1/Components/indicator.dart';
-import 'package:flutter_application_1/Components/setting_button.dart';
-import 'package:flutter_application_1/screens/Register/function.dart';
-import 'package:flutter_application_1/Components/main_app_bar.dart';
-import 'package:flutter_application_1/Color/Color.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, prefer_const_constructors_in_immutables, non_constant_identifier_names
+import 'package:flutter/material.dart';
+import 'package:flutter_application_1/Color/Color.dart';
+import 'package:flutter_application_1/Components/indicator.dart';
+import 'package:flutter_application_1/Components/main_app_bar.dart';
+import 'package:flutter_application_1/screens/Register/function.dart';
+import 'package:flutter_application_1/screens/Register/login_screen.dart';
 import 'package:flutter_application_1/screens/mainScreen/alertOnoffScreen.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:getwidget/getwidget.dart';
-import 'package:flutter_application_1/screens/Register/login_screen.dart';
-import 'package:get/get.dart';
 
 class Profilescreen extends StatefulWidget {
   Profilescreen({Key? key}) : super(key: key);
