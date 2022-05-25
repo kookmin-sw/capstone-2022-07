@@ -54,23 +54,31 @@ class _MainscreenState extends State<Mainscreen> {
     await firestore
         .collection('stock')
         .orderBy("DayNewsCount", descending: true)
-        .limit(3)
+        .limit(10)
         .get()
         .then((QuerySnapshot qs) async {
       int index = 0;
       for (var doc in qs.docs) {
+        print(doc['stockName']);
         topratestock.add(doc['stockName']);
-        await firestore
-            .collection('stock')
-            .doc(qs.docs[index++]['stockName'])
-            .collection('news')
-            .orderBy("date", descending: true)
-            .limit(1)
-            .get()
-            .then((QuerySnapshot qs) {
-          var news = qs.docs[0];
-          toprateNewslist.add(news.data() as Map<String, dynamic>);
-        });
+        try {
+          await firestore
+              .collection('stock')
+              .doc(qs.docs[index++]['stockName'])
+              .collection('news')
+              .orderBy("date", descending: true)
+              .limit(1)
+              .get()
+              .then((QuerySnapshot qs) {
+            var news = qs.docs[0];
+            toprateNewslist.add(news.data() as Map<String, dynamic>);
+          });
+        } catch (e) {
+          continue;
+        }
+        if (toprateNewslist.length == 3) {
+          break;
+        }
       }
     });
 
@@ -191,7 +199,7 @@ class _MainscreenState extends State<Mainscreen> {
               color: Color.fromRGBO(255, 255, 255, 1),
             ),
             child: ListView.separated(
-              itemCount: 5,
+              itemCount: list.length,
               physics: NeverScrollableScrollPhysics(),
               itemBuilder: (BuildContext context, int index) {
                 return mainStock(
@@ -893,7 +901,7 @@ class _MainscreenState extends State<Mainscreen> {
               scrollDirection: Axis.vertical,
               shrinkWrap: true,
               padding: const EdgeInsets.all(8),
-              itemCount: topList.length,
+              itemCount: 3,
               itemBuilder: (BuildContext context, int index) {
                 return newsView(
                     size,

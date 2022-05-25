@@ -16,9 +16,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_application_1/Components/numFormat.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
-
 class visitedstock extends StatefulWidget {
-  const visitedstock(this.parentSize,{Key? key }) : super(key: key);
+  const visitedstock(this.parentSize, {Key? key}) : super(key: key);
   final Size parentSize;
   @override
   State<visitedstock> createState() => _visitedstockState();
@@ -29,7 +28,7 @@ class _visitedstockState extends State<visitedstock> {
     return Container(
       alignment: Alignment.topLeft,
       margin:
-      EdgeInsets.only(left: size.width * 0.01, bottom: size.height * 0.01),
+          EdgeInsets.only(left: size.width * 0.01, bottom: size.height * 0.01),
       child: Text(
         '최근 조회 종목',
         style: GoogleFonts.notoSans(
@@ -40,8 +39,6 @@ class _visitedstockState extends State<visitedstock> {
     );
   }
 
-
-
   Widget favoritestock(Size size, bool res) {
     if (res == true) {
       return Icon(Icons.star_outlined, color: Colors.amber);
@@ -49,6 +46,7 @@ class _visitedstockState extends State<visitedstock> {
       return Icon(Icons.star_outline, color: Colors.amber);
     }
   }
+
   //주식 정보를 가져옴
   Future<List<Map<String, dynamic>>> _getstockInfo(List<dynamic> list) async {
     List<Map<String, dynamic>> stockcardlist = [];
@@ -64,8 +62,6 @@ class _visitedstockState extends State<visitedstock> {
     }
     return stockcardlist;
   }
-
-
 
   Widget visitedstockview(Size size, List<Map<String, dynamic>>? visitedlist,
       List<dynamic> favoritelist) {
@@ -92,7 +88,7 @@ class _visitedstockState extends State<visitedstock> {
             physics: AlwaysScrollableScrollPhysics(),
             itemCount: visitedlist.length,
             separatorBuilder: (BuildContext context, int index) =>
-            const Divider(color: GREY),
+                const Divider(color: GREY),
             itemBuilder: (BuildContext context, int index) {
               String name = stocklist[index]['stockName'];
 
@@ -112,9 +108,9 @@ class _visitedstockState extends State<visitedstock> {
                 stockColor = Color.fromARGB(255, 120, 119, 119);
               }
               String stockPrice =
-              intlprice.format(stocklist[index]['stockPrice']);
+                  intlprice.format(stocklist[index]['stockPrice']);
               String stockChange =
-              intlprice.format(stocklist[index]['stockChange'].abs());
+                  intlprice.format(stocklist[index]['stockChange'].abs());
               String stockPerChange =
                   intlperc.format(stocklist[index]['stockPerChange']) + "%";
 
@@ -300,11 +296,12 @@ class _visitedstockState extends State<visitedstock> {
       );
     }
   }
+
   //사용자의 visited와 favorite 정보를 가져옴
   Future<List<dynamic>> _getvisitedstockanddata() async {
     String useruid = FirebaseAuth.instance.currentUser!.uid;
     var user =
-    await FirebaseFirestore.instance.collection('users').doc(useruid).get();
+        await FirebaseFirestore.instance.collection('users').doc(useruid).get();
     List<dynamic> visitedlist = user['visited'];
     List<dynamic> favoritelist = user['favorite'];
 
@@ -318,7 +315,7 @@ class _visitedstockState extends State<visitedstock> {
 
   @override
   Widget build(BuildContext context) {
-    return  FutureBuilder<List<dynamic>>(
+    return FutureBuilder<List<dynamic>>(
         future: getvisited(),
         builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
@@ -353,8 +350,8 @@ class _visitedstockState extends State<visitedstock> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     visitedtitle(widget.parentSize),
-                    visitedstockview(
-                        widget.parentSize, visitedstocklist[0], visitedstocklist[1]),
+                    visitedstockview(widget.parentSize, visitedstocklist[0],
+                        visitedstocklist[1]),
                   ],
                 ),
               );
@@ -366,7 +363,6 @@ class _visitedstockState extends State<visitedstock> {
   }
 }
 
-
 class Searchscreen extends StatefulWidget {
   Searchscreen({Key? key}) : super(key: key);
   @override
@@ -376,7 +372,7 @@ class Searchscreen extends StatefulWidget {
 class _SearchscreenState extends State<Searchscreen> {
   FloatingSearchBarController? controller;
 
-  String selectedTerm = "";
+  String selectedTerm = "empty";
 
   @override
   Widget build(BuildContext context) {
@@ -385,7 +381,6 @@ class _SearchscreenState extends State<Searchscreen> {
       appBar: mainPageAppBar(
         context,
         "검색",
-        SettingButton(context),
       ),
       body: SizedBox(
           height: size.height,
@@ -399,8 +394,6 @@ class _SearchscreenState extends State<Searchscreen> {
           )),
     );
   }
-
-
 
   Widget searchStockList(Size size, List<Map<String, dynamic>> list) {
     return SingleChildScrollView(
@@ -635,4 +628,3 @@ class _SearchscreenState extends State<Searchscreen> {
     );
   }
 }
-
