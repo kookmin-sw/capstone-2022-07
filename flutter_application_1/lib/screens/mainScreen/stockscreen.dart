@@ -80,15 +80,15 @@ class _StockscreenState extends State<Stockscreen> {
               .where('stockName', isEqualTo: widget.stockName)
               .get();
 
-          
-          await FirebaseFirestore.instance.collection('stock')
-            .where('stockName', isEqualTo: '코스피')
-            .get()
-            .then((QuerySnapshot qs){
-              Map<String, dynamic> marketdata = qs.docs[0].data() as Map<String, dynamic>;
-              updatedTime = marketdata['updatedTime'];
-            }
-            );
+          await FirebaseFirestore.instance
+              .collection('stock')
+              .where('stockName', isEqualTo: '코스피')
+              .get()
+              .then((QuerySnapshot qs) {
+            Map<String, dynamic> marketdata =
+                qs.docs[0].data() as Map<String, dynamic>;
+            updatedTime = marketdata['updatedTime'];
+          });
 
           CollectionReference news =
               stocks.doc(stockData.docs[0].id).collection("news");
@@ -277,23 +277,25 @@ class _StockscreenState extends State<Stockscreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          margin: EdgeInsets.only(left: size.width * 0.06,
-              top: size.height * 0.01),
+          margin:
+              EdgeInsets.only(left: size.width * 0.06, top: size.height * 0.01),
           child: Text(
-             updatedTime + " 기준",
+            updatedTime + " 기준",
             style: TextStyle(
               color: Color.fromRGBO(0, 0, 0, 0.7),
               fontSize: size.width * 0.025,
               fontWeight: FontWeight.normal,
               height: 1,
             ),
-          textAlign: TextAlign.center,
+            textAlign: TextAlign.center,
           ),
         ),
         Container(
           margin: EdgeInsets.only(
-              bottom: size.height * 0.02, left: size.width * 0.05,
-              right: size.width * 0.05, top: size.height * 0.01),
+              bottom: size.height * 0.02,
+              left: size.width * 0.05,
+              right: size.width * 0.05,
+              top: size.height * 0.01),
           padding: EdgeInsets.all(size.width * 0.01),
           width: size.width * 0.9,
           decoration: BoxDecoration(
@@ -691,6 +693,7 @@ class _StockscreenState extends State<Stockscreen> {
       if (element == "marketCap") {
         stockValue.add("${marketCapFormat(firebaseStockData[element])}원");
       } else {
+        print(element);
         stockValue.add(intlprice.format(firebaseStockData[element]));
       }
     }

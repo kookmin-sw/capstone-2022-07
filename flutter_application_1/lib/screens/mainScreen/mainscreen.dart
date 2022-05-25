@@ -51,7 +51,7 @@ class _MainscreenState extends State<Mainscreen> {
     await firestore
         .collection('stock')
         .orderBy("DayNewsCount", descending: true)
-        .limit(10)
+        .limit(3)
         .get()
         .then((QuerySnapshot qs) async {
       int index = 0;
@@ -64,11 +64,18 @@ class _MainscreenState extends State<Mainscreen> {
               .doc(qs.docs[index++]['stockName'])
               .collection('news')
               .orderBy("date", descending: true)
-              .limit(1)
+              .limit(50)
               .get()
               .then((QuerySnapshot qs) {
-            var news = qs.docs[0];
-            toprateNewslist.add(news.data() as Map<String, dynamic>);
+            for (var i = 0; i < 50; i++) {
+              var news = qs.docs[i];
+              var newsData = news.data() as Map<String, dynamic>;
+              if (newsData["title"].contains(doc['stockName']) &&
+                  newsData["label"] != "1") {
+                toprateNewslist.add(newsData);
+                break;
+              }
+            }
           });
         } catch (e) {
           continue;
