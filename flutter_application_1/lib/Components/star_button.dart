@@ -1,11 +1,10 @@
 // ignore_for_file: prefer_const_constructors, non_constant_identifier_names
 
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_application_1/Color/Color.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_application_1/Color/Color.dart';
 
 class FavoriteButton extends StatefulWidget implements PreferredSizeWidget {
   FavoriteButton(this.stockName, this.stockCode)

@@ -2,20 +2,17 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:contained_tab_bar_view/contained_tab_bar_view.dart';
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, sized_box_for_whitespace, avoid_unnecessary_containers, non_constant_identifier_names, prefer_const_constructors_in_immutables, avoid_print
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Color/Color.dart';
 import 'package:flutter_application_1/Components/indicator.dart';
-
 import 'package:flutter_application_1/Components/main_app_bar.dart';
-import 'package:flutter_application_1/Components/setting_button.dart';
-import 'package:flutter_application_1/screens/mainScreen/stockscreen.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:contained_tab_bar_view/contained_tab_bar_view.dart';
 import 'package:flutter_application_1/Components/numFormat.dart';
+import 'package:flutter_application_1/screens/mainScreen/stockscreen.dart';
 import 'package:flutter_link_preview/flutter_link_preview.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Mainscreen extends StatefulWidget {
@@ -181,7 +178,6 @@ class _MainscreenState extends State<Mainscreen> {
                 top: size.height * 0.01,
                 bottom: size.height * 0.01),
             child: Text(
-              // api 수정 필요함
               list[0]["updatedTime"] + " 기준",
               style: TextStyle(
                 color: Color.fromRGBO(0, 0, 0, 0.7),

@@ -169,10 +169,9 @@ desc_del_list = [
 ]
 
 # 형태소분석
-JVM_PATH = "/Library/Java/JavaVirtualMachines/zulu-15.jdk/Contents/Home/bin/java"
-okt = Okt(jvmpath=JVM_PATH)
-
-# okt = Okt()
+# JVM_PATH = "/Library/Java/JavaVirtualMachines/zulu-15.jdk/Contents/Home/bin/java"
+# okt = Okt(jvmpath=JVM_PATH)
+okt = Okt()
 tokenizer = Tokenizer(num_words=35000)
 max_len = 20
 
@@ -225,11 +224,8 @@ db = firestore.client()
 
 
 def send_messaging_increase(stockName, stockCode, stockPerChange):
-    # Define a condition which will send to devices which are subscribed
-    # to either the Google stock or the tech industry topics.
     condition = f"'interest' in topics && '{stockCode}' in topics"
 
-    # See documentation on defining a message payload.
     message = messaging.Message(
         notification=messaging.Notification(
             title=f"종목 급등 알림",
@@ -244,19 +240,13 @@ def send_messaging_increase(stockName, stockCode, stockPerChange):
         condition=condition,
     )
 
-    # Send a message to devices subscribed to the combination of topics
-    # specified by the provided condition.
     response = messaging.send(message)
-    # Response is a message ID string.
     print("Successfully sent message:", response)
 
 
 def send_messaging_decrease(stockName, stockCode, stockPerChange):
-    # Define a condition which will send to devices which are subscribed
-    # to either the Google stock or the tech industry topics.
     condition = f"'interest' in topics && '{stockCode}' in topics"
 
-    # See documentation on defining a message payload.
     message = messaging.Message(
         notification=messaging.Notification(
             title=f"종목 급락 알림",
@@ -271,10 +261,7 @@ def send_messaging_decrease(stockName, stockCode, stockPerChange):
         condition=condition,
     )
 
-    # Send a message to devices subscribed to the combination of topics
-    # specified by the provided condition.
     response = messaging.send(message)
-    # Response is a message ID string.
     print("Successfully sent message:", response)
 
 
@@ -330,7 +317,6 @@ def getStockCode(market, code_list):
 
 
 def text_clean(inputString):
-    # inputString = inputString.replace("<b>","").replace("</b>","") # html 태그 제거  ## <b> <b/>
     inputString = re.sub(
         r"\<[^)]*\>", "", inputString, 0
     ).strip()  # <> 안의 내용 제거  ## html태그 + 종목명
@@ -412,21 +398,6 @@ def api_search(tuple_list, stock, id_key):
     if res.status_code == 200:
         temp = res.json()
 
-        # ## 파베에서 제일 최근 기사 time stamp 불러오기
-        # docs = (
-        #     db.collection("stock")
-        #     .document(stock)
-        #     .collection("news")
-        #     .where("timestamp", ">", temp_dt)
-        #     .order_by("timestamp", direction=firestore.Query.DESCENDING)
-        #     .limit(1)
-        #     .stream()
-        # )
-        # bb = {}
-        # for doc in docs:
-        #     bb = doc.to_dict()
-        # endPoint = bb["timestamp"] if len(bb) > 0 else temp_dt
-
         ## 종목별 endPoint 추가
         global endPoint_dict
         endPoint = endPoint_dict[stock]
@@ -441,17 +412,10 @@ def api_search(tuple_list, stock, id_key):
             if endPoint >= news_timestamp:
                 (stock, endPoint, news_timestamp)
                 break
-            # if dict['title'].find(stock) == -1:
-            #     continue
+            if dict["title"].find(stock) == -1:
+                continue
             origin_title = text_clean_origin(dict["title"])
             title = text_clean(dict["title"])
-            # try:
-            #     if origin_title[origin_title.find(str(stock))+len(str(stock))] ==' ' or origin_title[origin_title.find(str(stock))+len(str(stock))] ==',' :
-            #             pass
-            #     else :
-            #         continue
-            # except:
-            #     continue
 
             if any(keyword in dict["link"] for keyword in link_del_list):
                 continue
@@ -508,6 +472,8 @@ def api_search(tuple_list, stock, id_key):
     pool.close()
     pool.join()
 
+    dt_now = datetime.datetime.now()
+
     ## 개수 카운트
     dt_now = datetime.datetime.now()
 
@@ -535,7 +501,6 @@ def api_search(tuple_list, stock, id_key):
             TimePerPositiveNewsCount += 1
 
     time_day = dt_now - datetime.timedelta(hours=dt_now.hour, minutes=dt_now.minute)
-    # print((TimeNewsCount))
     docs = (
         db.collection("stock")
         .document(stock)
@@ -544,9 +509,9 @@ def api_search(tuple_list, stock, id_key):
         .stream()
     )
     bb = {}
+    DayNewsCount = 0
     for doc in docs:
         DayNewsCount += 1
-
     try:
         news_temp = db.collection("stock").document(stock)
         news_temp.update(
@@ -688,19 +653,6 @@ def stock_pretreatment():
             print(j)
             company.remove(j)
     print("after remove NAN len of company : ", len(company))
-    # 상장폐지 / 거래중지 종목 리스트에서 제거
-    # for i in company:
-    #     if (
-    #         math.isnan(i["stockPrice"])
-    #         or math.isnan(i["stockLowPrice"])
-    #         or math.isnan(i["stockHighPrice"])
-    #         or math.isnan(i["stockVolume"])
-    #         or math.isnan(i["stockOpenPrice"])
-    #         or math.isnan(i["stockClosingPrice"])
-    #         or math.isnan(i["stockChange"])
-    #         or math.isnan(i["stockPerChange"])
-    #     ):
-    #         company.remove(i)
 
     # round 처리로 2자리수까지 보여짐
     # nan 처리 해주고 나서 돌려야해서 필요한 코드
