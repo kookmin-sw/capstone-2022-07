@@ -662,6 +662,7 @@ class _StockscreenState extends State<Stockscreen> {
       if (element == "marketCap") {
         stockValue.add("${marketCapFormat(firebaseStockData[element])}원");
       } else {
+        print(element);
         stockValue.add(intlprice.format(firebaseStockData[element]));
       }
     }
