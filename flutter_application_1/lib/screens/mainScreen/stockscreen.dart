@@ -831,6 +831,7 @@ class _StockscreenState extends State<Stockscreen> {
           ),
         ],
       ),
+      behavior: HitTestBehavior.opaque,
     );
   }
 
@@ -854,12 +855,7 @@ class _StockscreenState extends State<Stockscreen> {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 2, horizontal: 5),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(8),
-          topRight: Radius.circular(8),
-          bottomLeft: Radius.circular(8),
-          bottomRight: Radius.circular(8),
-        ),
+        borderRadius: BorderRadius.circular(4),
         color: resultBackgrouncolor,
       ),
       child: Text(
