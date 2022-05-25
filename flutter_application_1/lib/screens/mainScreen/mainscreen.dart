@@ -163,7 +163,6 @@ class _MainscreenState extends State<Mainscreen> {
                 top: size.height * 0.01,
                 bottom: size.height * 0.01),
             child: Text(
-              // api 수정 필요함
               list[0]["updatedTime"] + " 기준",
               style: TextStyle(
                 color: Color.fromRGBO(0, 0, 0, 0.7),
