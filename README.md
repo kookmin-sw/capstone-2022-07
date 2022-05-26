@@ -9,12 +9,9 @@
 
 ## 활용 예시
 
-<center class="Image">
-    <img src="https://user-images.githubusercontent.com/28581806/170411480-aab2800d-aac5-4b55-8cc4-9bf8501f4c0c.png" width="200" height="400">
-    <img src="https://user-images.githubusercontent.com/28581806/170411503-aa8f377c-1c74-4771-b531-4dec3168b7ba.png" width="200" height="400">
-    <img src="https://user-images.githubusercontent.com/28581806/170411577-52633564-62e9-44bb-9885-aa3c915d7f7c.png" width="200" height="400">
-    <img src="https://user-images.githubusercontent.com/28581806/170411613-3540ffe7-080f-4290-b5e9-3bfb3bf16b2e.jpeg" width="200" height="400">
-</center>
+| <img src="https://user-images.githubusercontent.com/28581806/170411480-aab2800d-aac5-4b55-8cc4-9bf8501f4c0c.png" width="200" height="400"> | <img src="https://user-images.githubusercontent.com/28581806/170411503-aa8f377c-1c74-4771-b531-4dec3168b7ba.png" width="200" height="400"> | <img src="https://user-images.githubusercontent.com/28581806/170411577-52633564-62e9-44bb-9885-aa3c915d7f7c.png" width="200" height="400"> | <img src="https://user-images.githubusercontent.com/28581806/170411613-3540ffe7-080f-4290-b5e9-3bfb3bf16b2e.jpeg" width="200" height="400"> |
+| ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+
 
 1. 주요 주가 지수 및 주요 뉴스 제공
    - 코스피, 나스닥을 포함한 세계 주요 주가 지수 제공
