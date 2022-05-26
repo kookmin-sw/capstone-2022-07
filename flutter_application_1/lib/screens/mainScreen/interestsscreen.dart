@@ -80,7 +80,7 @@ class _InterestScreenState extends State<InterestScreen> {
     } else if (stockperc < 0) {
       color = CHART_MINUS;
     } else {
-      color = GREY;
+      color = Color.fromARGB(255, 120, 119, 119);
     }
 
     if (name != "코스피" && name != "코스닥") {

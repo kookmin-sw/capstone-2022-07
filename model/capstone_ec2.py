@@ -14,10 +14,12 @@ from multiprocessing.dummy import Pool as ThreadPool
 import schedule
 from konlpy.tag import Okt
 import numpy as np
+
 from tensorflow.keras.layers import Embedding, Dense, LSTM
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from keras.preprocessing.text import Tokenizer
+
 from dotenv import load_dotenv
 import os
 from dateutil import parser
@@ -40,12 +42,13 @@ print(physical_devices)
 tf.config.experimental.set_memory_growth(physical_devices[0], enable=True)
 # tf.config.experimental.set_visible_devices(physical_devices[0], device_type="GPU")
 
+import keras
+
+
 # warning 문자 무시
 import warnings
 
 warnings.filterwarnings("ignore")
-
-import keras
 
 stopwords = [
     "의",
@@ -68,37 +71,20 @@ stopwords = [
     "하다",
 ]
 del_list = [
-    "오늘의",
-    "뉴스",
-    "급락주",
-    "마감",
-    "주요",
-    "급등주",
     "증시일정",
-    "캘린더",
-    "이번주",
     "[포토]",
     "[인사]",
-    "상장사",
-    "주간",
-    "종목",
-    "총정리",
-    "다음주",
-    "슈퍼주총",
-    "공모주",
-    "돋보기",
-    "週間",
-    "증권주",
-    "코스피",
-    "코스닥",
-    "KOSPI",
-    "KOSDAQ",
+    "부고",
     "승리",
     "안타",
     "홈런",
     "패배",
     "야구",
     "축구",
+    "총정리",
+    "증시",
+    "시황",
+    "양궁",
 ]
 url_del_list = [
     "econonews",
@@ -160,9 +146,31 @@ link_del_list = [
 desc_del_list = [
     "제보",
     "극장",
+    "총정리",
+    "돋보기",
+    "증시일정",
+    "시황",
+    "승리",
+    "안타",
+    "홈런",
+    "패배",
+    "야구",
+    "축구",
+    "양궁",
+    "탁구",
+    "펜싱",
+    "테니스",
+    "↑",
+    "↓",
+    "△",
+    "▲",
+    "▽",
+    "▼",
 ]
 
 # 형태소분석
+# JVM_PATH = "/Library/Java/JavaVirtualMachines/zulu-15.jdk/Contents/Home/bin/java"
+# okt = Okt(jvmpath=JVM_PATH)
 okt = Okt()
 tokenizer = Tokenizer(num_words=35000)
 max_len = 20
@@ -366,6 +374,7 @@ Naver_client_id = [
 ]
 Naver_client_secret = ["mZP8JBDOBK", "HPqxX8HZfG", "ugLCC3LW85", "CRmEzrXlb7"]
 
+
 temp_dt = parser.parse("Thu, 01 Mar 2022 06:02:00 +0900")
 
 # 네이버 api 함수
@@ -378,7 +387,7 @@ def api_search(tuple_list, stock, id_key):
         "X-Naver-Client-Id": Naver_client_id[id_key],
         "X-Naver-Client-Secret": Naver_client_secret[id_key],
     }
-    param = {"query": stock, "display": 100, "start": 1, "sort": "date"}
+    param = {"query": stock, "display": 20, "start": 1, "sort": "date"}
     # query     : 검색할 단어
     # display   : 검색 출력 건수 (기본 10 / 최대 100)
     # start     : 검색 시작 위치 (기본 1  / 최대 1000)
@@ -401,6 +410,7 @@ def api_search(tuple_list, stock, id_key):
             news_timestamp = time_to_stamp(dict["pubDate"])
 
             if endPoint >= news_timestamp:
+                (stock, endPoint, news_timestamp)
                 break
             if dict["title"].find(stock) == -1:
                 continue
@@ -413,6 +423,9 @@ def api_search(tuple_list, stock, id_key):
                 continue
             if any(keyword in dict["originallink"] for keyword in url_del_list):
                 continue
+            if any(keyword in dict["title"] for keyword in del_list):
+                continue
+
             # 학습데이터를 통해서 라벨링
             X_test = []
             temp_X = okt.morphs(str(title), stem=True)  # 토큰화
@@ -425,6 +438,8 @@ def api_search(tuple_list, stock, id_key):
             pov_or_neg = np.argmax(predict, axis=1)[0]
             predict_labels = np.argmax(predict, axis=1)
             prediction = round(predict[0][predict_labels[0]], 2)
+
+            # prediction=0
             date = formatting_date(dict["pubDate"])
 
             stock_news_list.append(
@@ -460,7 +475,9 @@ def api_search(tuple_list, stock, id_key):
     dt_now = datetime.datetime.now()
 
     ## 개수 카운트
-    time_hour = datetime.datetime.now() - datetime.timedelta(hours=1)
+    dt_now = datetime.datetime.now()
+
+    time_hour = dt_now - datetime.timedelta(hours=1)
     docs = (
         db.collection("stock")
         .document(stock)
@@ -477,13 +494,13 @@ def api_search(tuple_list, stock, id_key):
     for doc in docs:
         TimeNewsCount += 1
         bb = doc.to_dict()
+        # print(stock, len(bb))
         if bb["label"] == "0":
             TimePerNegativeNewsCount += 1
         elif bb["label"] == "2":
             TimePerPositiveNewsCount += 1
 
     time_day = dt_now - datetime.timedelta(hours=dt_now.hour, minutes=dt_now.minute)
-
     docs = (
         db.collection("stock")
         .document(stock)
@@ -495,6 +512,19 @@ def api_search(tuple_list, stock, id_key):
     DayNewsCount = 0
     for doc in docs:
         DayNewsCount += 1
+    try:
+        news_temp = db.collection("stock").document(stock)
+        news_temp.update(
+            {
+                "DayNewsCount": DayNewsCount,
+                "TimeNewsCount": TimeNewsCount,
+                "TimePerPositiveNewsCount": TimePerPositiveNewsCount,
+                "TimePerNegativeNewsCount": TimePerNegativeNewsCount,
+            }
+        )
+    except Exception as e:
+        print(stock, " 에서 뉴스카운트 쿼리시에 ", e, " 에러가 발생했습니다")
+        pass
 
 
 # 종목들 전역변수로 가져오기
@@ -561,12 +591,13 @@ def stock_information_getTime():
     XKRX = ecals.get_calendar("XKRX")  # 한국 코드
     current = datetime.datetime.now()
     corr_current = current
+    current_to_UTC = datetime.datetime.now() - datetime.timedelta(hours=9)
     global pre_previous
     global time_previous
     global pre_pre_previous
     global previous
     global is_trading
-    if XKRX.is_trading_minute(corr_current.strftime("%Y-%m-%d %H:%M")):
+    if XKRX.is_trading_minute(current_to_UTC.strftime("%Y-%m-%d %H:%M")):
         previous = datetime.datetime.now().strftime("%Y-%m-%d")
         time_previous = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
         pre_previous = XKRX.previous_session(previous).strftime("%Y-%m-%d")
@@ -592,6 +623,7 @@ def stock_pretreatment():
     pre = parser.parse(previous)
     pre_pre = parser.parse(pre_previous)
     # item_list에 각 필드들 쿼링
+    print("before remove NAN len of company : ", len(company))
     for j in tqdm(company):
         stockCode = j["stockCode"]
         if (
@@ -618,7 +650,9 @@ def stock_pretreatment():
                 * 100
             )
         except:
+            print(j)
             company.remove(j)
+    print("after remove NAN len of company : ", len(company))
 
     # round 처리로 2자리수까지 보여짐
     # nan 처리 해주고 나서 돌려야해서 필요한 코드
@@ -706,6 +740,7 @@ def run():
     tuple_list.append(("stock", "title", "url", "date", "pov_or_neg"))
     id_key = reset % 4
     st = time.time()
+    # api_search(tuple_list, "삼성전자", id_key)
 
     #### Pool 프로세스 수는 변경 가능
     pool = ThreadPool(4)
@@ -726,7 +761,6 @@ def run():
 
 
 reset = 0
-
 # 8시 20분에 주식가져옴
 schedule.every().day.at("08:20").do(get_companylist)
 schedule.every().day.at("13:30").do(firebase_transaction_messaging)
