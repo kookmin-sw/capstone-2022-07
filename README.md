@@ -1,24 +1,28 @@
-[![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-f059dc9a6f8d3a56e377f745f24479a46679e63a5d9fe6f495e02850cd0d8118.svg)](https://classroom.github.com/online_ide?assignment_repo_id=7224462&assignment_repo_type=AssignmentRepo)
-
 # 단타충(단타도 타율이 충분하다면)
 
-
 ## 1. 프로젝트 소개
-<img src="https://user-images.githubusercontent.com/28239856/161903184-96effa17-111b-476e-a17c-23e5d34c3ec3.png" width="525
+
+<img src="https://user-images.githubusercontent.com/28581806/170416113-b9819ba5-9f11-478a-85d9-009a1b6fac97.png" width="525
 " height="150">
 
-본 프로젝트는 거래량 급등으로 이어질 호재 혹은 악재가 많이 나오고 있는 종목을 실시간으로 사용자에게 알려주는 시스템을 구축하고자 한다. 기존 HTS들은 거래량이 급등하거나 가격에 큰 폭의 변화가 있고 나서야 파악을 할 수 있는 단점이 있다. 그래서 단기투자를 주로 하고 있지만 장 중에 핫한 종목들을 놓치고, 거래량이 감소하거나 장이 종료되고 나서야 이를 파악하여 투자의 기회를 놓치는 경우가 많다. 단타충은 이러한 경우에 사용자가 단기투자에 좋은 종목을 놓치지 않도록 도움을 줄 수 있다.
+낮은 금리와 높은 물가 상승률로 재테크가 선택이 아닌 필수가 된 현대 사회에서, 주식에 많은 시간을 할애할 수 없는 투자자들에게 단기 투자는 쉽지 않은 투자 방법이다. 주식을 전업으로 하지 않는 이상 장 중에 이슈가 되고 있는 종목을 전부 파악하고, 그 종목들에 대한 정보를 구체적으로 알아보는 것은 현실적으로 불가능하기 때문이다. 본 프로젝트 ‘단타충’은 이러한 문제에 대해 실시간으로 주식 뉴스에 대해 정보를 제공하여 투자자의 수고를 덜어 줌으로써 해결하고자 한다.
+
+## 활용 예시
+
+| <img src="https://user-images.githubusercontent.com/28581806/170411480-aab2800d-aac5-4b55-8cc4-9bf8501f4c0c.png" width="200" height="400"> | <img src="https://user-images.githubusercontent.com/28581806/170411503-aa8f377c-1c74-4771-b531-4dec3168b7ba.png" width="200" height="400"> | <img src="https://user-images.githubusercontent.com/28581806/170411577-52633564-62e9-44bb-9885-aa3c915d7f7c.png" width="200" height="400"> | <img src="https://user-images.githubusercontent.com/28581806/170411613-3540ffe7-080f-4290-b5e9-3bfb3bf16b2e.jpeg" width="200" height="400"> |
+| ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
 
 
-## 활용 예시 
-<img src="https://user-images.githubusercontent.com/28239856/161903122-dcb0b951-e502-4863-ab29-c4247343fbfb.png" width="280
-" height="520"><img src="https://user-images.githubusercontent.com/28239856/161903209-4a8340d5-57a6-4cf6-83cf-a822acc67a9c.png" width="280
-" height="520">
-
-1. 종목별 정보 제공
-   + 종목별 호/악재 기사 판별 및  뉴스 정보 제공 
-   + 시가총액, 차트 등 기업 기본정보 제공 
-3. 실시간 기사 발표순위 제공
+1. 주요 주가 지수 및 주요 뉴스 제공
+   - 코스피, 나스닥을 포함한 세계 주요 주가 지수 제공
+   - 주요 뉴스 사진 및 제목 제공
+2. 실시간 기사 순위 제공
+   - 일일 기사 개수 많은 종목 순위 제공
+   - 15분 당 호재/악재 기사 많은 종목 순위 제공
+3. 종목 기본 정보 제공
+   - 종목별 시가 총액, 전일 종가를 포함한 기본 정보 제공
+   - 종목별 기사 제목, 호재/악재 판별 후 제공
+4. 관심종목에 큰 주가 변동 발생시 알림 제공
 
 ---
 
@@ -34,7 +38,19 @@ This project aims to build a system that notifies users of of stocks that are sh
 
 ---
 
-## 4. 팀 소개
+## 4. 시연 영상
+
+[![Watch the video](https://user-images.githubusercontent.com/28581806/170411671-f7ae06b6-e4c8-4f7f-8243-9fad6071339e.png)](https://drive.google.com/file/d/1O1nWlP6z-H8DGvld5NZPiHMgUYmQrKTE/view?usp=sharing)
+
+---
+
+## 5. 시스템 구성도
+
+<img src="https://user-images.githubusercontent.com/28581806/170411645-85e7aa95-317f-44c1-a416-8ce99e7aa64d.png" >
+
+---
+
+## 6. 팀 소개
 
 **이범석(팀장)**
 
@@ -78,7 +94,7 @@ This project aims to build a system that notifies users of of stocks that are sh
 
 ---
 
-## 5. 사용법
+## 7. 사용법
 
 ### 안드로이드 앱 실행 환경설정 가이드
 
@@ -102,7 +118,7 @@ https://flutter-ko.dev/docs/get-started/install
 
 https://flutter-ko.dev/docs/development/tools/sdk/releases
 
-- 최신 SDK version 설치 권장
+- SDK version 2.10.3 설치 권장
 ```
 
 ##### step 3:
@@ -170,24 +186,15 @@ $ sudo gem install cocoapods
 
 ##### step 4:
 
-iOS simulator 설정
-
-```markdown
-스팟라이트 단축키인 control + space 키를 이용하여 스팟라이트를 실행한다음 iOS 만 치면 최상단에 iOS Simulator 앱이 뜨게 됩니다.
-원하는 시뮬레이터 설정.
-```
-
-##### step 5:
-
 Flutter SDK를 설치하세요:
 
 ```markdown
 https://flutter.dev/docs/development/tools/sdk/releases
 
-- 최신 SDK version 설치 권장
+- SDK version 2.10.3 설치 권장
 ```
 
-##### step 6:
+##### step 5:
 
 Flutter 환경변수설정
 
@@ -196,7 +203,7 @@ https://flutter-ko.dev/docs/get-started/install/macos
 본인의 운영체제 버전에 따라 환경변수 설정하는 법이 다르므로 공식문서 활용하여 설정
 ```
 
-##### step 7:
+##### step 6:
 
 설치 확인을 위하여 다음 명령을 실행
 
@@ -206,7 +213,7 @@ https://flutter-ko.dev/docs/get-started/install/macos
    (flutter —doctor 실행시 본인의 환경에서 플러터 코드 실행을 할수 있는지 확인가능)
 ```
 
-##### step 8:
+##### step 7:
 
 아래 링크를 사용하여 이 저장소를 다운로드하거나 복제하세요:
 
@@ -214,7 +221,7 @@ https://flutter-ko.dev/docs/get-started/install/macos
 https://github.com/kookmin-sw/capstone-2022-07.git
 ```
 
-##### step 9:
+##### step 8:
 
 프로젝트 루트로 이동하고 콘솔에서 다음 명령을 실행하여 필요한 패키지를 가져오고, cd ios를 통해 ios폴더에서 필요한 라이브러리들을 추가 설치해주세요:
 
@@ -224,7 +231,7 @@ cd ios
 pod install
 ```
 
-##### step 10:
+##### step 9:
 
 프로젝트를 실행하세요:
 
@@ -233,7 +240,3 @@ flutter run
 ```
 
 ---
-
-## 6. 기타
-
-추가적인 내용은 자유롭게 작성하세요.
