@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-// ignore_for_file: prefer_const_literals_to_create_immutables, non_constant_identifier_names, prefer_const_constructors_in_immutables, constant_identifier_names, prefer_typing_uninitialized_variables, unnecessary_string_interpolations, prefer_const_constructors
+// ignore_for_file: prefer_const_literals_to_create_immutables, non_constant_identifier_names, prefer_const_constructors_in_immutables, constant_identifier_names, prefer_typing_uninitialized_variables, unnecessary_string_interpolations, prefer_const_constructors0
 
 import 'dart:async';
 
@@ -10,9 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Color/color.dart';
 import 'package:flutter_application_1/Components/indicator.dart';
 import 'package:flutter_application_1/Components/main_app_bar.dart';
-import 'package:flutter_application_1/Components/setting_button.dart';
-import 'package:intl/intl.dart';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_application_1/screens/Register/function.dart';
@@ -27,45 +24,8 @@ class InterestScreen extends StatefulWidget {
 }
 
 class _InterestScreenState extends State<InterestScreen> {
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
-
-  Future<List<dynamic>> _getstockList() async {
-    Map<String, dynamic> userdocdata =
-        await findUserByUid(FirebaseAuth.instance.currentUser!.uid)
-            as Map<String, dynamic>;
-
-    List<dynamic> nlist = userdocdata['favorite'];
-    return nlist;
-  }
-
-  Future<List<Map<String, dynamic>>> _getstockInfo(List<dynamic> nlist) async {
-    List<Map<String, dynamic>> stockcardlist = [];
-    Map<String, dynamic> stockdata;
-
-    for (var element in nlist) {
-      var userstockinfo = await firestore
-          .collection('stock')
-          .where("stockName", isEqualTo: "$element")
-          .get();
-
-      stockdata = userstockinfo.docs[0].data();
-      stockcardlist.add(stockdata);
-    }
-
-    return stockcardlist;
-  }
-
-  Future<List<Map<String, dynamic>>> customFuture() async {
-    var userstockinfo = await _getstockList();
-    print(userstockinfo);
-    if (userstockinfo == null) {
-      return [];
-    } else {
-      var stockinfo = await _getstockInfo(userstockinfo);
-      return stockinfo;
-    }
-  }
-
+  late List<Map<String, dynamic>> stockcardlist;
+  late List<String> deleteStocklist = [];
   Widget exceptCospiCosdaq(
       Size size, String stockName, String marketCapKor, Color color) {
     if (stockName != "코스피" && stockName != "코스닥") {
@@ -144,7 +104,7 @@ class _InterestScreenState extends State<InterestScreen> {
     }
 
     return Container(
-      height: size.height * 0.21,
+      height: size.height * 0.22,
       width: size.width * 0.9,
       decoration: const BoxDecoration(
         borderRadius: BorderRadius.only(
@@ -185,12 +145,9 @@ class _InterestScreenState extends State<InterestScreen> {
                 InkWell(
                   child: Icon(Icons.close),
                   onTap: () async {
-                    setState(() {});
-                    await FirebaseFirestore.instance
-                        .collection('users')
-                        .doc(FirebaseAuth.instance.currentUser!.uid)
-                        .update({
-                      "favorite": FieldValue.arrayRemove([name])
+                    setState(() {
+                      stockcardlist.removeWhere((element) => element['stockName'] == name);
+                      deleteStocklist.add(name);
                     });
                   },
                 )
@@ -439,6 +396,14 @@ class _InterestScreenState extends State<InterestScreen> {
     );
   }
 
+  // Create an instance variable.
+  late Future<List<Map<String, dynamic>>> userData;
+  @override
+  void initState(){
+    super.initState();
+    userData = _getFirebaseUserdata();
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -448,11 +413,11 @@ class _InterestScreenState extends State<InterestScreen> {
         "관심 종목",
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
-        future: customFuture(),
+        future: userData,
         builder: (BuildContext context,
             AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            List<Map<String, dynamic>> stockcardlist = snapshot.data ?? [];
+            stockcardlist = snapshot.data ?? [];
             if (stockcardlist.isEmpty) {
               return Center(
                 child: Column(
@@ -490,4 +455,45 @@ class _InterestScreenState extends State<InterestScreen> {
       ),
     );
   }
+
+  @override
+  void dispose() async{
+    super.dispose();
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .update({
+             "favorite": FieldValue.arrayRemove(deleteStocklist),
+            }
+        );
+  }
+
+}
+
+Future<List<dynamic>> _getUserInterestStocklist() async {
+  Map<String, dynamic> userdocdata = 
+    await findUserByUid(FirebaseAuth.instance.currentUser!.uid)
+    as Map<String, dynamic>;
+  List<dynamic> userlist = userdocdata['favorite'];
+  return userlist;
+}
+
+Future<List<Map<String, dynamic>>> _getUserInterestStockInfo(List<dynamic> UserStockList) async {
+  List<Map<String, dynamic>> stockcardlist = [];
+  Map<String, dynamic> stockdata;
+  for (var element in UserStockList) {
+    var userstockinfo = await  FirebaseFirestore.instance
+        .collection('stock')
+        .where("stockName", isEqualTo: "$element")
+        .get();
+    stockdata = userstockinfo.docs[0].data();
+    stockcardlist.add(stockdata);
+  }
+  return stockcardlist;
+}
+
+Future<List<Map<String, dynamic>>> _getFirebaseUserdata() async {
+  var userstockinfo = await _getUserInterestStocklist();
+  var stockinfo = await _getUserInterestStockInfo(userstockinfo);
+  return stockinfo;
 }
